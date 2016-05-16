@@ -1,0 +1,428 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress Watermark\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-02-14 11:40+0100\n"
+"PO-Revision-Date: 2014-05-13 19:43+0800\n"
+"Last-Translator: 逍遥乐汉化 <luoxiao123@outlook.com>\n"
+"Language-Team: 逍遥乐汉化 <luoxiao123@outlook.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl_PL\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e;_n:1,2;esc_attr__;esc_attr_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-Language: Chinese\n"
+"X-Poedit-Country: CHINA\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../image-watermark.php:29
+msgid "Sorry, Image Watermark plugin requires at least PHP 5.0 and WP 3.5 or higher."
+msgstr "对不起，图片水印插件需要至少PHP 5.0和W P3.5或更高版本。"
+
+#: ../image-watermark.php:218
+msgid "Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected."
+msgstr "水印不能被应用到选定的文件或者没有有效的图像（JPEG，PNG）被选定。"
+
+#: ../image-watermark.php:218
+#: ../image-watermark.php:222
+msgid "Skipped files"
+msgstr "跳过的文件"
+
+#: ../image-watermark.php:222
+#, php-format
+msgid "Watermark was succesfully applied to 1 image."
+msgid_plural "Watermark was succesfully applied to %s images."
+msgstr[0] "水印被成功地应用到1个图像。"
+msgstr[1] "水印被成功地应用到%s个图像。"
+
+#: ../image-watermark.php:265
+msgid "Support"
+msgstr "支持"
+
+#: ../image-watermark.php:287
+msgid "Settings"
+msgstr "设置"
+
+#: ../image-watermark.php:318
+msgid "Apply watermark"
+msgstr "添加水印"
+
+#: ../image-watermark.php:338
+msgid "Select watermark"
+msgstr "选择水印"
+
+#: ../image-watermark.php:339
+#: ../image-watermark.php:834
+msgid "Original size"
+msgstr "原稿尺寸"
+
+#: ../image-watermark.php:340
+#: ../image-watermark.php:828
+msgid "Watermak has not been selected yet."
+msgstr "水印没有被选中。"
+
+#: ../image-watermark.php:341
+msgid "This image is not supported as watermark. Use JPEG, PNG or GIF."
+msgstr "此图片是不支持的水印。只能使用JPEG，PNG或GIF格式的图像。"
+
+#: ../image-watermark.php:343
+msgid "Add watermark"
+msgstr "添加水印"
+
+#: ../image-watermark.php:360
+msgid "Are you sure you want to reset settings to defaults?"
+msgstr "您确定要重置设置为默认值？"
+
+#: ../image-watermark.php:417
+msgid "Image Watermark Options"
+msgstr "图像水印选项"
+
+#: ../image-watermark.php:418
+msgid "Watermark"
+msgstr "水印"
+
+#: ../image-watermark.php:444
+msgid "Image Watermark will not work properly without GD PHP extension."
+msgstr "没有GD PHP扩展图像水印将无法正常工作。"
+
+#: ../image-watermark.php:586
+msgid "Settings saved."
+msgstr "设置已保存。"
+
+#: ../image-watermark.php:599
+msgid "Settings restored to defaults."
+msgstr "设置已恢复到默认值。"
+
+#: ../image-watermark.php:619
+msgid "Watermark will not be applied when <b>watermark image is not set</b>."
+msgstr "当<b>水印图像没有设置</b>水印将不会被应用。"
+
+#: ../image-watermark.php:622
+msgid "Watermark will not be applied when <b>no image sizes are selected</b>."
+msgstr "当<b>无图像尺寸被选择</b>水印将不会被应用。"
+
+#: ../image-watermark.php:628
+msgid "Watermark will not be applied while frontend image upload if <b>watermark image is not set</b>."
+msgstr "如果<b>水印图像没有设置</b>，而前端图像上传,水印将不会被应用。"
+
+#: ../image-watermark.php:631
+msgid "Watermark will not be applied while frontend image upload if <b>no image sizes are selected</b>."
+msgstr "如果<b>没有图像尺寸被选择</b>，而前端图像上传,水印将不会被应用。"
+
+#: ../image-watermark.php:638
+msgid "Image Watermark Settings"
+msgstr "图像水印设置"
+
+#: ../image-watermark.php:642
+msgid "Image Watermark"
+msgstr "图像水印"
+
+#: ../image-watermark.php:644
+msgid "Need support?"
+msgstr "需要支持吗？"
+
+#: ../image-watermark.php:645
+msgid "If you are having problems with this plugin, please talk about them in the"
+msgstr "更多汉化主题和汉化插件请关注逍遥乐汉化-逍遥乐IT博客：<a href=\"http://www.luoxiao123.cn\">逍遥乐汉化</a><br>如果您有这个插件的任何问题，告诉在"
+
+#: ../image-watermark.php:645
+msgid "Support forum"
+msgstr "支持论坛"
+
+#: ../image-watermark.php:647
+msgid "Do you like this plugin?"
+msgstr "你喜欢这个插件？"
+
+#: ../image-watermark.php:648
+msgid "Rate it 5"
+msgstr "评分5"
+
+#: ../image-watermark.php:648
+msgid "on WordPress.org"
+msgstr "在 WordPress.org<br>如果你有更多汉化问题请访问逍遥乐汉化：<a href=\"http://www.luoxiao123.cn\">逍遥乐汉化</a>"
+
+#: ../image-watermark.php:649
+msgid "Blog about it & link to the"
+msgstr "在博客添加关于它的链接"
+
+#: ../image-watermark.php:649
+msgid "plugin page"
+msgstr "插件页面"
+
+#: ../image-watermark.php:650
+msgid "Check out our other"
+msgstr "看看我们的其他"
+
+#: ../image-watermark.php:650
+msgid "WordPress plugins"
+msgstr "WordPress插件"
+
+#: ../image-watermark.php:653
+msgid "Created by"
+msgstr "创建者"
+
+#: ../image-watermark.php:658
+msgid "General settings"
+msgstr "常规设置"
+
+#: ../image-watermark.php:661
+msgid "Automatic watermarking"
+msgstr "自动添加水印"
+
+#: ../image-watermark.php:665
+#: ../image-watermark.php:681
+#: ../image-watermark.php:728
+#: ../image-watermark.php:744
+msgid "on"
+msgstr "开启"
+
+#: ../image-watermark.php:667
+#: ../image-watermark.php:683
+#: ../image-watermark.php:730
+#: ../image-watermark.php:746
+msgid "off"
+msgstr "关闭"
+
+#: ../image-watermark.php:670
+msgid "Enable or disable watermark for uploaded images."
+msgstr "对上传的图片启用或禁用水印。"
+
+#: ../image-watermark.php:677
+msgid "Manual watermarking"
+msgstr "手动添加水印"
+
+#: ../image-watermark.php:686
+msgid "Enable or disable Apply Watermark option for images in Media Library."
+msgstr "启用或禁用添加水印到媒体库中的图像。"
+
+#: ../image-watermark.php:693
+msgid "Enable watermark for"
+msgstr "启用水印"
+
+#: ../image-watermark.php:702
+msgid "Check image sizes on which watermark should appear.<br /><strong>IMPORTANT:</strong> checking full size is NOT recommended as it's the original image. You may need it later - for removing or changing watermark, image sizes regeneration or any other image manipulations. Use it only if you know what you are doing."
+msgstr "选择水印应该出现的图像尺寸<br /><strong>重要提示：</strong> 不推荐选择全尺寸，因为它是原始图像。你以后可能会需要它 - 去除或改变水印，图像尺寸再生或任何其他图像操作，使用它只有当你知道你在做什么。"
+
+#: ../image-watermark.php:708
+msgid "everywhere"
+msgstr "所有位置"
+
+#: ../image-watermark.php:709
+msgid "on selected post types only"
+msgstr "只在选择的文章类型"
+
+#: ../image-watermark.php:717
+msgid "Check custom post types on which watermark should be applied to uploaded images."
+msgstr "选择其中的水印应适用于自定义文章类型上传的图片。"
+
+#: ../image-watermark.php:724
+msgid "Automatic frontend watermarking"
+msgstr "自动前端水印"
+
+#: ../image-watermark.php:733
+msgid "Enable or disable watermark for frontend image uploading. (uploading script is not included, but you may use a plugin or custom code). <strong>Notice:</strong> This functionality works only if uploaded images are processed using WordPress native upload methods."
+msgstr "启用或禁用水印前端上传图像。 （上传脚本是不包括在内，但你可以使用一个插件或自定义代码）。 <strong>注意：</strong>此功能只有当上传的图片都使用WordPress本地上传方法处理才能实现。"
+
+#: ../image-watermark.php:740
+msgid "Plugin deactivation"
+msgstr "停用插件"
+
+#: ../image-watermark.php:749
+msgid "Delete all database settings on plugin deactivation."
+msgstr "停用插件时删除所有的数据库设置。"
+
+#: ../image-watermark.php:755
+msgid "Watermark position"
+msgstr "水印位置"
+
+#: ../image-watermark.php:758
+msgid "Watermark alignment"
+msgstr "水印对齐方式"
+
+#: ../image-watermark.php:773
+msgid "Choose the position of watermark image."
+msgstr "选择水印在图片上的位置"
+
+#: ../image-watermark.php:778
+msgid "Watermark offset"
+msgstr "水印偏移"
+
+#: ../image-watermark.php:781
+#: ../image-watermark.php:861
+msgid "x:"
+msgstr "x:"
+
+#: ../image-watermark.php:781
+#: ../image-watermark.php:783
+#: ../image-watermark.php:861
+#: ../image-watermark.php:863
+msgid "px"
+msgstr "像素"
+
+#: ../image-watermark.php:783
+#: ../image-watermark.php:863
+msgid "y:"
+msgstr "y:"
+
+#: ../image-watermark.php:799
+#: ../image-watermark.php:803
+msgid "Watermark image"
+msgstr "水印图像"
+
+#: ../image-watermark.php:800
+msgid "Configure your watermark image. Allowed file formats are: JPEG, PNG, GIF."
+msgstr "配置你的水印图像。可以接受的文件格式为JPEG，PNG，GIF等。"
+
+#: ../image-watermark.php:806
+msgid "Select image"
+msgstr "选择图像"
+
+#: ../image-watermark.php:807
+msgid "Turn off image"
+msgstr "关闭图像"
+
+#: ../image-watermark.php:808
+msgid "You have to save changes after the selection or removal of the image."
+msgstr "您必须选择或清除图像后保存更改。"
+
+#: ../image-watermark.php:812
+msgid "Watermark preview"
+msgstr "水印预览"
+
+#: ../image-watermark.php:842
+msgid "Watermark size"
+msgstr "水印大小"
+
+#: ../image-watermark.php:846
+msgid "original"
+msgstr "原始"
+
+#: ../image-watermark.php:848
+msgid "custom"
+msgstr "自定义"
+
+#: ../image-watermark.php:850
+msgid "scaled"
+msgstr "缩放"
+
+#: ../image-watermark.php:853
+msgid "Select method of aplying watermark size."
+msgstr "选择用于确定水印大小的方法。"
+
+#: ../image-watermark.php:858
+msgid "Watermark custom size"
+msgstr "水印自定义尺寸"
+
+#: ../image-watermark.php:865
+msgid "Those dimensions will be used if \"custom\" method is selected above."
+msgstr "如果上面选择 \"自定义 \"方法，这些尺寸将被使用。"
+
+#: ../image-watermark.php:869
+msgid "Scale of watermark in relation to image width"
+msgstr "水印相对于图像的宽度规模"
+
+#: ../image-watermark.php:879
+msgid "This value will be used if \"scaled\" method if selected above. <br />Enter a number ranging from 0 to 100. 100 makes width of watermark image equal to width of the image it is applied to."
+msgstr "如果选择上面\"缩放\"方法，这个值将被使用。 <br />输入一个数字范围从0到100。如果为100使得宽度的水印图像等于宽度将它应用到图像的，即宽度为100%。"
+
+#: ../image-watermark.php:883
+msgid "Watermark transparency / opacity"
+msgstr "水印透明/不透明"
+
+#: ../image-watermark.php:893
+msgid "Enter a number ranging from 0 to 100. 0 makes watermark image completely transparent, 100 shows it as is."
+msgstr "输入一个数字范围：从0到100。0使得水印图像完全透明，100表示保持原样。"
+
+#: ../image-watermark.php:897
+msgid "Image quality"
+msgstr "图像质量"
+
+#: ../image-watermark.php:907
+msgid "Set output image quality."
+msgstr "设置输出的图像质量。"
+
+#: ../image-watermark.php:911
+msgid "Image format"
+msgstr "图像格式"
+
+#: ../image-watermark.php:915
+msgid "baseline"
+msgstr "基线"
+
+#: ../image-watermark.php:917
+msgid "progressive"
+msgstr "逐行"
+
+#: ../image-watermark.php:921
+msgid "Select baseline or progressive image format."
+msgstr "选择图像格式。"
+
+#: ../image-watermark.php:927
+msgid "Image protection"
+msgstr "图像保护"
+
+#: ../image-watermark.php:930
+msgid "Disable right mouse click on images"
+msgstr "禁用鼠标右键点击图片"
+
+#: ../image-watermark.php:934
+msgid "Prevent drag and drop"
+msgstr "防止拖放"
+
+#: ../image-watermark.php:938
+msgid "Enable image protection for logged-in users also"
+msgstr "对登录用户也启用图像保护"
+
+#: ../image-watermark.php:943
+msgid "Save Changes"
+msgstr "保存更改"
+
+#: ../image-watermark.php:944
+msgid "Reset to defaults"
+msgstr "重置为默认值"
+
+#~ msgid ""
+#~ "Check image sizes on which watermark should appear. <b>Notice:</b> "
+#~ "checking full size is not recommened as it's the original image."
+#~ msgstr ""
+#~ "Zaznacz wielkości obazków dla których będzie dodany znak wodny. <b>Uwaga:"
+#~ "</b> zaznaczenie pełnej wielkości nie jest rekomendowane, ponieważ jest "
+#~ "to oryginał obrazka."
+
+#, fuzzy
+#~ msgid "Enable or disable watermark for uploaded images on frontend."
+#~ msgstr "Włącz lub wyłącz dodawanie znaku wodnego do wgrywanych obrazków."
+
+#~ msgid "Check image sizes on which watermark should appear."
+#~ msgstr "Zaznacz wielkości obrazków dla których ma być dodawany znak wodny."
+
+#~ msgid "Width"
+#~ msgstr "Szerokość"
+
+#~ msgid "Watermark Preview"
+#~ msgstr "Podgląd obrazka"
+
+#~ msgid "WordPress Watermark"
+#~ msgstr "Znak wodny"
+
+#~ msgid "Options updated."
+#~ msgstr "Ustawienia zostały zaktualizowane"
+
+#~ msgid "Watermark image URL"
+#~ msgstr "Ścieżka do obrazka"
+
+#~ msgid "Upload Image"
+#~ msgstr "Wgraj obrazek"
+
+#~ msgid ""
+#~ "Enter an URL, upload an image or select image from media library.<br /"
+#~ "><b>Important:</b> You must select a <b>file URL</b> while inserting "
+#~ "image."
+#~ msgstr ""
+#~ "Podaj adres URL, wgraj obrazek lub wybierz obrazek z biblioteki mediów."
+#~ "<br /><b>Ważne:</b> Dodając obrazek musisz zaznaczyć <b>Adres URL pliku</"
+#~ "b>."

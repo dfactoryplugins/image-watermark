@@ -1,0 +1,25 @@
+/* Image Watermark settings */
+.df-credits { float: right; width: 280px; background: #fff; margin: 20px -300px 20px 20px; position: relative; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05); }
+.df-credits .inner { padding-left: 10px; padding-right: 10px; }
+.df-credits h3 { font-size: 14px; line-height: 1.4; margin: 0;  padding: 8px 12px; border-bottom: 1px solid #eee; }
+.df-credits .df-link { font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif; font-style:italic; padding-bottom: 10px; margin: 0; }
+.df-credits .df-link a { vertical-align: middle; padding: 5px 0 0 4px; }
+.image-watermark-settings .df-credits form { min-width: 260px; margin-bottom: 1em; }
+.image-watermark-settings .df-credits form input { margin: 0; padding: 0; }
+.image-watermark-settings { margin-right: 300px; }
+.image-watermark-settings hr, .df-credits hr { border: solid #eee; border-width: 1px 0 0; clear: both; height: 0; }
+.image-watermark-settings form { float: left; min-width: 463px; width: auto; }
+.image-watermark-settings fieldset span.description { margin-bottom: 8px; margin-top: 4px; display: block; }
+.image-watermark-settings.ui-button { margin-bottom: 5px; }
+.image-watermark-settings .description { font-size: 13px; margin-bottom: 8px; }
+
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 959px) {
+	.df-credits { width: 100%; float: none; margin: 20px 0; }
+	.image-watermark-settings { margin-right: 0; }
+}
+
+#cpt-select { margin-top: 5px; }
+.wplike-slider span.middle { width: 150px; }
+.wplike-slider span.left { margin-right: 10px; }
+.wplike-slider span.right { margin-left: 10px; }

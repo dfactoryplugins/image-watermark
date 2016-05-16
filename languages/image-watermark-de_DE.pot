@@ -1,0 +1,437 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: WordPress Watermark\n"
+"POT-Creation-Date: 2013-10-02 13:01+0100\n"
+"PO-Revision-Date: 2013-12-09 12:07+0100\n"
+"Last-Translator: Matthias Siebler <matthias.siebler@gmail.com>\n"
+"Language-Team: Matthias Siebler <matthias.siebler@gmail.com>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.1\n"
+"X-Poedit-KeywordsList: gettext;gettext_noop;__;_e;esc_attr__;esc_attr_e;"
+"_n:1,2\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../image-watermark.php:27
+msgid ""
+"Sorry, Image Watermark plugin requires at least PHP 5.0 and WP 3.5 or higher."
+msgstr ""
+"Sorry, das Image Watermark Plugin benötigt mindestens WordPress 3.5 und PHP "
+"5.0"
+
+#: ../image-watermark.php:215
+msgid ""
+"Watermark could not be applied to selected files or no valid images (JPEG, "
+"PNG) were selected."
+msgstr ""
+"Das Wasserzeichen konnte nicht auf die ausgewählten Bilder aufgebracht "
+"werden oder es wurden Bilder in einem ungültigen Format ausgewählt. (JPG und "
+"PNG sind erlaubt)"
+
+#: ../image-watermark.php:215 ../image-watermark.php:219
+msgid "Skipped files"
+msgstr "Übersprungene Dateien"
+
+#: ../image-watermark.php:219
+#, php-format
+msgid "Watermark was succesfully applied to 1 image."
+msgid_plural "Watermark was succesfully applied to %s images."
+msgstr[0] "Das Wasserzeichen wurde auf 1 Bild angewendet."
+msgstr[1] "Das Wasserzeichen wurde auf %s Bilden angewendet."
+
+#: ../image-watermark.php:262
+msgid "Support"
+msgstr "Support"
+
+#: ../image-watermark.php:284
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: ../image-watermark.php:315
+msgid "Apply watermark"
+msgstr "Wasserzeichen anwenden"
+
+#: ../image-watermark.php:335
+msgid "Select watermark"
+msgstr "Wähle ein Wasserzeichen"
+
+#: ../image-watermark.php:336 ../image-watermark.php:813
+msgid "Original size"
+msgstr "Originalgröße"
+
+#: ../image-watermark.php:337 ../image-watermark.php:807
+msgid "Watermak has not been selected yet."
+msgstr "Es wurde ein Wasserzeichen ausgewählt."
+
+#: ../image-watermark.php:338
+msgid "This image is not supported as watermark. Use JPEG, PNG or GIF."
+msgstr ""
+"Dieses Bildformat ist nicht unterstützt. Benutze bitte JPG-, PNG- oder GIF-"
+"Dateien"
+
+#: ../image-watermark.php:340
+msgid "Add watermark"
+msgstr "Wasserzeichen hinzufügen"
+
+#: ../image-watermark.php:357
+msgid "Are you sure you want to reset settings to defaults?"
+msgstr "Bist du sicher, dass du alle Einstellungen zurücksetzen möchtest?"
+
+#: ../image-watermark.php:412
+msgid "Image Watermark Options"
+msgstr "Image Watermark Optionen"
+
+#: ../image-watermark.php:413
+msgid "Watermark"
+msgstr "Wasserzeichen"
+
+#: ../image-watermark.php:439
+msgid "Image Watermark will not work properly without GD PHP extension."
+msgstr ""
+"Image Watermark wird nicht richtig funktionieren ohne der PHP-Erweiterung "
+"GD. "
+
+#: ../image-watermark.php:581
+msgid "Settings saved."
+msgstr "Einstellungen gespeichert."
+
+#: ../image-watermark.php:594
+msgid "Settings restored to defaults."
+msgstr "Einstellungen zurückgesetzt."
+
+#: ../image-watermark.php:614
+msgid "Watermark will not be applied when <b>watermark image is not set</b>."
+msgstr ""
+"Wasserzeichen konnte nicht aufgebracht werden. <b>Es wurde keine "
+"Wasserzeichen-Bilddatei ausgewählt.</b>"
+
+#: ../image-watermark.php:617
+msgid "Watermark will not be applied when <b>no image sizes are selected</b>."
+msgstr ""
+"Wasserzeichen konnte nicht aufgebracht werden. <b>Es wurde keine Bildgröße "
+"ausgewählt.</b>"
+
+#: ../image-watermark.php:623
+msgid ""
+"Watermark will not be applied while frontend image upload if <b>watermark "
+"image is not set</b>."
+msgstr ""
+"Wasserzeichen konnte nicht beim Frontend-Upload aufgebracht werden. <b>Es "
+"wurde keine Wasserzeichen-Bilddatei ausgewählt.</b>"
+
+#: ../image-watermark.php:626
+msgid ""
+"Watermark will not be applied while frontend image upload if <b>no image "
+"sizes are selected</b>."
+msgstr ""
+"Wasserzeichen konnte nicht beim Frontend-Upload aufgebracht werden. <b>Es "
+"wurde keine Bildgröße ausgewählt.</b>"
+
+#: ../image-watermark.php:633
+msgid "Image Watermark Settings"
+msgstr "Image Watermark Einstellungen"
+
+#: ../image-watermark.php:637
+msgid "General settings"
+msgstr "Allgemeine Einstellungen"
+
+#: ../image-watermark.php:640
+msgid "Automatic watermarking"
+msgstr "Automatisches Wasserzeichen"
+
+#: ../image-watermark.php:644 ../image-watermark.php:660
+#: ../image-watermark.php:707 ../image-watermark.php:723
+msgid "on"
+msgstr "an"
+
+#: ../image-watermark.php:646 ../image-watermark.php:662
+#: ../image-watermark.php:709 ../image-watermark.php:725
+msgid "off"
+msgstr "aus"
+
+#: ../image-watermark.php:649
+msgid "Enable or disable watermark for uploaded images."
+msgstr ""
+"Aktiviert oder deaktiviert das automatische Wasserzeichen beim upload von "
+"Bildern. "
+
+#: ../image-watermark.php:656
+msgid "Manual watermarking"
+msgstr "Manuelles Wasserzeichen"
+
+#: ../image-watermark.php:665
+msgid "Enable or disable Apply Watermark option for images in Media Library."
+msgstr ""
+"Aktiviert oder deaktiviert das manuelle hinzufügen des Wasserzeichen bei "
+"Bildern  in der Mediathek. "
+
+#: ../image-watermark.php:672
+msgid "Enable watermark for"
+msgstr "Aktiviere das Wasserzeichen für"
+
+#: ../image-watermark.php:681
+msgid ""
+"Check image sizes on which watermark should appear. <b>Notice:</b> checking "
+"full size is not recommened as it's the original image."
+msgstr ""
+"Überprüfe die Bildgröße der Datei wo das Wasserzeichen aufgebracht werden "
+"soll. <b>Hinweis:</b> Überprüfung in voller Größe ist beim Originalbild "
+"nicht empfohlen."
+
+#: ../image-watermark.php:687
+msgid "everywhere"
+msgstr "überall"
+
+#: ../image-watermark.php:688
+msgid "on selected post types only"
+msgstr "nur an ausgewählten Post-Types "
+
+#: ../image-watermark.php:696
+msgid ""
+"Check custom post types on which watermark should be applied to uploaded "
+"images."
+msgstr ""
+"Wähle den Custom Post Types in dem das Wasserzeichen beim Upload aufgebracht "
+"werden soll. "
+
+#: ../image-watermark.php:703
+msgid "Automatic frontend watermarking"
+msgstr "Automatisches  Frontend-Wasserzeichen"
+
+#: ../image-watermark.php:712
+msgid ""
+"Enable or disable watermark for frontend image uploading. (uploading script "
+"is not included, but you may use a plugin or custom code). Notice: This "
+"functionality works only if uploaded images are processed using WordPress "
+"native upload methods."
+msgstr ""
+"Aktiviere oder deaktiviere das aufbringen eines Wasserzeichens beim Fronten-"
+"Upload. (<b>Hinweis: </b>Eine Funktion für den Frontend-Upload ist in diesem "
+"Plugin nicht enthalten. Es sind aber zahlreiche Plugins für Wordpress "
+"verfügbar. Ein Aufbringen des Wasserzeichens ist nur dann möglich, wenn die "
+"Wordpress-Upload-Funktion verwendet wird.) "
+
+#: ../image-watermark.php:719
+msgid "Plugin deactivation"
+msgstr "Deaktivierung des Plugins"
+
+#: ../image-watermark.php:728
+msgid "Delete all database settings on plugin deactivation."
+msgstr "Löschen aller Datenbankeinstellungen zur deaktivierung des Plugins"
+
+#: ../image-watermark.php:734
+msgid "Watermark position"
+msgstr "Position des Wasserzeichens"
+
+#: ../image-watermark.php:737
+msgid "Watermark alignment"
+msgstr "Ausrichtung des Wasserzeichens"
+
+#: ../image-watermark.php:752
+msgid "Choose the position of watermark image."
+msgstr "Wähle die Position des Wasserzeichens"
+
+#: ../image-watermark.php:757
+msgid "Watermark offset"
+msgstr "Wasserzeichen einrücken"
+
+#: ../image-watermark.php:760 ../image-watermark.php:840
+msgid "x:"
+msgstr "x:"
+
+#: ../image-watermark.php:760 ../image-watermark.php:762
+#: ../image-watermark.php:840 ../image-watermark.php:842
+msgid "px"
+msgstr "Pixel"
+
+#: ../image-watermark.php:762 ../image-watermark.php:842
+msgid "y:"
+msgstr "y:"
+
+#: ../image-watermark.php:778 ../image-watermark.php:782
+msgid "Watermark image"
+msgstr "Wasserzeichen Bilddatei"
+
+#: ../image-watermark.php:779
+msgid ""
+"Configure your watermark image. Allowed file formats are: JPEG, PNG, GIF."
+msgstr ""
+"Einstellen der Wasserzeichen Bilddatei. Erlaubte formate sind JPG, PNG und "
+"GIF."
+
+#: ../image-watermark.php:785
+msgid "Select image"
+msgstr "Wähle ein Bild"
+
+#: ../image-watermark.php:786
+msgid "Turn off image"
+msgstr "Schalte das Bild aus"
+
+#: ../image-watermark.php:787
+msgid "You have to save changes after the selection or removal of the image."
+msgstr ""
+"Einstellungen müssen gespeichert werden nach dem hinzufügen oder entfernen "
+"von Wasserzeichen-Bildern"
+
+#: ../image-watermark.php:791
+msgid "Watermark preview"
+msgstr "Vorschau des Wasserzeichens"
+
+#: ../image-watermark.php:821
+msgid "Watermark size"
+msgstr "Größe des Wasserzeichens"
+
+#: ../image-watermark.php:825
+msgid "original"
+msgstr "original"
+
+#: ../image-watermark.php:827
+msgid "custom"
+msgstr "angepasst"
+
+#: ../image-watermark.php:829
+msgid "scaled"
+msgstr "skaliert"
+
+#: ../image-watermark.php:832
+msgid "Select method of aplying watermark size."
+msgstr "Wähle die Methode, wie das Wasserzeichen angebracht wird "
+
+#: ../image-watermark.php:837
+msgid "Watermark custom size"
+msgstr "Angepasste Größe des Wasserzeichens"
+
+#: ../image-watermark.php:844
+msgid "Those dimensions will be used if \"custom\" method is selected above."
+msgstr ""
+"Dieses Größenverhältnis wird verwendet wenn die Einstellung <b>angepasst</b> "
+"oben ausgewählt ist."
+
+#: ../image-watermark.php:848
+msgid "Scale of watermark in relation to image width"
+msgstr "Skaliere das Wasserzeichen in Abhängigkeit von der Bildweite"
+
+#: ../image-watermark.php:858
+msgid ""
+"This value will be used if \"scaled\" method if selected above. <br />Enter "
+"a number ranging from 0 to 100. 100 makes width of watermark image equal to "
+"width of the image it is applied to."
+msgstr ""
+"Diese Einstellungen werden verwendet wenn die Einstellung <b>skaliert</b> "
+"oben ausgewählt ist. <br />Gib eine Zahl zwischen 0 und 100 an. 100 macht "
+"das Wasserzeichen genau so groß wie die Bilddatei. 50 macht das "
+"Wasserzeichen nur halb so groß."
+
+#: ../image-watermark.php:862
+msgid "Watermark transparency / opacity"
+msgstr "Transparenz bzw. Deckkraft des Wasserzeichens"
+
+#: ../image-watermark.php:872
+msgid ""
+"Enter a number ranging from 0 to 100. 0 makes watermark image completely "
+"transparent, 100 shows it as is."
+msgstr ""
+"Gib eine Zahl zwischen 0 und 100 an. 0 macht das Wasserzeichen komplett  "
+"transparent, 100 zeige es, wie es ist."
+
+#: ../image-watermark.php:876
+msgid "Image quality"
+msgstr "Bildqualität"
+
+#: ../image-watermark.php:886
+msgid "Set output image quality."
+msgstr "Einstellen der Bildqualität für die Ausgabe"
+
+#: ../image-watermark.php:890
+msgid "Image format"
+msgstr "Bildformat"
+
+#: ../image-watermark.php:894
+msgid "baseline"
+msgstr "Baseline"
+
+#: ../image-watermark.php:896
+msgid "progressive"
+msgstr "Progressive"
+
+#: ../image-watermark.php:900
+msgid "Select baseline or progressive image format."
+msgstr "Wähle bei dem Bildformat Baseline oder Progressive."
+
+#: ../image-watermark.php:906
+msgid "Image protection"
+msgstr "Bildschutz"
+
+#: ../image-watermark.php:909
+msgid "Disable right mouse click on images"
+msgstr "Deaktiviere die rechte Maustaste auf Bildern"
+
+#: ../image-watermark.php:913
+msgid "Prevent drag and drop"
+msgstr "Verhindere Drag&Drop"
+
+#: ../image-watermark.php:917
+msgid "Enable image protection for logged-in users also"
+msgstr "Aktiviere Bildschutz auch für angemeldete Benutzer"
+
+#: ../image-watermark.php:922
+msgid "Save Changes"
+msgstr "Änderungen übernehmen"
+
+#: ../image-watermark.php:923
+msgid "Reset to defaults"
+msgstr "Zurücksetzen auf Standarteinstellungen"
+
+#: ../image-watermark.php:928
+msgid "Image Watermark"
+msgstr "Image Watermark"
+
+#: ../image-watermark.php:930
+msgid "Need support?"
+msgstr "Brauchst du Hilfe?"
+
+#: ../image-watermark.php:931
+msgid ""
+"If you are having problems with this plugin, please talk about them in the"
+msgstr "Wenn du mit diesem Plugin Probleme hast, wende dich an das "
+
+#: ../image-watermark.php:931
+msgid "Support forum"
+msgstr "Support Forum"
+
+#: ../image-watermark.php:933
+msgid "Do you like this plugin?"
+msgstr "Magst du dieses Plugin?"
+
+#: ../image-watermark.php:934
+msgid "Rate it 5"
+msgstr "Bewerte das Plugin mit 5 Sternen"
+
+#: ../image-watermark.php:934
+msgid "on WordPress.org"
+msgstr "auf wordpress.org"
+
+#: ../image-watermark.php:935
+msgid "Blog about it & link to the"
+msgstr "Schreibe darüber und verlinke die "
+
+#: ../image-watermark.php:935
+msgid "plugin page"
+msgstr "Plugin-Seite"
+
+#: ../image-watermark.php:936
+msgid "Check out our other"
+msgstr "Probiere auch unsere anderen"
+
+#: ../image-watermark.php:936
+msgid "WordPress plugins"
+msgstr "WordPress-Plugins"
+
+#: ../image-watermark.php:939
+msgid "Created by"
+msgstr "Erstellt von"

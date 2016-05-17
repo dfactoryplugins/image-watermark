@@ -57,6 +57,7 @@ class Image_Watermark_Settings {
 		add_settings_field( 'iw_manual_watermarking', __( 'Manual watermarking', 'image-watermark' ), array( $this, 'iw_manual_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
 		add_settings_field( 'iw_enable_for', __( 'Enable watermark for', 'image-watermark' ), array( $this, 'iw_enable_for' ), 'image_watermark_options', 'image_watermark_general' );
 		add_settings_field( 'iw_frontend_watermarking', __( 'Frontend watermarking', 'image-watermark' ), array( $this, 'iw_frontend_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
+		add_settings_field( 'iw_backup_size_full', __( 'Secure backup image', 'image-watermark' ), array( $this, 'iw_backup_size_full' ), 'image_watermark_options', 'image_watermark_general' );
 		add_settings_field( 'iw_deactivation', __( 'Deactivation', 'image-watermark' ), array( $this, 'iw_deactivation' ), 'image_watermark_options', 'image_watermark_general' );
 
 		// watermark position
@@ -199,6 +200,9 @@ class Image_Watermark_Settings {
 
 			$input['watermark_image']['frontend_active'] = isset( $_POST['iw_options']['watermark_image']['frontend_active'] ) ? ((bool) $_POST['iw_options']['watermark_image']['frontend_active'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['frontend_active'];
 			$input['watermark_image']['deactivation_delete'] = isset( $_POST['iw_options']['watermark_image']['deactivation_delete'] ) ? ((bool) $_POST['iw_options']['watermark_image']['deactivation_delete'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['deactivation_delete'];
+			$input['watermark_image']['backup_size_full'] = isset( $_POST['iw_options']['watermark_image']['backup_size_full'] ) ? ((bool) $_POST['iw_options']['watermark_image']['backup_size_full'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['backup_size_full'];
+
+
 
 			$positions = array();
 
@@ -352,6 +356,18 @@ class Image_Watermark_Settings {
 <?php echo __( 'Enable frontend image uploading. (uploading script is not included, but you may use a plugin or custom code).', 'image-watermark' ); ?>
 		</label>
 		<span class="description"><?php echo __( '<br /><strong>Notice:</strong> This functionality works only if uploaded images are processed using WordPress native upload methods.', 'image-watermark' ); ?></span>
+		<?php
+	}
+
+	/**
+	 * Remove data on deactivation option.
+	 */
+	public function iw_backup_size_full() {
+		?>
+		<label for="iw_backup_size_full">
+			<input id="iw_backup_size_full" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['backup_size_full'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][backup_size_full]">
+<?php echo __( 'Secure backup the full size image.', 'image-watermark' ); ?>
+		</label>
 		<?php
 	}
 

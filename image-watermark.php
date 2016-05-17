@@ -27,6 +27,7 @@ if ( ! defined( 'ABSPATH' ) )
 
 define( 'IMAGE_WATERMARK_URL', plugins_url( '', __FILE__ ) );
 define( 'IMAGE_WATERMARK_PATH', plugin_dir_path( __FILE__ ) );
+define( 'IMAGE_WATERMARK_BACKUP_DIR', WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'iw-backup' );
 
 /**
  * Image Watermark class.
@@ -113,6 +114,17 @@ final class Image_Watermark {
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_extend_links' ), 10, 2 );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_settings_link' ), 10, 2 );
 		add_filter( 'wp_handle_upload', array( $this, 'handle_upload_files' ) );
+
+		// create backup folder and security if enabled
+		if ( true == $this->options['backup']['backup_image'] ) {
+			if ( ! file_exists( IMAGE_WATERMARK_BACKUP_DIR ) ) {
+				wp_mkdir_p( IMAGE_WATERMARK_BACKUP_DIR);
+			}
+			if ( ! file_exists( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess' ) ) {
+				// htaccess security
+				file_put_contents( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all' );
+			}
+		}
 	}
 
 	/**
@@ -655,7 +667,7 @@ final class Image_Watermark {
 	 * $return bool
 	 */
 	private function do_backup( $data, $upload_dir, $attachment_id ) {
-		$backupfolder = $this->get_backup_folder();
+		$backupfolder = IMAGE_WATERMARK_BACKUP_DIR;
 		$backup_filepath = $backupfolder . DIRECTORY_SEPARATOR . $data['file'];
 		
 		$filepath = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'];
@@ -666,14 +678,9 @@ final class Image_Watermark {
 
 		if ( false !== $image ) {
 			// create backup directory if needed
-			wp_mkdir_p( $this->get_image_backup_folder( $data['file'] ) );
+			wp_mkdir_p( $this->get_image_backup_folder_location( $data['file'] ) );
 			// save backup image
 			$this->save_image_file( $image, $mime['type'], $backup_filepath, $this->options['backup']['backup_quality'] );
-
-			// htaccess security
-			$htaccesspath = $backupfolder . DIRECTORY_SEPARATOR . '.htaccess';
-			$htaccesscontent = 'deny from all';
-			file_put_contents( $htaccesspath, $htaccesscontent );
 
 			// clear watermark memory
 			imagedestroy( $image );
@@ -736,7 +743,7 @@ final class Image_Watermark {
 	 * @return	string $filename
 	 */
 	private function get_image_filename( $filepath ) {
-		return end( explode( DIRECTORY_SEPARATOR, $filepath ) ); 
+		return basename(  $filepath ); 
 	}
 
 	/**
@@ -745,20 +752,11 @@ final class Image_Watermark {
 	 * @param	string $filepath
 	 * @return	string $image_backup_folder
 	 */
-	private function get_image_backup_folder( $filepath ) {
+	private function get_image_backup_folder_location( $filepath ) {
 		$path = explode( DIRECTORY_SEPARATOR, $filepath );
 		array_pop( $path );
 		$path = implode( DIRECTORY_SEPARATOR, $path );
-		return $this->get_backup_folder() . DIRECTORY_SEPARATOR . $path;
-	}
-
-	/**
-	 * Get the watermark backup folder
-	 *
-	 * @return	string $backup_folder
-	 */
-	private function get_backup_folder() {
-		return WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'iw-backup';
+		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $path;
 	}
 
 	/**
@@ -768,7 +766,7 @@ final class Image_Watermark {
 	 * @return	string $backup_filepath
 	 */
 	private function get_image_backup_filepath( $filepath ) {
-		return $this->get_image_backup_folder() . DIRECTORY_SEPARATOR . $filepath;
+		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $filepath;
 	}
 
 	/**
@@ -777,14 +775,13 @@ final class Image_Watermark {
 	 * @param	int $attachment_id
 	 * @return	bool $force_delete
 	 */
-	public function delete_attachment( $attachment_id, $force_delete ) {
-		if ( true === $force_delete ) {
-			$filepath = get_attached_file( $attachment_id, true );
-			$backup_filepath = $this->get_image_backup_filepath( $filepath );
+	public function delete_attachment( $attachment_id ) {
+		// see get_attached_file() in wp-includes/post.php
+		$filepath = get_post_meta( $attachment_id, '_wp_attached_file', true );
+		$backup_filepath = $this->get_image_backup_filepath( $filepath );
 
-			if ( file_exists( $backup_filepath ) ) {
-				unlink( $backup_filepath );
-			}
+		if ( file_exists( $backup_filepath ) ) {
+			unlink( $backup_filepath );
 		}
 	}
 

@@ -522,7 +522,7 @@ final class Image_Watermark {
 		if ( getimagesize( $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'] ) !== false ) {
 			// create a backup if this is enabled
 			if ( isset( $this->options['backup']['backup_image'] ) && true == $this->options['backup']['backup_image'] ) {
-				$this->do_backup_size_full( $data, $upload_dir, $attachment_id );
+				$this->do_backup( $data, $upload_dir, $attachment_id );
 			}
 			// loop through active image sizes
 			foreach ( $this->options['watermark_on'] as $image_size => $active_size ) {
@@ -654,7 +654,7 @@ final class Image_Watermark {
 	 * $param
 	 * $return bool
 	 */
-	private function do_backup_size_full( $data, $upload_dir, $attachment_id ) {
+	private function do_backup( $data, $upload_dir, $attachment_id ) {
 		$backupfolder = $this->get_backup_folder();
 		$backup_filepath = $backupfolder . DIRECTORY_SEPARATOR . $data['file'];
 		

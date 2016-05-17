@@ -52,4 +52,17 @@ jQuery( document ).ready( function ( $ ) {
 		}
 	} );
 	
+	// quality slider
+	$( '#iw_backup_quality_span' ).slider( {
+		value: $( '#iw_backup_quality_input' ).val(),
+		min: 0,
+		max: 100,
+		step: 1,
+		orientation: 'horizontal',
+		slide: function ( e, ui ) {
+			$( '#iw_backup_quality_input' ).attr( 'value', ui.value );
+			$( '#iw_backup_quality_span' ).attr( 'title', ui.value );
+		}
+	} );
+
 } );

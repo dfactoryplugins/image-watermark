@@ -57,7 +57,6 @@ class Image_Watermark_Settings {
 		add_settings_field( 'iw_manual_watermarking', __( 'Manual watermarking', 'image-watermark' ), array( $this, 'iw_manual_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
 		add_settings_field( 'iw_enable_for', __( 'Enable watermark for', 'image-watermark' ), array( $this, 'iw_enable_for' ), 'image_watermark_options', 'image_watermark_general' );
 		add_settings_field( 'iw_frontend_watermarking', __( 'Frontend watermarking', 'image-watermark' ), array( $this, 'iw_frontend_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
-		add_settings_field( 'iw_backup_size_full', __( 'Secure backup image', 'image-watermark' ), array( $this, 'iw_backup_size_full' ), 'image_watermark_options', 'image_watermark_general' );
 		add_settings_field( 'iw_deactivation', __( 'Deactivation', 'image-watermark' ), array( $this, 'iw_deactivation' ), 'image_watermark_options', 'image_watermark_general' );
 
 		// watermark position
@@ -81,6 +80,11 @@ class Image_Watermark_Settings {
 		add_settings_field( 'iw_protection_right_click', __( 'Right click', 'image-watermark' ), array( $this, 'iw_protection_right_click' ), 'image_watermark_options', 'image_watermark_protection' );
 		add_settings_field( 'iw_protection_drag_drop', __( 'Drag and drop', 'image-watermark' ), array( $this, 'iw_protection_drag_drop' ), 'image_watermark_options', 'image_watermark_protection' );
 		add_settings_field( 'iw_protection_logged', __( 'Logged-in users', 'image-watermark' ), array( $this, 'iw_protection_logged' ), 'image_watermark_options', 'image_watermark_protection' );
+
+		// Backup
+		add_settings_section( 'image_watermark_backup', __( 'Image backup', 'image-watermark' ), '', 'image_watermark_options' );
+		add_settings_field( 'iw_backup_image', __( 'Backup full size image', 'image-watermark' ), array( $this, 'iw_backup_image' ), 'image_watermark_options', 'image_watermark_backup' );
+		add_settings_field( 'iw_backup_image_quality', __( 'Backup image quality', 'image-watermark' ), array( $this, 'iw_backup_image_quality' ), 'image_watermark_options', 'image_watermark_backup' );	
 	}
 
 	/**
@@ -200,8 +204,6 @@ class Image_Watermark_Settings {
 
 			$input['watermark_image']['frontend_active'] = isset( $_POST['iw_options']['watermark_image']['frontend_active'] ) ? ((bool) $_POST['iw_options']['watermark_image']['frontend_active'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['frontend_active'];
 			$input['watermark_image']['deactivation_delete'] = isset( $_POST['iw_options']['watermark_image']['deactivation_delete'] ) ? ((bool) $_POST['iw_options']['watermark_image']['deactivation_delete'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['deactivation_delete'];
-			$input['watermark_image']['backup_size_full'] = isset( $_POST['iw_options']['watermark_image']['backup_size_full'] ) ? ((bool) $_POST['iw_options']['watermark_image']['backup_size_full'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['backup_size_full'];
-
 
 
 			$positions = array();
@@ -227,6 +229,9 @@ class Image_Watermark_Settings {
 			$input['image_protection']['rightclick'] = isset( $_POST['iw_options']['image_protection']['rightclick'] ) ? ((bool) $_POST['iw_options']['image_protection']['rightclick'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['rightclick'];
 			$input['image_protection']['draganddrop'] = isset( $_POST['iw_options']['image_protection']['draganddrop'] ) ? ((bool) $_POST['iw_options']['image_protection']['draganddrop'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['draganddrop'];
 			$input['image_protection']['forlogged'] = isset( $_POST['iw_options']['image_protection']['forlogged'] ) ? ((bool) $_POST['iw_options']['image_protection']['forlogged'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['forlogged'];
+
+			$input['backup']['backup_image'] = isset( $_POST['iw_options']['backup']['backup_image'] ) ? ((bool) $_POST['iw_options']['backup']['backup_image'] == 1 ? true : false) : Image_Watermark()->defaults['options']['backup']['backup_image'];
+			$input['backup']['backup_quality'] = isset( $_POST['iw_options']['backup']['backup_quality'] ) ? (int) $_POST['iw_options']['backup']['backup_quality'] : Image_Watermark()->defaults['options']['backup']['backup_quality'];
 
 			add_settings_error( 'iw_settings_errors', 'iw_settings_saved', __( 'Settings saved.', 'image-watermark' ), 'updated' );
 		} elseif ( isset( $_POST['reset_image_watermark_options'] ) ) {
@@ -356,18 +361,6 @@ class Image_Watermark_Settings {
 <?php echo __( 'Enable frontend image uploading. (uploading script is not included, but you may use a plugin or custom code).', 'image-watermark' ); ?>
 		</label>
 		<span class="description"><?php echo __( '<br /><strong>Notice:</strong> This functionality works only if uploaded images are processed using WordPress native upload methods.', 'image-watermark' ); ?></span>
-		<?php
-	}
-
-	/**
-	 * Remove data on deactivation option.
-	 */
-	public function iw_backup_size_full() {
-		?>
-		<label for="iw_backup_size_full">
-			<input id="iw_backup_size_full" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['backup_size_full'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][backup_size_full]">
-<?php echo __( 'Secure backup the full size image.', 'image-watermark' ); ?>
-		</label>
 		<?php
 	}
 
@@ -620,4 +613,34 @@ class Image_Watermark_Settings {
 		</label>
 		<?php
 	}
+
+	/**
+	 * Backup the original image
+	 */
+	public function iw_backup_image() {
+		?>
+		<label for="iw_backup_size_full">
+			<input id="iw_backup_size_full" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['backup']['backup_image'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[backup][backup_image]">
+<?php echo __( 'Backup the full size image.', 'image-watermark' ); ?>
+		</label>
+		<?php
+	}
+
+	/**
+	 * Image backup quality option.
+	 */
+	public function iw_backup_image_quality() {
+		?>
+		<fieldset id="iw_backup_image_quality">
+			<div>
+				<input type="text" id="iw_backup_quality_input" maxlength="3" class="hide-if-js" name="iw_options[backup][backup_quality]" value="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>" />
+				<div class="wplike-slider">
+					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_backup_quality_span" title="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>"></span><span class="right hide-if-no-js">100</span>
+				</div>
+			</div>
+		</fieldset>
+		<p class="description"><?php _e( 'Set output image quality.', 'image-watermark' ); ?></p>
+		<?php
+	}
+
 }

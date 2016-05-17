@@ -68,6 +68,7 @@ final class Image_Watermark {
 				'absolute_height'		=> 0,
 				'transparent'			=> 50,
 				'quality'				=> 90,
+				'backup_quality'		=> 90,
 				'jpeg_format'			=> 'baseline',
 				'deactivation_delete'	=> false,
 				'media_library_notice'	=> true
@@ -76,6 +77,10 @@ final class Image_Watermark {
 				'rightclick'	 => 0,
 				'draganddrop'	 => 0,
 				'forlogged'		 => 0,
+			),
+			'backup'				=> array(
+				'backup_image'		=> 0,
+				'backup_quality'	=> 90,
 			),
 		),
 		'version' => '1.5.6'
@@ -102,6 +107,7 @@ final class Image_Watermark {
 		add_action( 'admin_init', array( $this, 'update_plugin' ) );
 		add_action( 'admin_init', array( $this, 'check_extensions' ) );
 		add_action( 'admin_notices', array( $this, 'bulk_admin_notices' ) );
+		add_action( 'delete_attachment', array( $this, 'delete_attachment' ) );
 
 		// filters
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_extend_links' ), 10, 2 );
@@ -514,6 +520,10 @@ final class Image_Watermark {
 
 		// is this really an iamge?
 		if ( getimagesize( $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'] ) !== false ) {
+			// create a backup if this is enabled
+			if ( isset( $this->options['backup']['backup_image'] ) && true == $this->options['backup']['backup_image'] ) {
+				$this->do_backup_size_full( $data, $upload_dir, $attachment_id );
+			}
 			// loop through active image sizes
 			foreach ( $this->options['watermark_on'] as $image_size => $active_size ) {
 				
@@ -639,7 +649,41 @@ final class Image_Watermark {
 	}
 
 	/**
+	 * Make a backup of the full size image
+	 *
+	 * $param
+	 * $return bool
+	 */
+	private function do_backup_size_full( $data, $upload_dir, $attachment_id ) {
+		$backupfolder = $this->get_backup_folder();
+		$backup_filepath = $backupfolder . DIRECTORY_SEPARATOR . $data['file'];
+		
+		$filepath = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'];
+		$mime = wp_check_filetype( $filepath );
+
+		// get image resource
+		$image = $this->get_image_resource( $filepath, $mime['type'] );
+
+		if ( false !== $image ) {
+			// create backup directory if needed
+			wp_mkdir_p( $this->get_image_backup_folder( $data['file'] ) );
+			// save backup image
+			$this->save_image_file( $image, $mime['type'], $backup_filepath, $this->options['backup']['backup_quality'] );
+
+			// htaccess security
+			$htaccesspath = $backupfolder . DIRECTORY_SEPARATOR . '.htaccess';
+			$htaccesscontent = 'deny from all';
+			file_put_contents( $htaccesspath, $htaccesscontent );
+
+			// clear watermark memory
+			imagedestroy( $image );
+			$image = null;
+		}
+	}
+
+	/**
 	 * Get image resource accordingly to mimetype.
+	 * Checks if a backup exists and uses the backup if available
 	 *
 	 * @param	string $filepath
 	 * @param	string $mime_type
@@ -668,6 +712,80 @@ final class Image_Watermark {
 		}
 
 		return $image;
+	}
+
+	/**
+	 * Get image resource accordingly to mimetype from the backup folder (if available).
+	 *
+	 * @param	string $filepath
+	 * @param	string $mime_type
+	 * @return	resource
+	 */
+	private function get_image_backup_resource( $filepath, $mime_type ) {
+		$backup_filepath = $this->get_image_backup_filepath( $filepath );
+		if ( file_exists( $backup_filepath ) ) {
+			return $this->get_image_resource( $backup_filepath, $mime_type );
+		}
+		return $this->get_image_resource( $filepath, $mime_type );
+	}
+
+	/**
+	 * Get image filename without the uploaded folders
+	 *
+	 * @param	string $filepath
+	 * @return	string $filename
+	 */
+	private function get_image_filename( $filepath ) {
+		return end( explode( DIRECTORY_SEPARATOR, $filepath ) ); 
+	}
+
+	/**
+	 * Get image backup folder
+	 *
+	 * @param	string $filepath
+	 * @return	string $image_backup_folder
+	 */
+	private function get_image_backup_folder( $filepath ) {
+		$path = explode( DIRECTORY_SEPARATOR, $filepath );
+		array_pop( $path );
+		$path = implode( DIRECTORY_SEPARATOR, $path );
+		return $this->get_backup_folder() . DIRECTORY_SEPARATOR . $path;
+	}
+
+	/**
+	 * Get the watermark backup folder
+	 *
+	 * @return	string $backup_folder
+	 */
+	private function get_backup_folder() {
+		return WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'iw-backup';
+	}
+
+	/**
+	 * Get image resource accordingly to mimetype from the backup folder (if available).
+	 *
+	 * @param	string $filepath
+	 * @return	string $backup_filepath
+	 */
+	private function get_image_backup_filepath( $filepath ) {
+		return $this->get_image_backup_folder() . DIRECTORY_SEPARATOR . $filepath;
+	}
+
+	/**
+	 * Delete the image backup if one exists
+	 *
+	 * @param	int $attachment_id
+	 * @return	bool $force_delete
+	 */
+	public function delete_attachment( $attachment_id, $force_delete ) {
+		if ( true === $force_delete ) {
+			$filepath = get_attached_file( $attachment_id, true );
+			$backup_filepath = $this->get_image_backup_filepath( $filepath );
+
+			if ( file_exists( $backup_filepath ) ) {
+				unlink( $backup_filepath );
+			}
+		}
 	}
 
 	/**

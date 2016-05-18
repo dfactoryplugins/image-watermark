@@ -206,7 +206,7 @@ jQuery( document ).ready( function ( $ ) {
 				display: 'table-cell',
 				width: '100%',
 				height: '100%',
-			}
+			};
 			icon = '';
 			iconcss = {
 				'font-size': '50px',

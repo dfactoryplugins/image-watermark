@@ -110,6 +110,7 @@ final class Image_Watermark {
 		add_action( 'admin_init', array( $this, 'check_extensions' ) );
 		add_action( 'admin_notices', array( $this, 'bulk_admin_notices' ) );
 		add_action( 'delete_attachment', array( $this, 'delete_attachment' ) );
+		add_action( 'wp_ajax_iw_watermark_bulk_action', array( $this, 'watermark_bulk_action_ajax' ) );
 
 		// filters
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_extend_links' ), 10, 2 );
@@ -229,6 +230,8 @@ final class Image_Watermark {
 	 * Enqueue admin scripts and styles.
 	 */
 	public function admin_enqueue_scripts( $page ) {
+		global $pagenow;
+
 		if ( $page === 'settings_page_watermark-options' ) {
 			wp_enqueue_media();
 
@@ -261,6 +264,30 @@ final class Image_Watermark {
 
 			wp_enqueue_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
 			wp_enqueue_style( 'wp-like-ui-theme', plugins_url( 'css/wp-like-ui-theme.css', __FILE__ ), array(), $this->defaults['version'] );
+		}
+
+		if ( $pagenow === 'upload.php' ) {
+			if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+
+				wp_enqueue_script( 'watermark-admin-bulk-actions', plugins_url( '/js/admin-bulk-actions.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], true );
+
+				wp_localize_script( 
+					'watermark-admin-bulk-actions', 
+					'iwBulkActionArgs', 
+					array(
+						'_nonce' => wp_create_nonce( 'image-watermark' ),
+						'__applied_none' => __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+						'__applied_one' => __( 'Watermark was succesfully applied to 1 image.', 'image-watermark' ),
+						'__applied_multi' => __( 'Watermark was succesfully applied to %s images.', 'image-watermark' ),
+						'__removed_none' => __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+						'__removed_one' => __( 'Watermark was succesfully removed from 1 image.', 'image-watermark' ),
+						'__removed_multi' => __( 'Watermark was succesfully removed from %s images.', 'image-watermark' ),
+						'__skipped' => __( 'Skipped files', 'image-watermark' ),
+						'__running' => __( 'Bulk action is currently running, please wait.', 'image-watermark' ),
+						'__dismiss' => __( 'Dismiss this notice.' ), // Wordpress default string
+					) 
+				);
+			}
 		}
 	}
 
@@ -365,6 +392,59 @@ final class Image_Watermark {
 
 	/**
 	 * Apply watermark for selected images on media page.
+	 */	
+	public function watermark_bulk_action_ajax() {
+		
+		// Security & data check
+		if (   ! defined('DOING_AJAX') 
+			|| ! DOING_AJAX 
+			|| ! isset( $_POST['_iw_nonce'] ) 
+			|| ! isset( $_POST['iw-action'] ) 
+			|| ! isset( $_POST['attachment_id'] ) 
+			|| ! is_numeric( $_POST['attachment_id'] ) 
+			|| ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) 
+		) {
+			wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
+			die();
+		}
+
+		$post_id = (int) $_POST['attachment_id'];
+		$action = false;
+		switch ( $_POST['iw-action'] ) {
+			case 'applywatermark': $action = 'applywatermark'; break;
+			case 'removewatermark': $action = 'removewatermark'; break;
+		}
+
+		// only if manual watermarking is turned on and image watermark is set
+		if ( $post_id > 0 && $action && $this->options['watermark_image']['manual_watermarking'] == 1 && ( $this->options['watermark_image']['url'] != 0 || $action == 'removewatermark' ) ) {
+			
+			$data = wp_get_attachment_metadata( $post_id, false );
+
+			// is this really an image?
+			if ( in_array( get_post_mime_type( $post_id ), $this->allowed_mime_types ) && is_array( $data ) ) {	
+
+				if ( $action === 'applywatermark' ) {
+					$this->apply_watermark( $data, $post_id, 'manual' );
+					wp_send_json_success( 'watermarked' );
+
+				} elseif ( $action === 'removewatermark' ) {
+					$success = $this->remove_watermark( $data, $post_id, 'manual' );
+					if ( $success ) {
+						wp_send_json_success( 'watermarkremoved' );
+					} else {
+						wp_send_json_success( 'skipped' );
+					}
+				}
+			} else {
+				wp_send_json_success( 'skipped' );
+			}
+		}
+		wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
+		die();
+	}
+
+	/**
+	 * Apply watermark for selected images on media page.
 	 */
 	public function watermark_bulk_action() {
 		global $pagenow;
@@ -378,7 +458,7 @@ final class Image_Watermark {
 				case 'removewatermark': $action = 'removewatermark'; break;
 			}
 			// only if manual watermarking is turned on and image watermark is set
-			if ( $action && $this->options['watermark_image']['manual_watermarking'] == 1 && $this->options['watermark_image']['url'] != 0 ) {
+			if ( $action && $this->options['watermark_image']['manual_watermarking'] == 1 && ( $this->options['watermark_image']['url'] != 0 || $action == 'removewatermark' ) ) {
 				// security check
 				check_admin_referer( 'bulk-media' );
 
@@ -418,8 +498,9 @@ final class Image_Watermark {
 								}
 								$watermarked = -1;
 							}
-						} else
+						} else {
 							$skipped ++;
+						}
 					}
 
 					$location = esc_url( add_query_arg( array( 'watermarked' => $watermarked, 'watermarkremoved' => $watermarkremoved, 'skipped' => $skipped ), $location ), null, '' );

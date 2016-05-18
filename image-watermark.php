@@ -415,7 +415,8 @@ final class Image_Watermark {
 			case 'removewatermark': $action = 'removewatermark'; break;
 		}
 
-		// only if manual watermarking is turned on and image watermark is set
+		// only if manual watermarking is turned and we have a valid action
+		// if the action is NOT "removewatermark" we also require a watermark image to be set
 		if ( $post_id > 0 && $action && $this->options['watermark_image']['manual_watermarking'] == 1 && ( $this->options['watermark_image']['url'] != 0 || $action == 'removewatermark' ) ) {
 			
 			$data = wp_get_attachment_metadata( $post_id, false );
@@ -457,7 +458,8 @@ final class Image_Watermark {
 				case 'applywatermark': $action = 'applywatermark'; break;
 				case 'removewatermark': $action = 'removewatermark'; break;
 			}
-			// only if manual watermarking is turned on and image watermark is set
+			// only if manual watermarking is turned and we have a valid action
+			// if the action is NOT "removewatermark" we also require a watermark image to be set
 			if ( $action && $this->options['watermark_image']['manual_watermarking'] == 1 && ( $this->options['watermark_image']['url'] != 0 || $action == 'removewatermark' ) ) {
 				// security check
 				check_admin_referer( 'bulk-media' );

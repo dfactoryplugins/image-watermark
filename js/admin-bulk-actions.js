@@ -1,7 +1,25 @@
 
 jQuery( document ).ready( function ( $ ) {
+
+	/**
+	 * wp_localize_script object: iwBulkActionArgs
+	 *
+	 * Params:
+	 *
+	 * _nonce
+	 * __applied_none => 	'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.'
+	 * __applied_one => 	'Watermark was succesfully applied to 1 image.
+	 * __applied_multi => 	'Watermark was succesfully applied to %s images.'
+	 * __removed_none => 	'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.'
+	 * __removed_one => 	'Watermark was succesfully removed from 1 image.'
+	 * __removed_multi => 	'Watermark was succesfully removed from %s images.'
+	 * __skipped => 		'Skipped files'
+	 * __running => 		'Bulk action is currently running, please wait.'
+	 * __dismiss => 		'Dismiss this notice.' // Wordpress default string
+	 * 
+	 */
+
 	watermarkBulkActions = {
-		nonce: '',
 		running: false,
 		action: '',
 		response: '',
@@ -10,8 +28,6 @@ jQuery( document ).ready( function ( $ ) {
 		skippedCount: 0,
 
 		init: function() {
-
-			watermarkBulkActions.nonce = iwBulkActionArgs._nonce;
 
 			$(document).on('click', '.bulkactions input#doaction', function(e) {
 				// Get the selected bulk action
@@ -22,18 +38,24 @@ jQuery( document ).ready( function ( $ ) {
 					// Stop default
 					e.preventDefault();
 
+					// store current action
 					watermarkBulkActions.action = action;
 
+					// Is this script running?
 					if ( watermarkBulkActions.running === false ) {
+						// No! set it on running
 						watermarkBulkActions.running = true;
 
+						// store selected attachment id's
 						$('.wp-list-table .check-column input:checkbox:checked').each(function(){
 							watermarkBulkActions.selected.push( $(this).val() );
 						});
 
+						// begin the update!
 						watermarkBulkActions.post_loop();
 
 					} else {
+						// script is running, can't run two at the same time
 						watermarkBulkActions.notice( 'error iw-notice', iwBulkActionArgs.__running, false );
 					}
 
@@ -48,78 +70,123 @@ jQuery( document ).ready( function ( $ ) {
 		},
 
 		post_loop: function() {
+			// do we have selected attachments?
 			if ( watermarkBulkActions.selected.length ) {
+
 				id = watermarkBulkActions.selected[ 0 ];
+
+				// check for a valid ID (needs to be numeric)
 				if ( ! isNaN( id ) ) {
-					watermarkBulkActions.animate_row_image( 'loading', id );
+
+					// Show loading icon
+					watermarkBulkActions.row_image_feedback( 'loading', id );
+
+					// post data
 					data = {
-						'_iw_nonce': watermarkBulkActions.nonce,
+						'_iw_nonce': iwBulkActionArgs._nonce,
 						'action': 'iw_watermark_bulk_action',
 						'iw-action': watermarkBulkActions.action,
 						'attachment_id': id
 					};
-					$.post(ajaxurl, data, function(response) {
+
+					// the ajax post!
+					$.post( ajaxurl, data, function(response) {
+						// show result
 						watermarkBulkActions.result(response, id);
+						// remove this ID/key from the selected attachments
 						watermarkBulkActions.selected.splice(0,1);
+						// Redo this function
 						watermarkBulkActions.post_loop();
-					});
+					} );
+
 				} else {
+					// ID is not valid so remove this key from the selected attachments
 					watermarkBulkActions.selected.splice(0,1);
+					// Redo this function
 					watermarkBulkActions.post_loop();
 				}
 			} else {
+				// All is done, reset this function
 				watermarkBulkActions.reset();
 			}
 		},
 
 		result: function( response, id ) {
 			
+			// Was the ajax post successful?
 			if ( response.success === true ) {
+
+				// defaults
 				type = false;
 				message = '';
 				watermarkBulkActions.response = response.data;
+
+				// Check what kind of action is done (watermarked, watermarkremoved or skipped)
 				switch ( response.data ) {
 					case 'watermarked': 
+						// The css classes for the notice
 						type = 'updated iw-notice iw-watermarked';
+						// another successful update
 						watermarkBulkActions.successCount += 1;
+						// Do we have more success updates?
 						if ( watermarkBulkActions.successCount > 1 ) {
+							//yes
 							message = iwBulkActionArgs.__applied_multi.replace('%s', watermarkBulkActions.successCount);
 						} else {
+							//no
 							message = iwBulkActionArgs.__applied_one;
 						}
-						watermarkBulkActions.animate_row_image( 'success', id );
+						// update the row feedback
+						watermarkBulkActions.row_image_feedback( 'success', id );
+						// reload the image
 						watermarkBulkActions.reload_image( id );
 					break;
 					case 'watermarkremoved': 
+						// The css classes for the notice
 						type = 'updated iw-notice iw-watermarkremoved';
+						// another successful update
 						watermarkBulkActions.successCount += 1;
+						// Do we have more success updates?
 						if ( watermarkBulkActions.successCount > 1 ) {
+							//yes
 							message = iwBulkActionArgs.__removed_multi.replace('%s', watermarkBulkActions.successCount);
 						} else {
+							//no
 							message = iwBulkActionArgs.__removed_one;
 						}
-						watermarkBulkActions.animate_row_image( 'success', id );
+						// update the row feedback
+						watermarkBulkActions.row_image_feedback( 'success', id );
+						// reload the image
 						watermarkBulkActions.reload_image( id );
 					break;
 					case 'skipped': 
+						// The css classes for the notice
 						type = 'error iw-notice iw-skipped';
+						// another skipped update
 						watermarkBulkActions.skippedCount += 1;
+						// adjust the message with the number of skipped updates
 						message = iwBulkActionArgs.__skipped + ': ' + watermarkBulkActions.skippedCount;
-						watermarkBulkActions.animate_row_image( 'error', id );
+						// update the row feedback
+						watermarkBulkActions.row_image_feedback( 'error', id );
 					break;
 				}
 				if ( type !== false ) {
+					// we have a valid terun type, show the notice! (Overwrite current notice if available)
 					watermarkBulkActions.notice( type, message, true );
 				}
 			} else {
+				// No success...
 				watermarkBulkActions.notice( 'error iw-notice', response.data, false );
-				watermarkBulkActions.animate_row_image( 'error', id );
+				// update the row feedback
+				watermarkBulkActions.row_image_feedback( 'error', id );
 			}
 
 		},
 
-		animate_row_image: function( type, id ) {
+		row_image_feedback: function( type, id ) {
 			container_selector = '.wp-list-table #post-'+id+' .image-icon';
+
+			// css rules
 			$(container_selector).css('position', 'relative');
 			css = {
 				display: 'table',
@@ -149,6 +216,8 @@ jQuery( document ).ready( function ( $ ) {
 				height: '50px',
 			};
 			rotate = false;
+			
+			// Type specific rules
 			switch ( type ) {
 				case 'loading':
 					icon = 'dashicons-update';
@@ -163,15 +232,19 @@ jQuery( document ).ready( function ( $ ) {
 					icon = 'dashicons-no-alt';
 				break;
 			}
+
+			// Only create the element if it doesn't exist
 			if ( ! $(container_selector+' .iw-overlay').length ) {
 				$(container_selector).append('<span class="iw-overlay"><span class="iw-overlay-inner"></span></span>');
 				$(container_selector+' .iw-overlay .iw-overlay-inner').html('<span class="dashicons ' + icon + '"></span>');
 			}
+			// Overwrite with new data
 			$(container_selector+' .iw-overlay').css(css);
 			$(container_selector+' .iw-overlay .iw-overlay-inner').css(cssinner);
 			$(container_selector+' .iw-overlay .iw-overlay-inner').html('<span class="dashicons '+icon+'"></span>');
 			$(container_selector+' .iw-overlay .dashicons').css(iconcss);
 
+			// Rotate the icon?
 			if ( rotate ) {
 				watermarkBulkActions.rotate_icon( $(container_selector+' .iw-overlay .dashicons') );
 			}
@@ -181,19 +254,24 @@ jQuery( document ).ready( function ( $ ) {
 		notice: function( type, message, overwrite ) {
 
 			type += ' notice is-dismissible';
+
+			// Overwrite the current notice?
 			if ( overwrite === true) {
-				selector = '';
+				selector = false;
+				// Get the selector based on the response
 				switch ( watermarkBulkActions.response ) {
 					case 'watermarked': selector = '.iw-notice.iw-watermarked'; break;
 					case 'watermarkremoved': selector = '.iw-notice.iw-watermarkremoved'; break;
 					case 'skipped': selector = '.iw-notice.iw-skipped'; break;
 				}
-				if ( $('.wrap '+selector+' > p').length ) {
+				// Do we have a selector and can we find it? If not, just create a new notice
+				if ( selector && $('.wrap '+selector+' > p').length ) {
 					$('.wrap '+selector+' > p').html( message );
 				} else {
 					$('.wrap > h1 ').after('<div class="' + type + '"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwBulkActionArgs.__dismiss + '</span></button></div>');
 				}
 			} else {
+				// create a new notice
 				$('.wrap > h1 ').after('<div class="' + type + '"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwBulkActionArgs.__dismiss + '</span></button></div>');
 			}
 
@@ -241,7 +319,7 @@ jQuery( document ).ready( function ( $ ) {
 					}, 
 					duration: 'slow',
 				}, 'linear', function(){
-					watermarkBulkActions.rotate_icon( icon );
+					watermarkBulkActions.rotate_icon( this );
 				}
 			);
 		}

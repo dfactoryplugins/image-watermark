@@ -49,6 +49,7 @@ final class Image_Watermark {
 		'image/pjpeg',
 		'image/png'
 	);
+	private $is_watermarked_metakey = 'iw-is-watermarked';
 	public $extensions;
 	public $defaults = array(
 		'options'	 => array(
@@ -555,10 +556,14 @@ final class Image_Watermark {
 
 		$upload_dir = wp_upload_dir();
 
-		// is this really an iamge?
+		// is this really an image?
 		if ( getimagesize( $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'] ) !== false ) {
+			// Remove the watermark if this image was allready watermarked, not === because the database can't hold booleans
+			if ( get_post_meta( $attachment_id, $this->is_watermarked_metakey ) == true ) {
+				$this->remove_watermark( $data, $attachment_id, 'manual' );
+			}
 			// create a backup if this is enabled
-			if ( isset( $this->options['backup']['backup_image'] ) && true == $this->options['backup']['backup_image'] ) {
+			if ( true == $this->options['backup']['backup_image'] ) {
 				$this->do_backup( $data, $upload_dir, $attachment_id );
 			}
 			// loop through active image sizes
@@ -578,14 +583,16 @@ final class Image_Watermark {
 								continue 2;
 					}
 
-					do_action( 'iw_before_apply_watermark' );
+					do_action( 'iw_before_apply_watermark', $attachment_id, $image_size );
 
 					// apply watermark
 					$this->do_watermark( $attachment_id, $filepath, $image_size, $upload_dir );
 
-					do_action( 'iw_after_apply_watermark' );
+					do_action( 'iw_after_apply_watermark', $attachment_id, $image_size );
 				}
 			}
+			// Update watermark status
+			update_post_meta( $attachment_id, $this->is_watermarked_metakey, true );
 		}
 
 		// pass forward attachment metadata
@@ -601,10 +608,18 @@ final class Image_Watermark {
 	 * @return	array
 	 */
 	private function remove_watermark( $data, $attachment_id, $method = '' ) {
-		if ( $method === 'manual' ) {
-			
+		if ( $method !== 'manual' ) {
+			return $data;
+		}
+
+		$upload_dir = wp_upload_dir();
+
+		// is this really an image?
+		if ( getimagesize( $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'] ) !== false ) {
+
 			// Live file path (probably watermarked)
 			$filepath = get_attached_file( $attachment_id );
+
 			// Backup file path (not watermarked)
 			$backup_filepath = $this->get_image_backup_filepath( get_post_meta( $attachment_id, '_wp_attached_file', true ) );
 
@@ -613,12 +628,19 @@ final class Image_Watermark {
 				if ( ! copy( $backup_filepath, $filepath ) ) {
 					// Failed to copy
 				}
-			} // If no backup exists, just use the current full-size image to regenerate
+			}
+			// If no backup exists, use the current full-size image to regenerate
+			// If the "full" size is enabled for watermarks and no backup has been made the removal of watermarks can't be done
 
 			// Regenerate metadata (and thumbs)
 			$metadata = wp_generate_attachment_metadata( $attachment_id, $filepath );
+
 			// Update attachment metadata with new metadata
 			wp_update_attachment_metadata( $attachment_id, $metadata );
+
+			// Update watermark status
+			update_post_meta( $attachment_id, $this->is_watermarked_metakey, false );
+
 			// Return the attachment metadata
 			return wp_get_attachment_metadata( $attachment_id );
 		}
@@ -728,27 +750,31 @@ final class Image_Watermark {
 		$backupfolder = IMAGE_WATERMARK_BACKUP_DIR;
 		$backup_filepath = $backupfolder . DIRECTORY_SEPARATOR . $data['file'];
 		
-		$filepath = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'];
-		$mime = wp_check_filetype( $filepath );
+		// Make sure the backup isn't created yet
+		if ( ! file_exists( $backup_filepath ) ) {
+			// The original (full size) image
+			$filepath = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'];
+			$mime = wp_check_filetype( $filepath );
 
-		// get image resource
-		$image = $this->get_image_resource( $filepath, $mime['type'] );
+			// get image resource
+			$image = $this->get_image_resource( $filepath, $mime['type'] );
 
-		if ( false !== $image ) {
-			// create backup directory if needed
-			wp_mkdir_p( $this->get_image_backup_folder_location( $data['file'] ) );
-			// save backup image
-			$this->save_image_file( $image, $mime['type'], $backup_filepath, $this->options['backup']['backup_quality'] );
+			if ( false !== $image ) {
+				// create backup directory if needed
+				wp_mkdir_p( $this->get_image_backup_folder_location( $data['file'] ) );
 
-			// clear watermark memory
-			imagedestroy( $image );
-			$image = null;
+				// save backup image
+				$this->save_image_file( $image, $mime['type'], $backup_filepath, $this->options['backup']['backup_quality'] );
+
+				// clear backup memory
+				imagedestroy( $image );
+				$image = null;
+			}
 		}
 	}
 
 	/**
 	 * Get image resource accordingly to mimetype.
-	 * Checks if a backup exists and uses the backup if available
 	 *
 	 * @param	string $filepath
 	 * @param	string $mime_type

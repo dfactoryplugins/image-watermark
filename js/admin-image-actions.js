@@ -112,10 +112,8 @@ jQuery( document ).ready( function ( $ ) {
 
 			// Since these are added later we'll need to enable dismissing again
 			$(document).on('click', '.iw-notice.is-dismissible .notice-dismiss', function(){
-				$(this).parents('.iw-notice').fadeOut('fast', function(){ 
-					$(this).slideUp('fast', function() {	
-						$(this).remove(); 
-					});
+				$(this).parents('.iw-notice').slideUp('fast', function() {	
+					$(this).remove(); 
 				});
 			});
 
@@ -381,12 +379,13 @@ jQuery( document ).ready( function ( $ ) {
 					}
 					$(prefix+selector+' > p').html( message );
 				} else {
-					$(prefix).after('<div class="' + type + '"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwImageActionArgs.__dismiss + '</span></button></div>');
+					$(prefix).after('<div class="' + type + '" style="display: none;"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwImageActionArgs.__dismiss + '</span></button></div>');
+					$('.iw-notice').slideDown('fast');
 				}
 			} else {
-
 				// create a new notice
-				$(prefix).after('<div class="' + type + '"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwImageActionArgs.__dismiss + '</span></button></div>');
+				$(prefix).after('<div class="' + type + '" style="display: none;"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwImageActionArgs.__dismiss + '</span></button></div>');
+				$('.iw-notice').slideDown('fast');
 			}
 
 		},

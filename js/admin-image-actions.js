@@ -56,6 +56,11 @@ jQuery( document ).ready( function ( $ ) {
 							watermarkImageActions.selected.push( $(this).val() );
 						});
 
+						// remove current notices
+						$('.iw-notice').slideUp('fast', function() {	
+							$(this).remove(); 
+						});
+
 						// begin the update!
 						watermarkImageActions.post_loop();
 
@@ -98,6 +103,11 @@ jQuery( document ).ready( function ( $ ) {
 
 						// store attachment id
 						watermarkImageActions.selected.push( id );
+
+						// remove current notices
+						$('.iw-notice').slideUp('fast', function() {	
+							$(this).remove(); 
+						});
 
 						// begin the update!
 						watermarkImageActions.post_loop();
@@ -238,7 +248,7 @@ jQuery( document ).ready( function ( $ ) {
 			css = cssinner = iconcss = {};
 			switch ( watermarkImageActions.action_location ) {
 				case 'upload-list': 
-					container_selector = '.wp-list-table #post-'+id+' .image-icon';
+					container_selector = '.wp-list-table #post-'+id+' .media-icon';
 					css = {
 						display: 'table',
 						width: $(container_selector).width() + 'px',

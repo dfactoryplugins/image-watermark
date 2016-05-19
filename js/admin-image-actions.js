@@ -36,12 +36,12 @@ jQuery( document ).ready( function ( $ ) {
 				action = $(this).parent().children('select').val();
 
 				// Validate action
-				if ( action == 'applywatermark' || action == 'removewatermark' ) {
+				if ( 'applywatermark' == action || 'removewatermark' == action ) {
 					// Stop default
 					e.preventDefault();
 
 					// Is this script running?
-					if ( watermarkImageActions.running === false ) {
+					if ( false === watermarkImageActions.running ) {
 						// No! set it on running
 						watermarkImageActions.running = true;
 
@@ -72,14 +72,14 @@ jQuery( document ).ready( function ( $ ) {
 				}
 			});
 
-			// Media modal mode
+			// Media modal or edit attachment screen mode
 			$(document).on('click', '#image_watermark_buttons button.iw-watermark-action', function(e) {
 				// Get the selected bulk action
 				action = $(this).attr('data-action');
 				id = $(this).attr('data-id');
 
 				// Validate action
-				if ( action == 'applywatermark' || action == 'removewatermark' && ! isNaN( id ) ) {
+				if ( 'applywatermark' == action || 'removewatermark' == action && ! isNaN( id ) ) {
 					// Stop default
 					e.preventDefault();
 
@@ -87,7 +87,7 @@ jQuery( document ).ready( function ( $ ) {
 					watermarkImageActions.action = action;
 
 					// Is this script running?
-					if ( watermarkImageActions.running === false ) {
+					if ( false === watermarkImageActions.running ) {
 						// No! set it on running
 						watermarkImageActions.running = true;
 
@@ -121,10 +121,10 @@ jQuery( document ).ready( function ( $ ) {
 			});
 
 			// Since these are added later we'll need to enable dismissing again
-			$(document).on('click', '.iw-notice.is-dismissible .notice-dismiss', function(){
-				$(this).parents('.iw-notice').slideUp('fast', function() {	
+			$(document).on('click', '.iw-notice.is-dismissible .notice-dismiss', function() {
+				$(this).parents('.iw-notice').slideUp( 'fast', function() {	
 					$(this).remove(); 
-				});
+				} );
 			});
 
 		},
@@ -133,6 +133,7 @@ jQuery( document ).ready( function ( $ ) {
 			// do we have selected attachments?
 			if ( watermarkImageActions.selected.length ) {
 
+				// take the first id
 				id = watermarkImageActions.selected[ 0 ];
 
 				// check for a valid ID (needs to be numeric)
@@ -150,23 +151,23 @@ jQuery( document ).ready( function ( $ ) {
 					};
 
 					// the ajax post!
-					$.post( ajaxurl, data, function(response) {
+					$.post( ajaxurl, data, function( response ) {
 						// show result
-						watermarkImageActions.result(response, id);
+						watermarkImageActions.result( response, id );
 						// remove this ID/key from the selected attachments
-						watermarkImageActions.selected.splice(0,1);
+						watermarkImageActions.selected.splice( 0, 1 );
 						// Redo this function
 						watermarkImageActions.post_loop();
 					} );
 
 				} else {
 					// ID is not valid so remove this key from the selected attachments
-					watermarkImageActions.selected.splice(0,1);
+					watermarkImageActions.selected.splice( 0, 1 );
 					// Redo this function
 					watermarkImageActions.post_loop();
 				}
 			} else {
-				// All is done, reset this function
+				// All is done, reset this "class"
 				watermarkImageActions.reset();
 			}
 		},
@@ -174,11 +175,12 @@ jQuery( document ).ready( function ( $ ) {
 		result: function( response, id ) {
 			
 			// Was the ajax post successful?
-			if ( response.success === true ) {
+			if ( true === response.success ) {
 
 				// defaults
 				type = false;
 				message = '';
+				// store response data
 				watermarkImageActions.response = response.data;
 
 				// Check what kind of action is done (watermarked, watermarkremoved or skipped)
@@ -188,10 +190,10 @@ jQuery( document ).ready( function ( $ ) {
 						type = 'updated iw-notice iw-watermarked';
 						// another successful update
 						watermarkImageActions.successCount += 1;
-						// Do we have more success updates?
-						if ( watermarkImageActions.successCount > 1 ) {
+						// did we have more success updates?
+						if ( 1 < watermarkImageActions.successCount ) {
 							//yes
-							message = iwImageActionArgs.__applied_multi.replace('%s', watermarkImageActions.successCount);
+							message = iwImageActionArgs.__applied_multi.replace( '%s', watermarkImageActions.successCount );
 						} else {
 							//no
 							message = iwImageActionArgs.__applied_one;
@@ -206,10 +208,10 @@ jQuery( document ).ready( function ( $ ) {
 						type = 'updated iw-notice iw-watermarkremoved';
 						// another successful update
 						watermarkImageActions.successCount += 1;
-						// Do we have more success updates?
-						if ( watermarkImageActions.successCount > 1 ) {
+						// did we have more success updates?
+						if ( 1 < watermarkImageActions.successCount ) {
 							//yes
-							message = iwImageActionArgs.__removed_multi.replace('%s', watermarkImageActions.successCount);
+							message = iwImageActionArgs.__removed_multi.replace( '%s', watermarkImageActions.successCount );
 						} else {
 							//no
 							message = iwImageActionArgs.__removed_one;
@@ -230,7 +232,7 @@ jQuery( document ).ready( function ( $ ) {
 						watermarkImageActions.row_image_feedback( 'error', id );
 					break;
 				}
-				if ( type !== false ) {
+				if ( false !== type ) {
 					// we have a valid terun type, show the notice! (Overwrite current notice if available)
 					watermarkImageActions.notice( type, message, true );
 				}
@@ -370,7 +372,7 @@ jQuery( document ).ready( function ( $ ) {
 			}
 
 			// Overwrite the current notice?
-			if ( overwrite === true) {
+			if ( true === overwrite ) {
 				selector = false;
 
 				// Get the selector based on the response
@@ -409,9 +411,11 @@ jQuery( document ).ready( function ( $ ) {
 			watermarkImageActions.skippedCount = 0;
 
 			// remove the overlay
-			setTimeout( function(){
-				$('.iw-overlay').each( function(){
-					$(this).fadeOut('slow', function(){ $(this).remove(); }); 
+			setTimeout( function() {
+				$('.iw-overlay').each( function() {
+					$(this).fadeOut('slow', function() { 
+						$(this).remove(); 
+					}); 
 				});
 			}, 1000 );
 		},
@@ -430,10 +434,11 @@ jQuery( document ).ready( function ( $ ) {
 			if ( selector ) {
 				image = $( selector );
 				image.each( function () {
+					// Remove the responsive metadata, this prevents reloading the image
 					$(this).removeAttr('srcset');
 					$(this).removeAttr('sizes');
+					// Reload the image (actually a browser hack by adding a time parameter to the image)
 					$(this).attr('src', watermarkImageActions.replace_url_param( $(this).attr('src'), 't', time ) );
-					//$(this).attr('src', $(this).attr('src') + '?t=' + time );
 				});
 			}
 		},
@@ -445,12 +450,14 @@ jQuery( document ).ready( function ( $ ) {
 			}
 			// Check for the length of the selected object.
 			if ( $( icon.selector ).length ) {
+				// Set rotation to 0
 				icon.css({
 					'-webkit-transform': 'rotate(0deg)',
 					'-ms-transform': 'rotate(0deg)',
 					'transform': 'rotate(0deg)',
 					'borderSpacing': '0',
 				});
+				// Do animation (one rotation)
 				icon.animate(
 					{ borderSpacing: 360 }, 
 					{ 
@@ -479,6 +486,7 @@ jQuery( document ).ready( function ( $ ) {
 		},
 	};
 
+	// We need that nonce!
 	if ( typeof iwImageActionArgs._nonce != 'undefined' ) {
 		watermarkImageActions.init();
 	}

@@ -110,12 +110,13 @@ final class Image_Watermark {
 		add_action( 'admin_init', array( $this, 'check_extensions' ) );
 		add_action( 'admin_notices', array( $this, 'bulk_admin_notices' ) );
 		add_action( 'delete_attachment', array( $this, 'delete_attachment' ) );
-		add_action( 'wp_ajax_iw_watermark_bulk_action', array( $this, 'watermark_bulk_action_ajax' ) );
+		add_action( 'wp_ajax_iw_watermark_bulk_action', array( $this, 'watermark_action_ajax' ) );
 
 		// filters
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_extend_links' ), 10, 2 );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_settings_link' ), 10, 2 );
 		add_filter( 'wp_handle_upload', array( $this, 'handle_upload_files' ) );
+		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_fields_to_edit' ), 10, 2 );
 
 		// create backup folder and security if enabled
 		if ( true == $this->options['backup']['backup_image'] ) {
@@ -268,28 +269,27 @@ final class Image_Watermark {
 			wp_enqueue_script( 'postbox' );
 		}
 
-		if ( $pagenow === 'upload.php' ) {
-			if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+		// I've omitted $pagenow === 'upload.php' because the image modal could be loaded in various places
+		if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
 
-				wp_enqueue_script( 'watermark-admin-bulk-actions', plugins_url( '/js/admin-bulk-actions.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], true );
+			wp_enqueue_script( 'watermark-admin-image-actions', plugins_url( '/js/admin-image-actions.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], true );
 
-				wp_localize_script( 
-					'watermark-admin-bulk-actions', 
-					'iwBulkActionArgs', 
-					array(
-						'_nonce' => wp_create_nonce( 'image-watermark' ),
-						'__applied_none' => __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
-						'__applied_one' => __( 'Watermark was succesfully applied to 1 image.', 'image-watermark' ),
-						'__applied_multi' => __( 'Watermark was succesfully applied to %s images.', 'image-watermark' ),
-						'__removed_none' => __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
-						'__removed_one' => __( 'Watermark was succesfully removed from 1 image.', 'image-watermark' ),
-						'__removed_multi' => __( 'Watermark was succesfully removed from %s images.', 'image-watermark' ),
-						'__skipped' => __( 'Skipped files', 'image-watermark' ),
-						'__running' => __( 'Bulk action is currently running, please wait.', 'image-watermark' ),
-						'__dismiss' => __( 'Dismiss this notice.' ), // Wordpress default string
-					) 
-				);
-			}
+			wp_localize_script( 
+				'watermark-admin-image-actions', 
+				'iwImageActionArgs', 
+				array(
+					'_nonce' => wp_create_nonce( 'image-watermark' ),
+					'__applied_none' => __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+					'__applied_one' => __( 'Watermark was succesfully applied to 1 image.', 'image-watermark' ),
+					'__applied_multi' => __( 'Watermark was succesfully applied to %s images.', 'image-watermark' ),
+					'__removed_none' => __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+					'__removed_one' => __( 'Watermark was succesfully removed from 1 image.', 'image-watermark' ),
+					'__removed_multi' => __( 'Watermark was succesfully removed from %s images.', 'image-watermark' ),
+					'__skipped' => __( 'Skipped files', 'image-watermark' ),
+					'__running' => __( 'Bulk action is currently running, please wait.', 'image-watermark' ),
+					'__dismiss' => __( 'Dismiss this notice.' ), // Wordpress default string
+				) 
+			);
 		}
 	}
 
@@ -393,9 +393,40 @@ final class Image_Watermark {
 	}
 
 	/**
+	 * Add watermark buttons on attachment image locations
+	 */	
+	public function attachment_fields_to_edit( $form_fields, $post ) {
+
+		if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+
+			$data = wp_get_attachment_metadata( $post->ID, false );
+
+			// is this really an image?
+			if ( in_array( get_post_mime_type( $post->ID ), $this->allowed_mime_types ) && is_array( $data ) ) {
+
+				$class = '';
+				if ( get_post_meta( $post->ID, $this->is_watermarked_metakey, true ) ) {
+					$class = 'watermarked';
+				}
+				$form_fields['image_watermark'] = array(
+	      			'show_in_edit' => false,
+	      			'tr' => '
+	      			<div id="image_watermark_buttons" class="' . $class . '" data-id="' . $post->ID . '">
+	      				<h3>' . __( 'Image Watermark', 'image-watermark' ) . '</h3>
+	      				<button class="iw-watermark-action" data-action="applywatermark" data-id="' . $post->ID . '">' . __( 'Apply watermark', 'image-watermark' ) . '</button>
+	      				<button class="iw-watermark-action" data-action="removewatermark" data-id="' . $post->ID . '">' . __( 'Remove watermark', 'image-watermark' ) . '</button>
+	      			</div>
+	      			',
+				);
+			}
+		}
+		return $form_fields;
+	}
+
+	/**
 	 * Apply watermark for selected images on media page.
 	 */	
-	public function watermark_bulk_action_ajax() {
+	public function watermark_action_ajax() {
 		
 		// Security & data check
 		if (   ! defined('DOING_AJAX') 

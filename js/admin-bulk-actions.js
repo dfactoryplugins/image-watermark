@@ -303,25 +303,35 @@ jQuery( document ).ready( function ( $ ) {
 		},
 
 		rotate_icon: function( icon ) {
-			icon.css({
-				'-webkit-transform': 'rotate(0deg)',
-				'-ms-transform': 'rotate(0deg)',
-				'transform': 'rotate(0deg)',
-				'borderSpacing': '0',
-			});
-			icon.animate(
-				{ borderSpacing: 360 }, 
-				{ 
-					step: function(now, fx) {
-				 		$(this).css('-webkit-transform', 'rotate('+now+'deg)');
-				 		$(this).css('-ms-transform', 'rotate('+now+'deg)');
-				 		$(this).css('transform', 'rotate('+now+'deg)');
-					}, 
-					duration: 'slow',
-				}, 'linear', function(){
-					watermarkBulkActions.rotate_icon( this );
-				}
-			);
+			// This function accepts selectors and objects
+			if ( typeof icon == 'string') {
+				icon = $( icon );
+			}
+			// Check for the length of the selected object.
+			if ( $( icon.selector ).length ) {
+				icon.css({
+					'-webkit-transform': 'rotate(0deg)',
+					'-ms-transform': 'rotate(0deg)',
+					'transform': 'rotate(0deg)',
+					'borderSpacing': '0',
+				});
+				icon.animate(
+					{ borderSpacing: 360 }, 
+					{ 
+						duration: 1000,
+						step: function(now, fx) {
+					 		$(this).css('-webkit-transform', 'rotate('+now+'deg)');
+					 		$(this).css('-ms-transform', 'rotate('+now+'deg)');
+					 		$(this).css('transform', 'rotate('+now+'deg)');
+					 		if (now == 360) {
+					 			// Animation finished, stop loop and restart
+					 			icon.stop();
+					 			watermarkBulkActions.rotate_icon( icon );
+					 		}
+						}, 
+					}
+				);
+			}
 		}
 	};
 

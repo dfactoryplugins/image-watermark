@@ -264,6 +264,8 @@ final class Image_Watermark {
 
 			wp_enqueue_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
 			wp_enqueue_style( 'wp-like-ui-theme', plugins_url( 'css/wp-like-ui-theme.css', __FILE__ ), array(), $this->defaults['version'] );
+
+			wp_enqueue_script( 'postbox' );
 		}
 
 		if ( $pagenow === 'upload.php' ) {

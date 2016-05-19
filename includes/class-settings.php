@@ -109,7 +109,7 @@ class Image_Watermark_Settings {
 			<h2>' . __( 'Image Watermark', 'image-watermark' ) . '</h2>';
 
 		echo '
-			<div class="image-watermark-settings">
+			<div class="image-watermark-settings metabox-holder">
 				<div class="df-sidebar">
 					<div class="df-credits">
 						<h3 class="hndle">' . __( 'Image Watermark', 'image-watermark' ) . ' ' . Image_Watermark()->defaults['version'] . '</h3>
@@ -132,10 +132,11 @@ class Image_Watermark_Settings {
 							<p class="df-link inner">' . __( 'Created by', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=created-by" target="_blank" title="dFactory - Quality plugins for WordPress"><img src="' . plugins_url( '../images/logo-dfactory.png', __FILE__ ) . '" title="dFactory - Quality plugins for WordPress" alt="dFactory - Quality plugins for WordPress" /></a></p>
 						</div>
 					</div>
-				<form action="options.php" method="post">';
-
+				</div>
+				<form action="options.php" method="post">
+					<div id="main-sortables" class="meta-box-sortables ui-sortable">';
 		settings_fields( 'image_watermark_options' );
-		do_settings_sections( 'image_watermark_options' );
+		$this->do_settings_sections( 'image_watermark_options' );
 
 		echo '
 					<p class="submit">';
@@ -147,10 +148,23 @@ class Image_Watermark_Settings {
 
 		echo '
 					</p>
+					</div>
 				</form>
 			</div>
 			<div class="clear"></div>
 		</div>';
+		?>
+			<script type="text/javascript">
+				//<![CDATA[
+				jQuery(document).ready( function ($) {
+					// close postboxes that should be closed
+					$('.if-js-closed').removeClass('if-js-closed').addClass('closed');
+					// postboxes setup
+					postboxes.add_postbox_toggles('toplevel_page_genesis');
+				});
+				//]]>
+			</script>
+		<?php
 	}
 
 	/**
@@ -641,6 +655,41 @@ class Image_Watermark_Settings {
 		</fieldset>
 		<p class="description"><?php _e( 'Set output image quality.', 'image-watermark' ); ?></p>
 		<?php
+	}
+	
+	/**
+	 * This function is similar to the function in the Settings API, only the output HTML is changed.
+	 * Print out the settings fields for a particular settings section
+	 *
+	 * @global $wp_settings_fields Storage array of settings fields and their pages/sections
+	 *
+	 * @since 0.1
+	 *
+	 * @param string $page Slug title of the admin page who's settings fields you want to show.
+	 * @param string $section Slug title of the settings section who's fields you want to show.
+	 */
+	function do_settings_sections( $page ) {
+		global $wp_settings_sections, $wp_settings_fields;
+	 
+		if ( ! isset( $wp_settings_sections[$page] ) )
+			return;
+	 
+		foreach ( (array) $wp_settings_sections[$page] as $section ) {
+			echo '<div id="" class="stuffbox postbox '.$section['id'].'">';
+			echo '<button type="button" class="handlediv button-link" aria-expanded="true"><span class="screen-reader-text">' . __('Toggle panel', 'image-watermark') . '</span><span class="toggle-indicator" aria-hidden="true"></span></button>';
+			if ( $section['title'] )
+				echo "<h3 class=\"hndle\"><span>{$section['title']}</span></h3>\n";
+	 
+			if ( $section['callback'] )
+				call_user_func( $section['callback'], $section );
+	 
+			if ( ! isset( $wp_settings_fields ) || !isset( $wp_settings_fields[$page] ) || !isset( $wp_settings_fields[$page][$section['id']] ) )
+				continue;
+			echo '<div class="inside"><table class="form-table">';
+			do_settings_fields( $page, $section['id'] );
+			echo '</table></div>';
+			echo '</div>';
+		}
 	}
 
 }

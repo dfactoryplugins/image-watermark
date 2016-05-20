@@ -411,11 +411,18 @@ final class Image_Watermark {
 				$form_fields['image_watermark'] = array(
 	      			'show_in_edit' => false,
 	      			'tr' => '
-	      			<div id="image_watermark_buttons" class="' . $class . '" data-id="' . $post->ID . '">
+	      			<div id="image_watermark_buttons" class="' . $class . '" data-id="' . $post->ID . '" style="display: none;">
 	      				<h3>' . __( 'Image Watermark', 'image-watermark' ) . '</h3>
 	      				<button class="iw-watermark-action" data-action="applywatermark" data-id="' . $post->ID . '">' . __( 'Apply watermark', 'image-watermark' ) . '</button>
 	      				<button class="iw-watermark-action" data-action="removewatermark" data-id="' . $post->ID . '">' . __( 'Remove watermark', 'image-watermark' ) . '</button>
 	      			</div>
+	      			<script>
+	      				jQuery( document ).ready( function ( $ ) {
+	      					if ( typeof watermarkImageActions != "undefined" ) {
+	      						$("#image_watermark_buttons").show();
+	      					}
+	      				});
+	      			</script>
 	      			',
 				);
 			}
@@ -863,8 +870,8 @@ final class Image_Watermark {
 	 * $return bool
 	 */
 	private function do_backup( $data, $upload_dir, $attachment_id ) {
-		$backupfolder = IMAGE_WATERMARK_BACKUP_DIR;
-		$backup_filepath = $backupfolder . DIRECTORY_SEPARATOR . $data['file'];
+		// get the filepath for the backup image we're creating
+		$backup_filepath = $this->get_image_backup_filepath( $data['file'] );
 		
 		// Make sure the backup isn't created yet
 		if ( ! file_exists( $backup_filepath ) ) {
@@ -878,6 +885,7 @@ final class Image_Watermark {
 			if ( false !== $image ) {
 				// create backup directory if needed
 				wp_mkdir_p( $this->get_image_backup_folder_location( $data['file'] ) );
+
 
 				// save backup image
 				$this->save_image_file( $image, $mime['type'], $backup_filepath, $this->options['backup']['backup_quality'] );
@@ -956,6 +964,10 @@ final class Image_Watermark {
 		$path = explode( DIRECTORY_SEPARATOR, $filepath );
 		array_pop( $path );
 		$path = implode( DIRECTORY_SEPARATOR, $path );
+		// Multisite?
+		if ( is_multisite() && ! is_main_site() ) {
+			$path = 'sites' . DIRECTORY_SEPARATOR . get_current_blog_id() . DIRECTORY_SEPARATOR . $path;
+		}
 		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $path;
 	}
 
@@ -966,6 +978,10 @@ final class Image_Watermark {
 	 * @return	string $backup_filepath
 	 */
 	private function get_image_backup_filepath( $filepath ) {
+		// Multisite?
+		if ( is_multisite() && ! is_main_site() ) {
+			$filepath = 'sites' . DIRECTORY_SEPARATOR . get_current_blog_id() . DIRECTORY_SEPARATOR . $filepath;
+		}
 		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $filepath;
 	}
 

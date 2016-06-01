@@ -70,7 +70,6 @@ final class Image_Watermark {
 				'absolute_height'		=> 0,
 				'transparent'			=> 50,
 				'quality'				=> 90,
-				'backup_quality'		=> 90,
 				'jpeg_format'			=> 'baseline',
 				'deactivation_delete'	=> false,
 				'media_library_notice'	=> true

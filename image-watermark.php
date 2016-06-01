@@ -27,7 +27,6 @@ if ( ! defined( 'ABSPATH' ) )
 
 define( 'IMAGE_WATERMARK_URL', plugins_url( '', __FILE__ ) );
 define( 'IMAGE_WATERMARK_PATH', plugin_dir_path( __FILE__ ) );
-define( 'IMAGE_WATERMARK_BACKUP_DIR', WP_CONTENT_DIR . DIRECTORY_SEPARATOR . 'iw-backup' );
 
 /**
  * Image Watermark class.
@@ -50,6 +49,7 @@ final class Image_Watermark {
 		'image/png'
 	);
 	private $is_watermarked_metakey = 'iw-is-watermarked';
+	public $is_backup_folder_writable = null;
 	public $extensions;
 	public $defaults = array(
 		'options'	 => array(
@@ -118,15 +118,31 @@ final class Image_Watermark {
 		add_filter( 'wp_handle_upload', array( $this, 'handle_upload_files' ) );
 		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_fields_to_edit' ), 10, 2 );
 
+
 		// create backup folder and security if enabled
 		if ( true == $this->options['backup']['backup_image'] ) {
-			if ( ! file_exists( IMAGE_WATERMARK_BACKUP_DIR ) ) {
-				wp_mkdir_p( IMAGE_WATERMARK_BACKUP_DIR);
+
+			// Define our backup location
+			$upload_dir = wp_upload_dir();
+			define( 'IMAGE_WATERMARK_BACKUP_DIR', $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'iw-backup' );
+
+			if ( is_writable( $upload_dir['basedir'] ) ) {
+				$this->is_backup_folder_writable = true;
+				if ( ! file_exists( IMAGE_WATERMARK_BACKUP_DIR ) ) {
+					wp_mkdir_p( IMAGE_WATERMARK_BACKUP_DIR );
+				}
+				if ( ! file_exists( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess' ) ) {
+					// htaccess security
+					file_put_contents( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all' );
+				}
+			} else {
+				$this->is_backup_folder_writable = false;
+				// Disable backup setting
+				$this->options['backup']['backup_image'] = 0;
+				update_option( 'image_watermark_options', $this->options );
 			}
-			if ( ! file_exists( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess' ) ) {
-				// htaccess security
-				file_put_contents( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all' );
-			}
+
+			add_action( 'admin_notices', array( $this, 'filder_writable_admin_notice' ) );
 		}
 	}
 
@@ -998,6 +1014,20 @@ final class Image_Watermark {
 
 		if ( file_exists( $backup_filepath ) ) {
 			unlink( $backup_filepath );
+		}
+	}
+
+	/**
+	 * Create admin notice when we can't create the backup folder
+	 * @return	void
+	 */
+	function filder_writable_admin_notice() {
+		if ( current_user_can('manage_options') && true !== $this->is_backup_folder_writable ) {
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php _e( 'Image Watermark', 'image-watermark' ); ?> - <?php _e( 'Image backup', 'image-watermark' ); ?>: <?php _e( "Your uploads folder is not writable so we can't create a backup of your image uploads. We've disabled this feature for now.", 'image-watermark' ); ?></p>
+			</div>
+		<?php
 		}
 	}
 

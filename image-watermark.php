@@ -119,7 +119,7 @@ final class Image_Watermark {
 
 		// Define our backup location
 		$upload_dir = wp_upload_dir();
-		define( 'IMAGE_WATERMARK_BACKUP_DIR', $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'iw-backup' );
+		define( 'IMAGE_WATERMARK_BACKUP_DIR', apply_filters( 'image_watermark_backup_dir', $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'iw-backup' ) );
 
 		// create backup folder and security if enabled
 		if ( true == $this->options['backup']['backup_image'] ) {
@@ -909,7 +909,6 @@ final class Image_Watermark {
 				// create backup directory if needed
 				wp_mkdir_p( $this->get_image_backup_folder_location( $data['file'] ) );
 
-
 				// save backup image
 				$this->save_image_file( $image, $mime['type'], $backup_filepath, $this->options['backup']['backup_quality'] );
 
@@ -988,23 +987,23 @@ final class Image_Watermark {
 		array_pop( $path );
 		$path = implode( DIRECTORY_SEPARATOR, $path );
 		// Multisite?
-		if ( is_multisite() && ! is_main_site() ) {
+		/*if ( is_multisite() && ! is_main_site() ) {
 			$path = 'sites' . DIRECTORY_SEPARATOR . get_current_blog_id() . DIRECTORY_SEPARATOR . $path;
-		}
+		}*/
 		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $path;
 	}
 
 	/**
-	 * Get image resource accordingly to mimetype from the backup folder (if available).
+	 * Get image resource from the backup folder (if available).
 	 *
 	 * @param	string $filepath
 	 * @return	string $backup_filepath
 	 */
 	private function get_image_backup_filepath( $filepath ) {
 		// Multisite?
-		if ( is_multisite() && ! is_main_site() ) {
+		/*if ( is_multisite() && ! is_main_site() ) {
 			$filepath = 'sites' . DIRECTORY_SEPARATOR . get_current_blog_id() . DIRECTORY_SEPARATOR . $filepath;
-		}
+		}*/
 		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $filepath;
 	}
 

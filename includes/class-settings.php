@@ -160,7 +160,7 @@ class Image_Watermark_Settings {
 					// close postboxes that should be closed
 					$('.if-js-closed').removeClass('if-js-closed').addClass('closed');
 					// postboxes setup
-					postboxes.add_postbox_toggles('toplevel_page_genesis');
+					postboxes.add_postbox_toggles('watermark-options');
 				});
 				//]]>
 			</script>

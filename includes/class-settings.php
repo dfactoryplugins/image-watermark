@@ -80,6 +80,11 @@ class Image_Watermark_Settings {
 		add_settings_field( 'iw_protection_right_click', __( 'Right click', 'image-watermark' ), array( $this, 'iw_protection_right_click' ), 'image_watermark_options', 'image_watermark_protection' );
 		add_settings_field( 'iw_protection_drag_drop', __( 'Drag and drop', 'image-watermark' ), array( $this, 'iw_protection_drag_drop' ), 'image_watermark_options', 'image_watermark_protection' );
 		add_settings_field( 'iw_protection_logged', __( 'Logged-in users', 'image-watermark' ), array( $this, 'iw_protection_logged' ), 'image_watermark_options', 'image_watermark_protection' );
+
+		// Backup
+		add_settings_section( 'image_watermark_backup', __( 'Image backup', 'image-watermark' ), '', 'image_watermark_options' );
+		add_settings_field( 'iw_backup_image', __( 'Backup full size image', 'image-watermark' ), array( $this, 'iw_backup_image' ), 'image_watermark_options', 'image_watermark_backup' );
+		add_settings_field( 'iw_backup_image_quality', __( 'Backup image quality', 'image-watermark' ), array( $this, 'iw_backup_image_quality' ), 'image_watermark_options', 'image_watermark_backup' );	
 	}
 
 	/**
@@ -104,7 +109,7 @@ class Image_Watermark_Settings {
 			<h2>' . __( 'Image Watermark', 'image-watermark' ) . '</h2>';
 
 		echo '
-			<div class="image-watermark-settings">
+			<div class="image-watermark-settings metabox-holder">
 				<div class="df-sidebar">
 					<div class="df-credits">
 						<h3 class="hndle">' . __( 'Image Watermark', 'image-watermark' ) . ' ' . Image_Watermark()->defaults['version'] . '</h3>
@@ -127,10 +132,11 @@ class Image_Watermark_Settings {
 							<p class="df-link inner">' . __( 'Created by', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=created-by" target="_blank" title="dFactory - Quality plugins for WordPress"><img src="' . plugins_url( '../images/logo-dfactory.png', __FILE__ ) . '" title="dFactory - Quality plugins for WordPress" alt="dFactory - Quality plugins for WordPress" /></a></p>
 						</div>
 					</div>
-				<form action="options.php" method="post">';
-
+				</div>
+				<form action="options.php" method="post">
+					<div id="main-sortables" class="meta-box-sortables ui-sortable">';
 		settings_fields( 'image_watermark_options' );
-		do_settings_sections( 'image_watermark_options' );
+		$this->do_settings_sections( 'image_watermark_options' );
 
 		echo '
 					<p class="submit">';
@@ -142,10 +148,23 @@ class Image_Watermark_Settings {
 
 		echo '
 					</p>
+					</div>
 				</form>
 			</div>
 			<div class="clear"></div>
 		</div>';
+		?>
+			<script type="text/javascript">
+				//<![CDATA[
+				jQuery(document).ready( function ($) {
+					// close postboxes that should be closed
+					$('.if-js-closed').removeClass('if-js-closed').addClass('closed');
+					// postboxes setup
+					postboxes.add_postbox_toggles('watermark-options');
+				});
+				//]]>
+			</script>
+		<?php
 	}
 
 	/**
@@ -200,6 +219,7 @@ class Image_Watermark_Settings {
 			$input['watermark_image']['frontend_active'] = isset( $_POST['iw_options']['watermark_image']['frontend_active'] ) ? ((bool) $_POST['iw_options']['watermark_image']['frontend_active'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['frontend_active'];
 			$input['watermark_image']['deactivation_delete'] = isset( $_POST['iw_options']['watermark_image']['deactivation_delete'] ) ? ((bool) $_POST['iw_options']['watermark_image']['deactivation_delete'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['deactivation_delete'];
 
+
 			$positions = array();
 
 			foreach ( $this->watermark_positions['y'] as $position_y ) {
@@ -223,6 +243,9 @@ class Image_Watermark_Settings {
 			$input['image_protection']['rightclick'] = isset( $_POST['iw_options']['image_protection']['rightclick'] ) ? ((bool) $_POST['iw_options']['image_protection']['rightclick'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['rightclick'];
 			$input['image_protection']['draganddrop'] = isset( $_POST['iw_options']['image_protection']['draganddrop'] ) ? ((bool) $_POST['iw_options']['image_protection']['draganddrop'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['draganddrop'];
 			$input['image_protection']['forlogged'] = isset( $_POST['iw_options']['image_protection']['forlogged'] ) ? ((bool) $_POST['iw_options']['image_protection']['forlogged'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['forlogged'];
+
+			$input['backup']['backup_image'] = isset( $_POST['iw_options']['backup']['backup_image'] ) ? ((bool) $_POST['iw_options']['backup']['backup_image'] == 1 ? true : false) : Image_Watermark()->defaults['options']['backup']['backup_image'];
+			$input['backup']['backup_quality'] = isset( $_POST['iw_options']['backup']['backup_quality'] ) ? (int) $_POST['iw_options']['backup']['backup_quality'] : Image_Watermark()->defaults['options']['backup']['backup_quality'];
 
 			add_settings_error( 'iw_settings_errors', 'iw_settings_saved', __( 'Settings saved.', 'image-watermark' ), 'updated' );
 		} elseif ( isset( $_POST['reset_image_watermark_options'] ) ) {
@@ -604,4 +627,69 @@ class Image_Watermark_Settings {
 		</label>
 		<?php
 	}
+
+	/**
+	 * Backup the original image
+	 */
+	public function iw_backup_image() {
+		?>
+		<label for="iw_backup_size_full">
+			<input id="iw_backup_size_full" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['backup']['backup_image'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[backup][backup_image]">
+<?php echo __( 'Backup the full size image.', 'image-watermark' ); ?>
+		</label>
+		<?php
+	}
+
+	/**
+	 * Image backup quality option.
+	 */
+	public function iw_backup_image_quality() {
+		?>
+		<fieldset id="iw_backup_image_quality">
+			<div>
+				<input type="text" id="iw_backup_quality_input" maxlength="3" class="hide-if-js" name="iw_options[backup][backup_quality]" value="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>" />
+				<div class="wplike-slider">
+					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_backup_quality_span" title="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>"></span><span class="right hide-if-no-js">100</span>
+				</div>
+			</div>
+		</fieldset>
+		<p class="description"><?php _e( 'Set output image quality.', 'image-watermark' ); ?></p>
+		<?php
+	}
+	
+	/**
+	 * This function is similar to the function in the Settings API, only the output HTML is changed.
+	 * Print out the settings fields for a particular settings section
+	 *
+	 * @global $wp_settings_fields Storage array of settings fields and their pages/sections
+	 *
+	 * @since 0.1
+	 *
+	 * @param string $page Slug title of the admin page who's settings fields you want to show.
+	 * @param string $section Slug title of the settings section who's fields you want to show.
+	 */
+	function do_settings_sections( $page ) {
+		global $wp_settings_sections, $wp_settings_fields;
+	 
+		if ( ! isset( $wp_settings_sections[$page] ) )
+			return;
+	 
+		foreach ( (array) $wp_settings_sections[$page] as $section ) {
+			echo '<div id="" class="stuffbox postbox '.$section['id'].'">';
+			echo '<button type="button" class="handlediv button-link" aria-expanded="true"><span class="screen-reader-text">' . __('Toggle panel', 'image-watermark') . '</span><span class="toggle-indicator" aria-hidden="true"></span></button>';
+			if ( $section['title'] )
+				echo "<h3 class=\"hndle\"><span>{$section['title']}</span></h3>\n";
+	 
+			if ( $section['callback'] )
+				call_user_func( $section['callback'], $section );
+	 
+			if ( ! isset( $wp_settings_fields ) || !isset( $wp_settings_fields[$page] ) || !isset( $wp_settings_fields[$page][$section['id']] ) )
+				continue;
+			echo '<div class="inside"><table class="form-table">';
+			do_settings_fields( $page, $section['id'] );
+			echo '</table></div>';
+			echo '</div>';
+		}
+	}
+
 }

@@ -48,6 +48,8 @@ final class Image_Watermark {
 		'image/pjpeg',
 		'image/png'
 	);
+	private $is_watermarked_metakey = 'iw-is-watermarked';
+	public $is_backup_folder_writable = null;
 	public $extensions;
 	public $defaults = array(
 		'options'	 => array(
@@ -77,6 +79,10 @@ final class Image_Watermark {
 				'draganddrop'	 => 0,
 				'forlogged'		 => 0,
 			),
+			'backup'				=> array(
+				'backup_image'		=> 0,
+				'backup_quality'	=> 90,
+			),
 		),
 		'version' => '1.5.6'
 	);
@@ -98,15 +104,53 @@ final class Image_Watermark {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'admin_print_scripts', array( $this, 'admin_print_scripts' ), 20 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
-		add_action( 'load-upload.php', array( $this, 'apply_watermark_bulk_action' ) );
+		add_action( 'load-upload.php', array( $this, 'watermark_bulk_action' ) );
 		add_action( 'admin_init', array( $this, 'update_plugin' ) );
 		add_action( 'admin_init', array( $this, 'check_extensions' ) );
 		add_action( 'admin_notices', array( $this, 'bulk_admin_notices' ) );
+		add_action( 'delete_attachment', array( $this, 'delete_attachment' ) );
+		add_action( 'wp_ajax_iw_watermark_bulk_action', array( $this, 'watermark_action_ajax' ) );
 
 		// filters
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_extend_links' ), 10, 2 );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_settings_link' ), 10, 2 );
 		add_filter( 'wp_handle_upload', array( $this, 'handle_upload_files' ) );
+		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_fields_to_edit' ), 10, 2 );
+
+		// Define our backup location
+		$upload_dir = wp_upload_dir();
+		define( 'IMAGE_WATERMARK_BACKUP_DIR', apply_filters( 'image_watermark_backup_dir', $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'iw-backup' ) );
+
+		// create backup folder and security if enabled
+		if ( true == $this->options['backup']['backup_image'] ) {
+
+			if ( is_writable( $upload_dir['basedir'] ) ) {
+				$this->is_backup_folder_writable = true;
+
+				// Create backup folder ( if it exists this returns true: https://codex.wordpress.org/Function_Reference/wp_mkdir_p )
+				$backup_folder_created = wp_mkdir_p( IMAGE_WATERMARK_BACKUP_DIR );
+
+				// Check if the folder exists and is writable
+				if ( $backup_folder_created && is_writable( IMAGE_WATERMARK_BACKUP_DIR ) ) {
+					// Check if the htaccess file exists
+					if ( ! file_exists( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess' ) ) {
+						// htaccess security
+						file_put_contents( IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . '.htaccess', 'deny from all' );
+					}
+				} else {
+					$this->is_backup_folder_writable = false;
+				}
+			} else {
+				$this->is_backup_folder_writable = false;
+			}
+			if ( true !== $this->is_backup_folder_writable ) {
+				// Disable backup setting
+				$this->options['backup']['backup_image'] = 0;
+				update_option( 'image_watermark_options', $this->options );
+			}
+
+			add_action( 'admin_notices', array( $this, 'filder_writable_admin_notice' ) );
+		}
 	}
 
 	/**
@@ -196,6 +240,8 @@ final class Image_Watermark {
 						$( document ).ready( function() {
 							$( "<option>" ).val( "applywatermark" ).text( "<?php _e( 'Apply watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action']" );
 							$( "<option>" ).val( "applywatermark" ).text( "<?php _e( 'Apply watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action2']" );
+							$( "<option>" ).val( "removewatermark" ).text( "<?php _e( 'Remove watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action']" );
+							$( "<option>" ).val( "removewatermark" ).text( "<?php _e( 'Remove watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action2']" );
 						});
 					});
 				</script>
@@ -208,6 +254,8 @@ final class Image_Watermark {
 	 * Enqueue admin scripts and styles.
 	 */
 	public function admin_enqueue_scripts( $page ) {
+		global $pagenow;
+
 		if ( $page === 'settings_page_watermark-options' ) {
 			wp_enqueue_media();
 
@@ -240,6 +288,31 @@ final class Image_Watermark {
 
 			wp_enqueue_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
 			wp_enqueue_style( 'wp-like-ui-theme', plugins_url( 'css/wp-like-ui-theme.css', __FILE__ ), array(), $this->defaults['version'] );
+
+			wp_enqueue_script( 'postbox' );
+		}
+
+		// I've omitted $pagenow === 'upload.php' because the image modal could be loaded in various places
+		if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+
+			wp_enqueue_script( 'watermark-admin-image-actions', plugins_url( '/js/admin-image-actions.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], true );
+
+			wp_localize_script( 
+				'watermark-admin-image-actions', 
+				'iwImageActionArgs', 
+				array(
+					'_nonce' => wp_create_nonce( 'image-watermark' ),
+					'__applied_none' => __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+					'__applied_one' => __( 'Watermark was succesfully applied to 1 image.', 'image-watermark' ),
+					'__applied_multi' => __( 'Watermark was succesfully applied to %s images.', 'image-watermark' ),
+					'__removed_none' => __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+					'__removed_one' => __( 'Watermark was succesfully removed from 1 image.', 'image-watermark' ),
+					'__removed_multi' => __( 'Watermark was succesfully removed from %s images.', 'image-watermark' ),
+					'__skipped' => __( 'Skipped files', 'image-watermark' ),
+					'__running' => __( 'Bulk action is currently running, please wait.', 'image-watermark' ),
+					'__dismiss' => __( 'Dismiss this notice.' ), // Wordpress default string
+				) 
+			);
 		}
 	}
 
@@ -343,20 +416,118 @@ final class Image_Watermark {
 	}
 
 	/**
+	 * Add watermark buttons on attachment image locations
+	 */	
+	public function attachment_fields_to_edit( $form_fields, $post ) {
+
+		if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+
+			$data = wp_get_attachment_metadata( $post->ID, false );
+
+			// is this really an image?
+			if ( in_array( get_post_mime_type( $post->ID ), $this->allowed_mime_types ) && is_array( $data ) ) {
+
+				$class = '';
+				if ( get_post_meta( $post->ID, $this->is_watermarked_metakey, true ) ) {
+					$class = 'watermarked';
+				}
+				$form_fields['image_watermark'] = array(
+	      			'show_in_edit' => false,
+	      			'tr' => '
+	      			<div id="image_watermark_buttons" class="' . $class . '" data-id="' . $post->ID . '" style="display: none;">
+	      				<h3>' . __( 'Image Watermark', 'image-watermark' ) . '</h3>
+	      				<button class="iw-watermark-action" data-action="applywatermark" data-id="' . $post->ID . '">' . __( 'Apply watermark', 'image-watermark' ) . '</button>
+	      				<button class="iw-watermark-action" data-action="removewatermark" data-id="' . $post->ID . '">' . __( 'Remove watermark', 'image-watermark' ) . '</button>
+	      			</div>
+	      			<script>
+	      				jQuery( document ).ready( function ( $ ) {
+	      					if ( typeof watermarkImageActions != "undefined" ) {
+	      						$("#image_watermark_buttons").show();
+	      					}
+	      				});
+	      			</script>
+	      			',
+				);
+			}
+		}
+		return $form_fields;
+	}
+
+	/**
+	 * Apply watermark for selected images on media page.
+	 */	
+	public function watermark_action_ajax() {
+		
+		// Security & data check
+		if (   ! defined('DOING_AJAX') 
+			|| ! DOING_AJAX 
+			|| ! isset( $_POST['_iw_nonce'] ) 
+			|| ! isset( $_POST['iw-action'] ) 
+			|| ! isset( $_POST['attachment_id'] ) 
+			|| ! is_numeric( $_POST['attachment_id'] ) 
+			|| ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) 
+		) {
+			wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
+			die();
+		}
+
+		$post_id = (int) $_POST['attachment_id'];
+		$action = false;
+		switch ( $_POST['iw-action'] ) {
+			case 'applywatermark': $action = 'applywatermark'; break;
+			case 'removewatermark': $action = 'removewatermark'; break;
+		}
+
+		// only if manual watermarking is turned and we have a valid action
+		// if the action is NOT "removewatermark" we also require a watermark image to be set
+		if ( $post_id > 0 && $action && $this->options['watermark_image']['manual_watermarking'] == 1 && ( $this->options['watermark_image']['url'] != 0 || $action == 'removewatermark' ) ) {
+			
+			$data = wp_get_attachment_metadata( $post_id, false );
+
+			// is this really an image?
+			if ( in_array( get_post_mime_type( $post_id ), $this->allowed_mime_types ) && is_array( $data ) ) {	
+
+				if ( $action === 'applywatermark' ) {
+					$this->apply_watermark( $data, $post_id, 'manual' );
+					wp_send_json_success( 'watermarked' );
+
+				} elseif ( $action === 'removewatermark' ) {
+					$success = $this->remove_watermark( $data, $post_id, 'manual' );
+					if ( $success ) {
+						wp_send_json_success( 'watermarkremoved' );
+					} else {
+						wp_send_json_success( 'skipped' );
+					}
+				}
+			} else {
+				wp_send_json_success( 'skipped' );
+			}
+		}
+		wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
+		die();
+	}
+
+	/**
 	 * Apply watermark for selected images on media page.
 	 */
-	public function apply_watermark_bulk_action() {
+	public function watermark_bulk_action() {
 		global $pagenow;
 
 		if ( $pagenow == 'upload.php' && $this->extension ) {
 			$wp_list_table = _get_list_table( 'WP_Media_List_Table' );
 
-			// only if manual watermarking is turned on and image watermark is set
-			if ( $wp_list_table->current_action() === 'applywatermark' && $this->options['watermark_image']['manual_watermarking'] == 1 && $this->options['watermark_image']['url'] != 0 ) {
+			$action = false;
+			switch ( $wp_list_table->current_action() ) {
+				case 'applywatermark': $action = 'applywatermark'; break;
+				case 'removewatermark': $action = 'removewatermark'; break;
+			}
+			// only if manual watermarking is turned and we have a valid action
+			// if the action is NOT "removewatermark" we also require a watermark image to be set
+			if ( $action && $this->options['watermark_image']['manual_watermarking'] == 1 && ( $this->options['watermark_image']['url'] != 0 || $action == 'removewatermark' ) ) {
 				// security check
 				check_admin_referer( 'bulk-media' );
 
-				$location = esc_url( remove_query_arg( array( 'watermarked', 'skipped', 'trashed', 'untrashed', 'deleted', 'message', 'ids', 'posted' ), wp_get_referer() ) );
+				$location = esc_url( remove_query_arg( array( 'watermarked', 'watermarkremoved', 'skipped', 'trashed', 'untrashed', 'deleted', 'message', 'ids', 'posted' ), wp_get_referer() ) );
 
 				if ( ! $location ) {
 					$location = 'upload.php';
@@ -372,20 +543,32 @@ final class Image_Watermark {
 				// do we have selected attachments?
 				if ( $post_ids ) {
 
-					$watermarked = $skipped = 0;
+					$watermarked = $watermarkremoved = $skipped = 0;
 
 					foreach ( $post_ids as $post_id ) {
 						$data = wp_get_attachment_metadata( $post_id, false );
 
 						// is this really an image?
 						if ( in_array( get_post_mime_type( $post_id ), $this->allowed_mime_types ) && is_array( $data ) ) {
-							$this->apply_watermark( $data, $post_id, 'manual' );
-							$watermarked ++;
-						} else
+							if ( $action === 'applywatermark' ) {
+								$this->apply_watermark( $data, $post_id, 'manual' );
+								$watermarked ++;
+								$watermarkremoved = -1;
+							} elseif ( $action === 'removewatermark' ) {
+								$success = $this->remove_watermark( $data, $post_id, 'manual' );
+								if ( $success ) {
+									$watermarkremoved ++;
+								} else {
+									$skipped ++;
+								}
+								$watermarked = -1;
+							}
+						} else {
 							$skipped ++;
+						}
 					}
 
-					$location = esc_url( add_query_arg( array( 'watermarked' => $watermarked, 'skipped' => $skipped ), $location ), null, '' );
+					$location = esc_url( add_query_arg( array( 'watermarked' => $watermarked, 'watermarkremoved' => $watermarkremoved, 'skipped' => $skipped ), $location ), null, '' );
 				}
 
 				wp_redirect( $location );
@@ -431,14 +614,20 @@ final class Image_Watermark {
 				}
 			}
 			
-			if ( isset( $_REQUEST['watermarked'], $_REQUEST['skipped'] ) && $post_type === 'attachment' ) {
-				$watermarked = (int) $_REQUEST['watermarked'];
-				$skipped = (int) $_REQUEST['skipped'];
+			if ( isset( $_REQUEST['watermarked'], $_REQUEST['watermarkremoved'], $_REQUEST['skipped'] ) && $post_type === 'attachment' ) {
+				$watermarked      = (int) $_REQUEST['watermarked'];
+				$watermarkremoved = (int) $_REQUEST['watermarkremoved'];
+				$skipped          = (int) $_REQUEST['skipped'];
 	
 				if ( $watermarked === 0 ) {
 					echo '<div class="error"><p>' . __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
-				} else {
+				} elseif ( $watermarked > 0 ) {
 					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was succesfully applied to 1 image.', 'Watermark was succesfully applied to %s images.', $watermarked, 'image-watermark' ), number_format_i18n( $watermarked ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+				}	
+				if ( $watermarkremoved === 0 ) {
+					echo '<div class="error"><p>' . __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+				} elseif ( $watermarkremoved > 0 ) {
+					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was succesfully removed from 1 image.', 'Watermark was succesfully removed from %s images.', $watermarkremoved, 'image-watermark' ), number_format_i18n( $watermarkremoved ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				}
 	
 				$_SERVER['REQUEST_URI'] = esc_url( remove_query_arg( array( 'watermarked', 'skipped' ), $_SERVER['REQUEST_URI'] ) );
@@ -488,7 +677,8 @@ final class Image_Watermark {
 	 * Apply watermark to selected image sizes.
 	 *
 	 * @param	array		$data
-	 * @param	int|string	$attachment_id	Attachment ID or 'manual'
+	 * @param	int|string	$attachment_id	Attachment ID
+	 * @param 	string 		$method
 	 * @return	array
 	 */
 	public function apply_watermark( $data, $attachment_id, $method = '' ) {
@@ -512,8 +702,16 @@ final class Image_Watermark {
 
 		$upload_dir = wp_upload_dir();
 
-		// is this really an iamge?
+		// is this really an image?
 		if ( getimagesize( $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'] ) !== false ) {
+			// Remove the watermark if this image was allready watermarked, not === because the database can't hold booleans
+			if ( get_post_meta( $attachment_id, $this->is_watermarked_metakey ) == true ) {
+				$this->remove_watermark( $data, $attachment_id, 'manual' );
+			}
+			// create a backup if this is enabled
+			if ( true == $this->options['backup']['backup_image'] ) {
+				$this->do_backup( $data, $upload_dir, $attachment_id );
+			}
 			// loop through active image sizes
 			foreach ( $this->options['watermark_on'] as $image_size => $active_size ) {
 				
@@ -531,18 +729,68 @@ final class Image_Watermark {
 								continue 2;
 					}
 
-					do_action( 'iw_before_apply_watermark' );
+					do_action( 'iw_before_apply_watermark', $attachment_id, $image_size );
 
 					// apply watermark
 					$this->do_watermark( $attachment_id, $filepath, $image_size, $upload_dir );
 
-					do_action( 'iw_after_apply_watermark' );
+					do_action( 'iw_after_apply_watermark', $attachment_id, $image_size );
 				}
 			}
+			// Update watermark status
+			update_post_meta( $attachment_id, $this->is_watermarked_metakey, true );
 		}
 
 		// pass forward attachment metadata
 		return $data;
+	}
+
+	/**
+	 * Remove watermark to selected image sizes.
+	 *
+	 * @param	array		$data
+	 * @param	int|string	$attachment_id	Attachment ID
+	 * @param 	string 		$method
+	 * @return	array
+	 */
+	private function remove_watermark( $data, $attachment_id, $method = '' ) {
+		if ( $method !== 'manual' ) {
+			return $data;
+		}
+
+		$upload_dir = wp_upload_dir();
+
+		// is this really an image?
+		if ( getimagesize( $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'] ) !== false ) {
+
+			// Live file path (probably watermarked)
+			$filepath = get_attached_file( $attachment_id );
+
+			// Backup file path (not watermarked)
+			$backup_filepath = $this->get_image_backup_filepath( get_post_meta( $attachment_id, '_wp_attached_file', true ) );
+
+			// Replace the image in uploads with our backup if one exists
+			if ( file_exists( $backup_filepath ) ) {
+				if ( ! copy( $backup_filepath, $filepath ) ) {
+					// Failed to copy
+				}
+			}
+			// If no backup exists, use the current full-size image to regenerate
+			// If the "full" size is enabled for watermarks and no backup has been made the removal of watermarks can't be done
+
+			// Regenerate metadata (and thumbs)
+			$metadata = wp_generate_attachment_metadata( $attachment_id, $filepath );
+
+			// Update attachment metadata with new metadata
+			wp_update_attachment_metadata( $attachment_id, $metadata );
+
+			// Update watermark status
+			update_post_meta( $attachment_id, $this->is_watermarked_metakey, false );
+
+			// Return the attachment metadata
+			return wp_get_attachment_metadata( $attachment_id );
+		}
+		return false;
 	}
 
 	/**
@@ -639,6 +887,39 @@ final class Image_Watermark {
 	}
 
 	/**
+	 * Make a backup of the full size image
+	 *
+	 * $param
+	 * $return bool
+	 */
+	private function do_backup( $data, $upload_dir, $attachment_id ) {
+		// get the filepath for the backup image we're creating
+		$backup_filepath = $this->get_image_backup_filepath( $data['file'] );
+		
+		// Make sure the backup isn't created yet
+		if ( ! file_exists( $backup_filepath ) ) {
+			// The original (full size) image
+			$filepath = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'];
+			$mime = wp_check_filetype( $filepath );
+
+			// get image resource
+			$image = $this->get_image_resource( $filepath, $mime['type'] );
+
+			if ( false !== $image ) {
+				// create backup directory if needed
+				wp_mkdir_p( $this->get_image_backup_folder_location( $data['file'] ) );
+
+				// save backup image
+				$this->save_image_file( $image, $mime['type'], $backup_filepath, $this->options['backup']['backup_quality'] );
+
+				// clear backup memory
+				imagedestroy( $image );
+				$image = null;
+			}
+		}
+	}
+
+	/**
 	 * Get image resource accordingly to mimetype.
 	 *
 	 * @param	string $filepath
@@ -668,6 +949,92 @@ final class Image_Watermark {
 		}
 
 		return $image;
+	}
+
+	/**
+	 * Get image resource accordingly to mimetype from the backup folder (if available).
+	 *
+	 * @param	string $filepath
+	 * @param	string $mime_type
+	 * @return	resource
+	 */
+	private function get_image_backup_resource( $filepath, $mime_type ) {
+		$backup_filepath = $this->get_image_backup_filepath( $filepath );
+		if ( file_exists( $backup_filepath ) ) {
+			return $this->get_image_resource( $backup_filepath, $mime_type );
+		}
+		return $this->get_image_resource( $filepath, $mime_type );
+	}
+
+	/**
+	 * Get image filename without the uploaded folders
+	 *
+	 * @param	string $filepath
+	 * @return	string $filename
+	 */
+	private function get_image_filename( $filepath ) {
+		return basename(  $filepath ); 
+	}
+
+	/**
+	 * Get image backup folder
+	 *
+	 * @param	string $filepath
+	 * @return	string $image_backup_folder
+	 */
+	private function get_image_backup_folder_location( $filepath ) {
+		$path = explode( DIRECTORY_SEPARATOR, $filepath );
+		array_pop( $path );
+		$path = implode( DIRECTORY_SEPARATOR, $path );
+		// Multisite?
+		/*if ( is_multisite() && ! is_main_site() ) {
+			$path = 'sites' . DIRECTORY_SEPARATOR . get_current_blog_id() . DIRECTORY_SEPARATOR . $path;
+		}*/
+		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $path;
+	}
+
+	/**
+	 * Get image resource from the backup folder (if available).
+	 *
+	 * @param	string $filepath
+	 * @return	string $backup_filepath
+	 */
+	private function get_image_backup_filepath( $filepath ) {
+		// Multisite?
+		/*if ( is_multisite() && ! is_main_site() ) {
+			$filepath = 'sites' . DIRECTORY_SEPARATOR . get_current_blog_id() . DIRECTORY_SEPARATOR . $filepath;
+		}*/
+		return IMAGE_WATERMARK_BACKUP_DIR . DIRECTORY_SEPARATOR . $filepath;
+	}
+
+	/**
+	 * Delete the image backup if one exists
+	 *
+	 * @param	int $attachment_id
+	 * @return	bool $force_delete
+	 */
+	public function delete_attachment( $attachment_id ) {
+		// see get_attached_file() in wp-includes/post.php
+		$filepath = get_post_meta( $attachment_id, '_wp_attached_file', true );
+		$backup_filepath = $this->get_image_backup_filepath( $filepath );
+
+		if ( file_exists( $backup_filepath ) ) {
+			unlink( $backup_filepath );
+		}
+	}
+
+	/**
+	 * Create admin notice when we can't create the backup folder
+	 * @return	void
+	 */
+	function filder_writable_admin_notice() {
+		if ( current_user_can('manage_options') && true !== $this->is_backup_folder_writable ) {
+		?>
+			<div class="notice notice-error is-dismissible">
+				<p><?php _e( 'Image Watermark', 'image-watermark' ); ?> - <?php _e( 'Image backup', 'image-watermark' ); ?>: <?php _e( "Your uploads folder is not writable so we can't create a backup of your image uploads. We've disabled this feature for now.", 'image-watermark' ); ?></p>
+			</div>
+		<?php
+		}
 	}
 
 	/**

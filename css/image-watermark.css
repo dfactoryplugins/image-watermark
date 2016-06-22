@@ -8,7 +8,7 @@
 .image-watermark-settings .df-credits form input { margin: 0; padding: 0; }
 .image-watermark-settings { margin-right: 300px; }
 .image-watermark-settings hr, .df-credits hr { border: solid #eee; border-width: 1px 0 0; clear: both; height: 0; }
-.image-watermark-settings form { float: left; min-width: 463px; width: auto; }
+.image-watermark-settings form { float: left; min-width: 100%; width: auto; }
 .image-watermark-settings fieldset span.description { margin-bottom: 8px; margin-top: 4px; display: block; }
 .image-watermark-settings.ui-button { margin-bottom: 5px; }
 .image-watermark-settings .description { font-size: 13px; margin-bottom: 8px; }
@@ -17,6 +17,11 @@
 @media only screen and (max-width: 959px) {
 	.df-credits { width: 100%; float: none; margin: 20px 0; }
 	.image-watermark-settings { margin-right: 0; }
+}
+
+/* Larger sizes */
+@media only screen and (min-width: 959px) {
+	.df-credits { position: fixed; right: 0; margin: 0 20px; }
 }
 
 #cpt-select { margin-top: 5px; }

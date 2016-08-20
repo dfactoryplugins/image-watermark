@@ -28,3 +28,29 @@
 .wplike-slider span.middle { width: 150px; }
 .wplike-slider span.left { margin-right: 10px; }
 .wplike-slider span.right { margin-left: 10px; }
+
+#image_watermark_buttons {
+	margin: 10px 0;
+}
+
+.iw-overlay .spinner {
+	margin: 0;
+	height: 20px;
+	width: 40px;
+	padding: 0;
+}
+
+div.iw-notice {
+	margin: 12px 0;
+}
+
+.iw-watermark-action {
+	text-decoration: none;
+}
+.delete-watermark, .media-frame a.delete-watermark {
+	color: #bc0b0b;
+}
+
+.delete-watermark:hover, .delete-watermark:focus, .media-frame a.delete-watermark:hover, .media-frame a.delete-watermark:focus {
+	color: #f00;
+}

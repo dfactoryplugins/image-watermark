@@ -35,6 +35,10 @@ jQuery( document ).ready( function ( $ ) {
 				// Get the selected bulk action
 				action = $(this).parent().children('select').val();
 
+				if ( ! iwImageActionArgs.backup_image && action === 'removewatermark' ) {
+					return;
+				}
+
 				// Validate action
 				if ( 'applywatermark' == action || 'removewatermark' == action ) {
 					// Stop default
@@ -66,14 +70,14 @@ jQuery( document ).ready( function ( $ ) {
 
 					} else {
 						// script is running, can't run two at the same time
-						watermarkImageActions.notice( 'error iw-notice', iwImageActionArgs.__running, false );
+						watermarkImageActions.notice( 'iw-notice error', iwImageActionArgs.__running, false );
 					}
 
 				}
 			});
 
 			// Media modal or edit attachment screen mode
-			$(document).on('click', '#image_watermark_buttons button.iw-watermark-action', function(e) {
+			$(document).on('click', '#image_watermark_buttons a.iw-watermark-action', function(e) {
 				// Get the selected bulk action
 				action = $(this).attr('data-action');
 				id = $(this).attr('data-id');
@@ -105,18 +109,16 @@ jQuery( document ).ready( function ( $ ) {
 						watermarkImageActions.selected.push( id );
 
 						// remove current notices
-						$('.iw-notice').slideUp('fast', function() {	
-							$(this).remove(); 
+						$('.iw-notice').slideUp( 'fast', function() {	
+							$( this ).remove(); 
 						});
 
 						// begin the update!
 						watermarkImageActions.post_loop();
-
 					} else {
 						// script is running, can't run two at the same time
-						watermarkImageActions.notice( 'error iw-notice', iwMediaModal.__running, false );
+						watermarkImageActions.notice( 'iw-notice error', iwMediaModal.__running, false );
 					}
-
 				}
 			});
 
@@ -158,6 +160,24 @@ jQuery( document ).ready( function ( $ ) {
 						watermarkImageActions.selected.splice( 0, 1 );
 						// Redo this function
 						watermarkImageActions.post_loop();
+
+						$('.iw-overlay').first().each( function() {
+							$(this).fadeOut( 'fast', function() {
+								$(this).remove();
+
+								if ( response.data === 'watermarked' ) {
+									$( '#image_watermark_buttons .value' ).append( '<span class="dashicons dashicons-yes" style="font-size: 24px;float: none;min-width: 28px;padding: 0;margin: 0; display: none;"></span>' );
+									$( '#image_watermark_buttons .value .dashicons' ).fadeIn( 'fast' );
+								} else if ( response.data === 'watermarkremoved' ) {
+									$( '#image_watermark_buttons .value' ).append( '<span class="dashicons dashicons-yes" style="font-size: 24px;float: none;min-width: 28px;padding: 0;margin: 0; display: none;"></span>' );
+									$( '#image_watermark_buttons .value .dashicons' ).fadeIn( 'fast' );
+								}
+
+								$( '#image_watermark_buttons .value .dashicons' ).delay( 1500 ).fadeOut( 'fast', function() {
+									$( this ).remove();
+								} );
+							} );
+						} );
 					} );
 
 				} else {
@@ -187,7 +207,7 @@ jQuery( document ).ready( function ( $ ) {
 				switch ( response.data ) {
 					case 'watermarked': 
 						// The css classes for the notice
-						type = 'updated iw-notice iw-watermarked';
+						type = 'iw-notice updated iw-watermarked';
 						// another successful update
 						watermarkImageActions.successCount += 1;
 						// did we have more success updates?
@@ -205,7 +225,7 @@ jQuery( document ).ready( function ( $ ) {
 					break;
 					case 'watermarkremoved': 
 						// The css classes for the notice
-						type = 'updated iw-notice iw-watermarkremoved';
+						type = 'iw-notice updated iw-watermarkremoved';
 						// another successful update
 						watermarkImageActions.successCount += 1;
 						// did we have more success updates?
@@ -223,7 +243,7 @@ jQuery( document ).ready( function ( $ ) {
 					break;
 					case 'skipped': 
 						// The css classes for the notice
-						type = 'error iw-notice iw-skipped';
+						type = 'iw-notice error iw-skipped';
 						// another skipped update
 						watermarkImageActions.skippedCount += 1;
 						// adjust the message with the number of skipped updates
@@ -238,7 +258,7 @@ jQuery( document ).ready( function ( $ ) {
 				}
 			} else {
 				// No success...
-				watermarkImageActions.notice( 'error iw-notice', response.data, false );
+				watermarkImageActions.notice( 'iw-notice error', response.data, false );
 				// update the row feedback
 				watermarkImageActions.row_image_feedback( 'error', id );
 			}
@@ -246,8 +266,10 @@ jQuery( document ).ready( function ( $ ) {
 		},
 
 		row_image_feedback: function( type, id ) {
+			var css = {},
+				cssinner = {},
+				container_selector;
 
-			css = cssinner = iconcss = {};
 			switch ( watermarkImageActions.action_location ) {
 				case 'upload-list': 
 					container_selector = '.wp-list-table #post-'+id+' .media-icon';
@@ -260,8 +282,7 @@ jQuery( document ).ready( function ( $ ) {
 						position: 'absolute',
 						font: 'normal normal normal dashicons',
 						background: 'rgba(255,255,255,0.75)',
-						content: '',
-						color: '#111',
+						content: ''
 					};
 					cssinner = {
 						'vertical-align': 'middle',
@@ -270,14 +291,8 @@ jQuery( document ).ready( function ( $ ) {
 						width: '100%',
 						height: '100%',
 					};
-					iconcss = {
-						'font-size': '50px',
-						'line-height': 'normal',
-						'vertical-align': 'middle',
-						width: '50px',
-						height: '50px',
-					};
-				break;
+					break;
+
 				case 'edit': 
 					container_selector = '.wp_attachment_holder #thumbnail-head-'+id+'';
 					css = {
@@ -289,8 +304,7 @@ jQuery( document ).ready( function ( $ ) {
 						position: 'absolute',
 						font: 'normal normal normal dashicons',
 						background: 'rgba(255,255,255,0.75)',
-						content: '',
-						color: '#111',
+						content: ''
 					};
 					cssinner = {
 						'vertical-align': 'middle',
@@ -299,76 +313,52 @@ jQuery( document ).ready( function ( $ ) {
 						width: '100%',
 						height: '100%',
 					};
-					iconcss = {
-						'font-size': '50px',
-						'line-height': 'normal',
-						'vertical-align': 'middle',
-						width: '50px',
-						height: '50px',
-					};
-				break;
+					break;
+
 				case 'media-modal':
-					container_selector = '.media-modal #image_watermark_buttons[data-id="'+id+'"]';
-					iconcss = {
-						'font-size': '25px',
-						'line-height': 'normal',
-						'vertical-align': 'middle',
-						width: '25px',
-						height: '25px',
+					container_selector = '.media-modal #image_watermark_buttons[data-id="'+id+'"] .value';
+					css = {
+						'float': 'none'
 					};
-				break;
+					cssinner = {
+						'float': 'none'
+					};
+					break;
+
 				default:
 					return false;
 			}
 
 			// css rules
-			$(container_selector).css('position', 'relative');
-			icon = '';
-			rotate = false;
-			
-			// Type specific rules
-			switch ( type ) {
-				case 'loading':
-					css.color = '#111';
-					icon = 'dashicons-update';
-					rotate = true;
-				break;
-				case 'success': 
-					css.color = '#46b450';
-					icon = 'dashicons-yes';
-				break;
-				case 'error': 
-					css.color = '#dc3232';
-					icon = 'dashicons-no-alt';
-				break;
-			}
+			$( container_selector ).css( 'position', 'relative' );
 
 			// Only create the element if it doesn't exist
-			if ( ! $(container_selector+' .iw-overlay').length ) {
-				$(container_selector).append('<span class="iw-overlay"><span class="iw-overlay-inner"></span></span>');
-				$(container_selector+' .iw-overlay .iw-overlay-inner').html('<span class="dashicons ' + icon + '"></span>');
+			if ( ! $( container_selector + ' .iw-overlay').length ) {
+				$( container_selector ).append( '<span class="iw-overlay"><span class="iw-overlay-inner"></span></span>' );
 			}
+
 			// Overwrite with new data
-			$(container_selector+' .iw-overlay').css(css);
-			$(container_selector+' .iw-overlay .iw-overlay-inner').css(cssinner);
-			$(container_selector+' .iw-overlay .iw-overlay-inner').html('<span class="dashicons '+icon+'"></span>');
-			$(container_selector+' .iw-overlay .dashicons').css(iconcss);
+			$( container_selector + ' .iw-overlay' ).css( css );
+			$( container_selector + ' .iw-overlay .iw-overlay-inner' ).css( cssinner );
+			$( container_selector + ' .iw-overlay .iw-overlay-inner' ).html( '<span class="spinner is-active"></span>' );
 
-			// Rotate the icon?
-			if ( rotate ) {
-				watermarkImageActions.rotate_icon( $(container_selector+' .iw-overlay .dashicons') );
+			if ( watermarkImageActions.action_location === 'media-modal' ) {
+				$( container_selector + ' .iw-overlay .iw-overlay-inner .spinner' ).css( { 'float': 'none', 'padding': 0, 'margin': '-4px 0 0 10px' } );
 			}
-
 		},
 
 		notice: function( type, message, overwrite ) {
+
+			if ( watermarkImageActions.action_location === 'media-modal' ) {
+				return;
+			}
 
 			type += ' notice is-dismissible';
 
 			// Get the prefix based on the action location
 			switch ( watermarkImageActions.action_location ) {
 				case 'upload-list':	prefix = '.wrap > h1'; break;
-				default: prefix = '#image_watermark_buttons > h3'; break;
+				default: prefix = '#image_watermark_buttons'; break;
 			}
 
 			// Overwrite the current notice?
@@ -412,12 +402,12 @@ jQuery( document ).ready( function ( $ ) {
 
 			// remove the overlay
 			setTimeout( function() {
-				$('.iw-overlay').each( function() {
-					$(this).fadeOut('slow', function() { 
+				$( '.iw-overlay' ).each( function() {
+					$(this).fadeOut('fast', function() { 
 						$(this).remove(); 
 					}); 
 				});
-			}, 1000 );
+			}, 100 );
 		},
 
 		reload_image: function( id ) {
@@ -463,14 +453,14 @@ jQuery( document ).ready( function ( $ ) {
 					{ 
 						duration: 1000,
 						step: function(now, fx) {
-					 		$(this).css('-webkit-transform', 'rotate('+now+'deg)');
-					 		$(this).css('-ms-transform', 'rotate('+now+'deg)');
-					 		$(this).css('transform', 'rotate('+now+'deg)');
-					 		if (now == 360) {
-					 			// Animation finished, stop loop and restart
-					 			icon.stop();
-					 			watermarkImageActions.rotate_icon( icon );
-					 		}
+							$(this).css('-webkit-transform', 'rotate('+now+'deg)');
+							$(this).css('-ms-transform', 'rotate('+now+'deg)');
+							$(this).css('transform', 'rotate('+now+'deg)');
+							if (now == 360) {
+								// Animation finished, stop loop and restart
+								icon.stop();
+								watermarkImageActions.rotate_icon( icon );
+							}
 						}, 
 					}
 				);
@@ -478,11 +468,11 @@ jQuery( document ).ready( function ( $ ) {
 		},
 
 		replace_url_param: function( url, paramName, paramValue ) {
-		    var pattern = new RegExp('\\b('+paramName+'=).*?(&|$)');
-		    if(url.search(pattern)>=0){
-		        return url.replace(pattern,'$1' + paramValue + '$2');
-		    }
-		    return url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue;
+			var pattern = new RegExp('\\b('+paramName+'=).*?(&|$)');
+			if(url.search(pattern)>=0){
+				return url.replace(pattern,'$1' + paramValue + '$2');
+			}
+			return url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue;
 		},
 	};
 

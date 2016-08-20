@@ -23,7 +23,7 @@ jQuery( document ).ready( function ( $ ) {
 
 			if ( jQuery.inArray( attachment.attributes.mime, ['image/gif', 'image/jpg', 'image/jpeg', 'image/png'] ) !== -1 ) {
 				
-				$( '#upload_image' ).val( attachment.attributes.id );
+				$( '#iw_upload_image' ).val( attachment.attributes.id );
 
 				if ( $( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src' ) !== '' )	{
 					$( 'div#previewImg_imageDiv img#previewImg_image' ).replaceWith( '<img id="previewImg_image" src="' + attachment.attributes.url + '" alt="" width="300" />' );
@@ -31,7 +31,7 @@ jQuery( document ).ready( function ( $ ) {
 					$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', attachment.attributes.url );
 				}
 
-				$( '#turn_off_image_button' ).removeAttr( 'disabled' );
+				$( '#iw_turn_off_image_button' ).removeAttr( 'disabled' );
 				$( 'div#previewImg_imageDiv img#previewImg_image' ).show();
 
 				var img = new Image();
@@ -43,15 +43,15 @@ jQuery( document ).ready( function ( $ ) {
 				
 			} else {
 				
-				$( '#turn_off_image_button' ).attr( 'disabled', 'true' );
-				$( '#upload_image' ).val( 0 );
+				$( '#iw_turn_off_image_button' ).attr( 'disabled', 'true' );
+				$( '#iw_upload_image' ).val( 0 );
 				$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', '' ).hide();
 				$( 'p#previewImageInfo' ).html( '<strong>' + iwUploadArgs.notAllowedImg + '</strong>' );
 				
 			}
 		},
 		init: function () {
-			$( '#wpbody' ).on( 'click', 'input#upload_image_button', function ( e ) {
+			$( '#wpbody' ).on( 'click', 'input#iw_upload_image_button', function ( e ) {
 				e.preventDefault();
 				watermarkFileUpload.frame().open();
 			} );
@@ -60,9 +60,9 @@ jQuery( document ).ready( function ( $ ) {
 
 	watermarkFileUpload.init();
 
-	$( document ).on( 'click', '#turn_off_image_button', function ( event ) {
+	$( document ).on( 'click', '#iw_turn_off_image_button', function ( event ) {
 		$( this ).attr( 'disabled', 'true' );
-		$( '#upload_image' ).val( 0 );
+		$( '#iw_upload_image' ).val( 0 );
 		$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', '' ).hide();
 		$( 'p#previewImageInfo' ).html( iwUploadArgs.noSelectedImg );
 	} );

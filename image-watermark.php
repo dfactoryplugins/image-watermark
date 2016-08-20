@@ -80,7 +80,7 @@ final class Image_Watermark {
 				'forlogged'		 => 0,
 			),
 			'backup'				=> array(
-				'backup_image'		=> 0,
+				'backup_image'		=> 1,
 				'backup_quality'	=> 90,
 			),
 		),
@@ -103,6 +103,7 @@ final class Image_Watermark {
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
 		add_action( 'admin_print_scripts', array( $this, 'admin_print_scripts' ), 20 );
+		add_action( 'wp_enqueue_media', array( $this, 'wp_enqueue_media' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 		add_action( 'load-upload.php', array( $this, 'watermark_bulk_action' ) );
 		add_action( 'admin_init', array( $this, 'update_plugin' ) );
@@ -238,10 +239,15 @@ final class Image_Watermark {
 				<script type="text/javascript">
 					jQuery( function( $ ) {
 						$( document ).ready( function() {
+							var backup = <?php echo (int)$this->options['backup']['backup_image']; ?>;
+
 							$( "<option>" ).val( "applywatermark" ).text( "<?php _e( 'Apply watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action']" );
 							$( "<option>" ).val( "applywatermark" ).text( "<?php _e( 'Apply watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action2']" );
-							$( "<option>" ).val( "removewatermark" ).text( "<?php _e( 'Remove watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action']" );
-							$( "<option>" ).val( "removewatermark" ).text( "<?php _e( 'Remove watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action2']" );
+
+							if ( backup === 1 ) {
+								$( "<option>" ).val( "removewatermark" ).text( "<?php _e( 'Remove watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action']" );
+								$( "<option>" ).val( "removewatermark" ).text( "<?php _e( 'Remove watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action2']" );
+							}
 						});
 					});
 				</script>
@@ -253,8 +259,17 @@ final class Image_Watermark {
 	/**
 	 * Enqueue admin scripts and styles.
 	 */
+	public function wp_enqueue_media( $page ) {
+		wp_enqueue_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
+	}
+
+	/**
+	 * Enqueue admin scripts and styles.
+	 */
 	public function admin_enqueue_scripts( $page ) {
 		global $pagenow;
+
+		wp_register_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
 
 		if ( $page === 'settings_page_watermark-options' ) {
 			wp_enqueue_media();
@@ -286,10 +301,14 @@ final class Image_Watermark {
 				)
 			);
 
-			wp_enqueue_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
 			wp_enqueue_style( 'wp-like-ui-theme', plugins_url( 'css/wp-like-ui-theme.css', __FILE__ ), array(), $this->defaults['version'] );
+			wp_enqueue_style( 'watermark-style' );
 
 			wp_enqueue_script( 'postbox' );
+		}
+
+		if ( $pagenow === 'upload.php' ) {
+			wp_enqueue_style( 'watermark-style' );
 		}
 
 		// I've omitted $pagenow === 'upload.php' because the image modal could be loaded in various places
@@ -301,6 +320,7 @@ final class Image_Watermark {
 				'watermark-admin-image-actions', 
 				'iwImageActionArgs', 
 				array(
+					'backup_image' => (int)$this->options['backup']['backup_image'],
 					'_nonce' => wp_create_nonce( 'image-watermark' ),
 					'__applied_none' => __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
 					'__applied_one' => __( 'Watermark was succesfully applied to 1 image.', 'image-watermark' ),
@@ -420,33 +440,29 @@ final class Image_Watermark {
 	 */	
 	public function attachment_fields_to_edit( $form_fields, $post ) {
 
-		if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+		if ( $this->options['watermark_image']['manual_watermarking'] == 1 && $this->options['backup']['backup_image'] ) {
 
 			$data = wp_get_attachment_metadata( $post->ID, false );
 
 			// is this really an image?
 			if ( in_array( get_post_mime_type( $post->ID ), $this->allowed_mime_types ) && is_array( $data ) ) {
-
-				$class = '';
-				if ( get_post_meta( $post->ID, $this->is_watermarked_metakey, true ) ) {
-					$class = 'watermarked';
-				}
 				$form_fields['image_watermark'] = array(
-	      			'show_in_edit' => false,
-	      			'tr' => '
-	      			<div id="image_watermark_buttons" class="' . $class . '" data-id="' . $post->ID . '" style="display: none;">
-	      				<h3>' . __( 'Image Watermark', 'image-watermark' ) . '</h3>
-	      				<button class="iw-watermark-action" data-action="applywatermark" data-id="' . $post->ID . '">' . __( 'Apply watermark', 'image-watermark' ) . '</button>
-	      				<button class="iw-watermark-action" data-action="removewatermark" data-id="' . $post->ID . '">' . __( 'Remove watermark', 'image-watermark' ) . '</button>
-	      			</div>
-	      			<script>
-	      				jQuery( document ).ready( function ( $ ) {
-	      					if ( typeof watermarkImageActions != "undefined" ) {
-	      						$("#image_watermark_buttons").show();
-	      					}
-	      				});
-	      			</script>
-	      			',
+					'show_in_edit' => false,
+					'tr' => '
+					<div id="image_watermark_buttons"' . ( get_post_meta( $post->ID, $this->is_watermarked_metakey, true ) ? ' class="watermarked"' : '' ) . ' data-id="' . $post->ID . '" style="display: none;">
+						<label class="setting">
+							<span class="name">' . __( 'Image Watermark', 'image-watermark' ) . '</span>
+							<span class="value" style="width: 63%"><a href="#" class="iw-watermark-action" data-action="applywatermark" data-id="' . $post->ID . '">' . __( 'Apply watermark', 'image-watermark' ) . '</a> | <a href="#" class="iw-watermark-action delete-watermark" data-action="removewatermark" data-id="' . $post->ID . '">' . __( 'Remove watermark', 'image-watermark' ) . '</a></span>
+						</label>
+						<div class="clear"></div>
+					</div>
+					<script>
+						jQuery( document ).ready( function ( $ ) {
+							if ( typeof watermarkImageActions != "undefined" ) {
+								$( "#image_watermark_buttons" ).show();
+							}
+						});
+					</script>'
 				);
 			}
 		}
@@ -457,22 +473,21 @@ final class Image_Watermark {
 	 * Apply watermark for selected images on media page.
 	 */	
 	public function watermark_action_ajax() {
-		
 		// Security & data check
-		if (   ! defined('DOING_AJAX') 
+		if ( ! defined( 'DOING_AJAX' )
 			|| ! DOING_AJAX 
 			|| ! isset( $_POST['_iw_nonce'] ) 
 			|| ! isset( $_POST['iw-action'] ) 
 			|| ! isset( $_POST['attachment_id'] ) 
 			|| ! is_numeric( $_POST['attachment_id'] ) 
-			|| ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) 
-		) {
+			|| ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' )
+			|| ! $this->options['backup']['backup_image']
+		)
 			wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
-			die();
-		}
 
 		$post_id = (int) $_POST['attachment_id'];
 		$action = false;
+
 		switch ( $_POST['iw-action'] ) {
 			case 'applywatermark': $action = 'applywatermark'; break;
 			case 'removewatermark': $action = 'removewatermark'; break;
@@ -503,8 +518,8 @@ final class Image_Watermark {
 				wp_send_json_success( 'skipped' );
 			}
 		}
+
 		wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
-		die();
 	}
 
 	/**
@@ -536,9 +551,9 @@ final class Image_Watermark {
 				$location = esc_url( add_query_arg( 'paged', $wp_list_table->get_pagenum(), $location ) );
 				
 				// make sure ids are submitted.  depending on the resource type, this may be 'media' or 'ids'
-			    if ( isset( $_REQUEST['media'] ) ) {
-			      $post_ids = array_map( 'intval', $_REQUEST['media'] );
-			    }
+				if ( isset( $_REQUEST['media'] ) ) {
+				  $post_ids = array_map( 'intval', $_REQUEST['media'] );
+				}
 
 				// do we have selected attachments?
 				if ( $post_ids ) {
@@ -949,21 +964,6 @@ final class Image_Watermark {
 		}
 
 		return $image;
-	}
-
-	/**
-	 * Get image resource accordingly to mimetype from the backup folder (if available).
-	 *
-	 * @param	string $filepath
-	 * @param	string $mime_type
-	 * @return	resource
-	 */
-	private function get_image_backup_resource( $filepath, $mime_type ) {
-		$backup_filepath = $this->get_image_backup_filepath( $filepath );
-		if ( file_exists( $backup_filepath ) ) {
-			return $this->get_image_resource( $backup_filepath, $mime_type );
-		}
-		return $this->get_image_resource( $filepath, $mime_type );
 	}
 
 	/**

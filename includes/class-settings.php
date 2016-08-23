@@ -446,9 +446,9 @@ class Image_Watermark_Settings {
 		}
 		?>
 		<div class="iw_watermark_image">
-			<input id="upload_image" type="hidden" name="iw_options[watermark_image][url]" value="<?php echo (int) Image_Watermark()->options['watermark_image']['url']; ?>" />
-			<input id="upload_image_button" type="button" class="button button-secondary" value="<?php echo __( 'Select image', 'image-watermark' ); ?>" />
-			<input id="turn_off_image_button" type="button" class="button button-secondary" value="<?php echo __( 'Remove image', 'image-watermark' ); ?>" <?php if ( $image_selected === false ) echo 'disabled="disabled"'; ?>/>
+			<input id="iw_upload_image" type="hidden" name="iw_options[watermark_image][url]" value="<?php echo (int) Image_Watermark()->options['watermark_image']['url']; ?>" />
+			<input id="iw_upload_image_button" type="button" class="button button-secondary" value="<?php echo __( 'Select image', 'image-watermark' ); ?>" />
+			<input id="iw_turn_off_image_button" type="button" class="button button-secondary" value="<?php echo __( 'Remove image', 'image-watermark' ); ?>" <?php if ( $image_selected === false ) echo 'disabled="disabled"'; ?>/>
 			<p class="description"><?php _e( 'You have to save changes after the selection or removal of the image.', 'image-watermark' ); ?></p>
 		</div>
 		<?php

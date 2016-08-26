@@ -244,7 +244,7 @@ class Image_Watermark_Settings {
 			$input['image_protection']['draganddrop'] = isset( $_POST['iw_options']['image_protection']['draganddrop'] ) ? ((bool) $_POST['iw_options']['image_protection']['draganddrop'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['draganddrop'];
 			$input['image_protection']['forlogged'] = isset( $_POST['iw_options']['image_protection']['forlogged'] ) ? ((bool) $_POST['iw_options']['image_protection']['forlogged'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['forlogged'];
 
-			$input['backup']['backup_image'] = isset( $_POST['iw_options']['backup']['backup_image'] ) ? ((bool) $_POST['iw_options']['backup']['backup_image'] == 1 ? true : false) : Image_Watermark()->defaults['options']['backup']['backup_image'];
+			$input['backup']['backup_image'] = isset( $_POST['iw_options']['backup']['backup_image'] );
 			$input['backup']['backup_quality'] = isset( $_POST['iw_options']['backup']['backup_quality'] ) ? (int) $_POST['iw_options']['backup']['backup_quality'] : Image_Watermark()->defaults['options']['backup']['backup_quality'];
 
 			add_settings_error( 'iw_settings_errors', 'iw_settings_saved', __( 'Settings saved.', 'image-watermark' ), 'updated' );
@@ -634,7 +634,7 @@ class Image_Watermark_Settings {
 	public function iw_backup_image() {
 		?>
 		<label for="iw_backup_size_full">
-			<input id="iw_backup_size_full" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['backup']['backup_image'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[backup][backup_image]">
+			<input id="iw_backup_size_full" type="checkbox" <?php checked( ! empty( Image_Watermark()->options['backup']['backup_image'] ), true, true ); ?> value="1" name="iw_options[backup][backup_image]">
 <?php echo __( 'Backup the full size image.', 'image-watermark' ); ?>
 		</label>
 		<?php

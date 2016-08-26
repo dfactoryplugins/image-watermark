@@ -2,7 +2,7 @@
 /*
 Plugin Name: Image Watermark
 Description: Image Watermark allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
-Version: 1.5.6
+Version: 1.6.0
 Author: dFactory
 Author URI: http://www.dfactory.eu/
 Plugin URI: http://www.dfactory.eu/plugins/image-watermark/
@@ -32,7 +32,7 @@ define( 'IMAGE_WATERMARK_PATH', plugin_dir_path( __FILE__ ) );
  * Image Watermark class.
  *
  * @class Image_Watermark
- * @version	1.5.6
+ * @version	1.6.0
  */
 final class Image_Watermark {
 
@@ -80,11 +80,11 @@ final class Image_Watermark {
 				'forlogged'		 => 0,
 			),
 			'backup'				=> array(
-				'backup_image'		=> 1,
+				'backup_image'		=> true,
 				'backup_quality'	=> 90,
 			),
 		),
-		'version' => '1.5.6'
+		'version' => '1.6.0'
 	);
 	public $options = array();
 
@@ -123,7 +123,7 @@ final class Image_Watermark {
 		define( 'IMAGE_WATERMARK_BACKUP_DIR', apply_filters( 'image_watermark_backup_dir', $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'iw-backup' ) );
 
 		// create backup folder and security if enabled
-		if ( true == $this->options['backup']['backup_image'] ) {
+		if ( $this->options['backup']['backup_image'] ) {
 
 			if ( is_writable( $upload_dir['basedir'] ) ) {
 				$this->is_backup_folder_writable = true;
@@ -146,7 +146,7 @@ final class Image_Watermark {
 			}
 			if ( true !== $this->is_backup_folder_writable ) {
 				// Disable backup setting
-				$this->options['backup']['backup_image'] = 0;
+				$this->options['backup']['backup_image'] = false;
 				update_option( 'image_watermark_options', $this->options );
 			}
 
@@ -720,13 +720,13 @@ final class Image_Watermark {
 		// is this really an image?
 		if ( getimagesize( $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $data['file'] ) !== false ) {
 			// Remove the watermark if this image was allready watermarked, not === because the database can't hold booleans
-			if ( get_post_meta( $attachment_id, $this->is_watermarked_metakey ) == true ) {
+			if ( get_post_meta( $attachment_id, $this->is_watermarked_metakey ) == true )
 				$this->remove_watermark( $data, $attachment_id, 'manual' );
-			}
+
 			// create a backup if this is enabled
-			if ( true == $this->options['backup']['backup_image'] ) {
+			if ( $this->options['backup']['backup_image'] )
 				$this->do_backup( $data, $upload_dir, $attachment_id );
-			}
+
 			// loop through active image sizes
 			foreach ( $this->options['watermark_on'] as $image_size => $active_size ) {
 				

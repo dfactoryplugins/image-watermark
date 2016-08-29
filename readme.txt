@@ -3,8 +3,8 @@ Contributors: dfactory
 Donate link: http://www.dfactory.eu/
 Tags: image, images, picture, photo, watermark, watermarking, protection, image protection, image security, plugin
 Requires at least: 3.5
-Tested up to: 4.5.2
-Stable tag: 1.5.6
+Tested up to: 4.6
+Stable tag: 1.6
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -52,6 +52,10 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.6.0 =
+* New: Image backup functionality, thanks to [JoryHogeveen](https://github.com/JoryHogeveen)
+* New: Option to remove watermark (if backup is available)
 
 = 1.5.6 =
 * New: PHP image processing library option, if more than one available.
@@ -157,7 +161,6 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.5.6 =
-* New: PHP image processing library option, if more than one available.
-* Fix: Manual / Media library watermarking not working.
-* Fix: Image sizes not being generated proparly in GD library.
+= 1.6.0 =
+* New: Image backup functionality, thanks to [JoryHogeveen](https://github.com/JoryHogeveen)
+* New: Option to remove watermark (if backup is available)

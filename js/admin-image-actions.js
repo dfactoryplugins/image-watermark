@@ -524,11 +524,6 @@ jQuery( document ).ready( function ( $ ) {
 				break;
 			}
 
-			// Can't go lower than 0
-			if ( offsetTop < 0 ) {
-				offsetTop = 0;
-			}
-
 			$( window ).scrollTop( offsetTop );
 		}
 	};

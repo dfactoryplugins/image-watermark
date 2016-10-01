@@ -152,6 +152,10 @@ jQuery( document ).ready( function ( $ ) {
 						'attachment_id': id
 					};
 
+					if ( watermarkImageActions.action_location == 'upload-list' ) {
+						watermarkImageActions.scroll_to( '#post-' + id, 'bottom' );
+					}
+
 					// the ajax post!
 					$.post( ajaxurl, data, function( response ) {
 						// show result
@@ -485,6 +489,26 @@ jQuery( document ).ready( function ( $ ) {
 			}
 			return url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue;
 		},
+
+		scroll_to: function( elementSelector, verticalTarget ) {
+
+			var offset = $( elementSelector ).offset();
+			var offsetTop = offset.top;
+
+			switch ( verticalTarget ) {
+				case 'top':
+					offsetTop = offsetTop - $( elementSelector ).outerHeight();
+				break;
+				case 'bottom':
+					offsetTop = offsetTop - $( window ).outerHeight();
+					offsetTop = offsetTop + $( elementSelector ).outerHeight();
+				break;
+			}
+
+			if ( offsetTop > 0 ) {
+				$( document ).scrollTop( offsetTop );
+			}
+		}
 	};
 
 	// We need that nonce!

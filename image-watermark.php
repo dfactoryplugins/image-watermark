@@ -481,7 +481,6 @@ final class Image_Watermark {
 			|| ! isset( $_POST['attachment_id'] ) 
 			|| ! is_numeric( $_POST['attachment_id'] ) 
 			|| ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' )
-			|| ! $this->options['backup']['backup_image']
 		)
 			wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
 

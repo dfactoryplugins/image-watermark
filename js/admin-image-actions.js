@@ -31,7 +31,7 @@ jQuery( document ).ready( function ( $ ) {
 		init: function() {
 
 			// Normal (list) mode
-			$(document).on('click', '.bulkactions input#doaction', function(e) {
+			$(document).on('click', '.bulkactions input#doaction, .bulkactions input#doaction2', function(e) {
 				// Get the selected bulk action
 				action = $(this).parent().children('select').val();
 

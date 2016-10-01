@@ -495,23 +495,41 @@ jQuery( document ).ready( function ( $ ) {
 			var offset = $( elementSelector ).offset();
 			var offsetTop = offset.top;
 
+			// If the element it above the current viewport, scroll to it
+			if ( offset.top < $( window ).scrollTop() ) {
+				$( window ).scrollTop( offsetTop );
+				return; // No further actions needed
+			}
+
+			var windowTopOffset = $( window ).scrollTop();
+			var windowBottomOffset = windowTopOffset + $( window ).outerHeight();
+
 			switch ( verticalTarget ) {
 				case 'top':
 					offsetTop = offsetTop - $( elementSelector ).outerHeight();
 				break;
 				case 'bottom':
+					if ( offset.top < windowBottomOffset ) {
+						return; // The element is in the viewport
+					}
 					offsetTop = offsetTop - $( window ).outerHeight();
 					offsetTop = offsetTop + $( elementSelector ).outerHeight();
 				break;
 				case 'center':
+					if ( offsetTop < windowBottomOffset && offsetTop >= windowTopOffset ) {
+						return; // The element is in the viewport
+					}
 					offsetTop = offsetTop - ( $( window ).outerHeight() / 2 );
 					offsetTop = offsetTop + ( $( elementSelector ).outerHeight() / 2 );
 				break;
 			}
 
-			if ( offsetTop > 0 ) {
-				$( document ).scrollTop( offsetTop );
+			// Can't go lower than 0
+			if ( offsetTop < 0 ) {
+				offsetTop = 0;
 			}
+
+			$( window ).scrollTop( offsetTop );
 		}
 	};
 

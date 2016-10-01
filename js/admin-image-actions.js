@@ -503,6 +503,10 @@ jQuery( document ).ready( function ( $ ) {
 					offsetTop = offsetTop - $( window ).outerHeight();
 					offsetTop = offsetTop + $( elementSelector ).outerHeight();
 				break;
+				case 'center':
+					offsetTop = offsetTop - ( $( window ).outerHeight() / 2 );
+					offsetTop = offsetTop + ( $( elementSelector ).outerHeight() / 2 );
+				break;
 			}
 
 			if ( offsetTop > 0 ) {

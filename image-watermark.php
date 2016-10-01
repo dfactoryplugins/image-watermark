@@ -502,8 +502,12 @@ final class Image_Watermark {
 			if ( in_array( get_post_mime_type( $post_id ), $this->allowed_mime_types ) && is_array( $data ) ) {
 
 				if ( $action === 'applywatermark' ) {
-					$this->apply_watermark( $data, $post_id, 'manual' );
-					wp_send_json_success( 'watermarked' );
+					$success = $this->apply_watermark( $data, $post_id, 'manual' );
+					if ( ! empty( $success[ 'error' ] ) ) {
+						wp_send_json_success( $success[ 'error' ] );
+					} else {
+						wp_send_json_success( 'watermarked' );
+					}
 
 				} elseif ( $action === 'removewatermark' ) {
 					$success = $this->remove_watermark( $data, $post_id, 'manual' );
@@ -558,6 +562,7 @@ final class Image_Watermark {
 				if ( $post_ids ) {
 
 					$watermarked = $watermarkremoved = $skipped = 0;
+					$messages = array();
 
 					foreach ( $post_ids as $post_id ) {
 						$data = wp_get_attachment_metadata( $post_id, false );
@@ -565,9 +570,13 @@ final class Image_Watermark {
 						// is this really an image?
 						if ( in_array( get_post_mime_type( $post_id ), $this->allowed_mime_types ) && is_array( $data ) ) {
 							if ( $action === 'applywatermark' ) {
-								$this->apply_watermark( $data, $post_id, 'manual' );
-								$watermarked ++;
-								$watermarkremoved = -1;
+								$success = $this->apply_watermark( $data, $post_id, 'manual' );
+								if ( ! empty( $success[ 'error' ] ) ) {
+									$messages[] = $success[ 'error' ];
+								} else {
+									$watermarked ++;
+									$watermarkremoved = -1;
+								}
 							} elseif ( $action === 'removewatermark' ) {
 								$success = $this->remove_watermark( $data, $post_id, 'manual' );
 								if ( $success ) {
@@ -582,7 +591,7 @@ final class Image_Watermark {
 						}
 					}
 
-					$location = esc_url( add_query_arg( array( 'watermarked' => $watermarked, 'watermarkremoved' => $watermarkremoved, 'skipped' => $skipped ), $location ), null, '' );
+					$location = esc_url( add_query_arg( array( 'watermarked' => $watermarked, 'watermarkremoved' => $watermarkremoved, 'skipped' => $skipped, 'messages' => $messages ), $location ), null, '' );
 				}
 
 				wp_redirect( $location );

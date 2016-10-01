@@ -198,8 +198,9 @@ jQuery( document ).ready( function ( $ ) {
 			if ( true === response.success ) {
 
 				// defaults
-				type = false;
-				message = '';
+				var type = false;
+				var message = '';
+				var overwrite = true;
 				// store response data
 				watermarkImageActions.response = response.data;
 
@@ -251,10 +252,20 @@ jQuery( document ).ready( function ( $ ) {
 						// update the row feedback
 						watermarkImageActions.row_image_feedback( 'error', id );
 					break;
+					default:
+						// The css classes for the notice
+						type = 'iw-notice error iw-message';
+						// The error message
+						message = response.data;
+						// update the row feedback
+						watermarkImageActions.row_image_feedback( 'error', id );
+						// This can be anything so don't overwrite
+						overwrite = false;
+					break;
 				}
 				if ( false !== type ) {
 					// we have a valid terun type, show the notice! (Overwrite current notice if available)
-					watermarkImageActions.notice( type, message, true );
+					watermarkImageActions.notice( type, message, overwrite );
 				}
 			} else {
 				// No success...

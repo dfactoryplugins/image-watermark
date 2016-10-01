@@ -16,7 +16,7 @@ jQuery( document ).ready( function ( $ ) {
 	 * __skipped => 		'Skipped files'
 	 * __running => 		'Bulk action is currently running, please wait.'
 	 * __dismiss => 		'Dismiss this notice.' // Wordpress default string
-	 * 
+	 *
 	 */
 
 	watermarkImageActions = {
@@ -61,8 +61,8 @@ jQuery( document ).ready( function ( $ ) {
 						});
 
 						// remove current notices
-						$('.iw-notice').slideUp('fast', function() {	
-							$(this).remove(); 
+						$('.iw-notice').slideUp('fast', function() {
+							$(this).remove();
 						});
 
 						// begin the update!
@@ -109,8 +109,8 @@ jQuery( document ).ready( function ( $ ) {
 						watermarkImageActions.selected.push( id );
 
 						// remove current notices
-						$('.iw-notice').slideUp( 'fast', function() {	
-							$( this ).remove(); 
+						$('.iw-notice').slideUp( 'fast', function() {
+							$( this ).remove();
 						});
 
 						// begin the update!
@@ -124,8 +124,8 @@ jQuery( document ).ready( function ( $ ) {
 
 			// Since these are added later we'll need to enable dismissing again
 			$(document).on('click', '.iw-notice.is-dismissible .notice-dismiss', function() {
-				$(this).parents('.iw-notice').slideUp( 'fast', function() {	
-					$(this).remove(); 
+				$(this).parents('.iw-notice').slideUp( 'fast', function() {
+					$(this).remove();
 				} );
 			});
 
@@ -193,7 +193,7 @@ jQuery( document ).ready( function ( $ ) {
 		},
 
 		result: function( response, id ) {
-			
+
 			// Was the ajax post successful?
 			if ( true === response.success ) {
 
@@ -205,7 +205,7 @@ jQuery( document ).ready( function ( $ ) {
 
 				// Check what kind of action is done (watermarked, watermarkremoved or skipped)
 				switch ( response.data ) {
-					case 'watermarked': 
+					case 'watermarked':
 						// The css classes for the notice
 						type = 'iw-notice updated iw-watermarked';
 						// another successful update
@@ -223,7 +223,7 @@ jQuery( document ).ready( function ( $ ) {
 						// reload the image
 						watermarkImageActions.reload_image( id );
 					break;
-					case 'watermarkremoved': 
+					case 'watermarkremoved':
 						// The css classes for the notice
 						type = 'iw-notice updated iw-watermarkremoved';
 						// another successful update
@@ -241,7 +241,7 @@ jQuery( document ).ready( function ( $ ) {
 						// reload the image
 						watermarkImageActions.reload_image( id );
 					break;
-					case 'skipped': 
+					case 'skipped':
 						// The css classes for the notice
 						type = 'iw-notice error iw-skipped';
 						// another skipped update
@@ -271,7 +271,7 @@ jQuery( document ).ready( function ( $ ) {
 				container_selector;
 
 			switch ( watermarkImageActions.action_location ) {
-				case 'upload-list': 
+				case 'upload-list':
 					container_selector = '.wp-list-table #post-'+id+' .media-icon';
 					css = {
 						display: 'table',
@@ -293,7 +293,7 @@ jQuery( document ).ready( function ( $ ) {
 					};
 					break;
 
-				case 'edit': 
+				case 'edit':
 					container_selector = '.wp_attachment_holder #thumbnail-head-'+id+'';
 					css = {
 						display: 'table',
@@ -403,9 +403,9 @@ jQuery( document ).ready( function ( $ ) {
 			// remove the overlay
 			setTimeout( function() {
 				$( '.iw-overlay' ).each( function() {
-					$(this).fadeOut('fast', function() { 
-						$(this).remove(); 
-					}); 
+					$(this).fadeOut('fast', function() {
+						$(this).remove();
+					});
 				});
 			}, 100 );
 		},
@@ -449,8 +449,8 @@ jQuery( document ).ready( function ( $ ) {
 				});
 				// Do animation (one rotation)
 				icon.animate(
-					{ borderSpacing: 360 }, 
-					{ 
+					{ borderSpacing: 360 },
+					{
 						duration: 1000,
 						step: function(now, fx) {
 							$(this).css('-webkit-transform', 'rotate('+now+'deg)');
@@ -461,7 +461,7 @@ jQuery( document ).ready( function ( $ ) {
 								icon.stop();
 								watermarkImageActions.rotate_icon( icon );
 							}
-						}, 
+						},
 					}
 				);
 			}

@@ -2,7 +2,7 @@
 /*
 Plugin Name: Image Watermark
 Description: Image Watermark allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
-Version: 1.6.0
+Version: 1.6.0-dev
 Author: dFactory
 Author URI: http://www.dfactory.eu/
 Plugin URI: http://www.dfactory.eu/plugins/image-watermark/
@@ -43,7 +43,7 @@ final class Image_Watermark {
 
 	private $is_admin = true;
 	private $extension = false;
-	private $allowed_mime_types = array( 
+	private $allowed_mime_types = array(
 		'image/jpeg',
 		'image/pjpeg',
 		'image/png'
@@ -316,9 +316,9 @@ final class Image_Watermark {
 
 			wp_enqueue_script( 'watermark-admin-image-actions', plugins_url( '/js/admin-image-actions.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], true );
 
-			wp_localize_script( 
-				'watermark-admin-image-actions', 
-				'iwImageActionArgs', 
+			wp_localize_script(
+				'watermark-admin-image-actions',
+				'iwImageActionArgs',
 				array(
 					'backup_image' => (int)$this->options['backup']['backup_image'],
 					'_nonce' => wp_create_nonce( 'image-watermark' ),
@@ -331,7 +331,7 @@ final class Image_Watermark {
 					'__skipped' => __( 'Skipped files', 'image-watermark' ),
 					'__running' => __( 'Bulk action is currently running, please wait.', 'image-watermark' ),
 					'__dismiss' => __( 'Dismiss this notice.' ), // Wordpress default string
-				) 
+				)
 			);
 		}
 	}
@@ -355,7 +355,7 @@ final class Image_Watermark {
 
 	/**
 	 * Check which extension is available and set it.
-	 * 
+	 *
 	 * @return	void
 	 */
 	public function check_extensions() {
@@ -386,7 +386,7 @@ final class Image_Watermark {
 
 	/**
 	 * Apply watermark everywhere or for specific post types.
-	 * 
+	 *
 	 * @param	resource $file
 	 * @return	resource
 	 */
@@ -437,7 +437,7 @@ final class Image_Watermark {
 
 	/**
 	 * Add watermark buttons on attachment image locations
-	 */	
+	 */
 	public function attachment_fields_to_edit( $form_fields, $post ) {
 
 		if ( $this->options['watermark_image']['manual_watermarking'] == 1 && $this->options['backup']['backup_image'] ) {
@@ -471,15 +471,15 @@ final class Image_Watermark {
 
 	/**
 	 * Apply watermark for selected images on media page.
-	 */	
+	 */
 	public function watermark_action_ajax() {
 		// Security & data check
 		if ( ! defined( 'DOING_AJAX' )
-			|| ! DOING_AJAX 
-			|| ! isset( $_POST['_iw_nonce'] ) 
-			|| ! isset( $_POST['iw-action'] ) 
-			|| ! isset( $_POST['attachment_id'] ) 
-			|| ! is_numeric( $_POST['attachment_id'] ) 
+			|| ! DOING_AJAX
+			|| ! isset( $_POST['_iw_nonce'] )
+			|| ! isset( $_POST['iw-action'] )
+			|| ! isset( $_POST['attachment_id'] )
+			|| ! is_numeric( $_POST['attachment_id'] )
 			|| ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' )
 		)
 			wp_send_json_error( __('Cheatin uh?', 'image-watermark') );
@@ -495,11 +495,11 @@ final class Image_Watermark {
 		// only if manual watermarking is turned and we have a valid action
 		// if the action is NOT "removewatermark" we also require a watermark image to be set
 		if ( $post_id > 0 && $action && $this->options['watermark_image']['manual_watermarking'] == 1 && ( $this->options['watermark_image']['url'] != 0 || $action == 'removewatermark' ) ) {
-			
+
 			$data = wp_get_attachment_metadata( $post_id, false );
 
 			// is this really an image?
-			if ( in_array( get_post_mime_type( $post_id ), $this->allowed_mime_types ) && is_array( $data ) ) {	
+			if ( in_array( get_post_mime_type( $post_id ), $this->allowed_mime_types ) && is_array( $data ) ) {
 
 				if ( $action === 'applywatermark' ) {
 					$this->apply_watermark( $data, $post_id, 'manual' );
@@ -548,7 +548,7 @@ final class Image_Watermark {
 				}
 
 				$location = esc_url( add_query_arg( 'paged', $wp_list_table->get_pagenum(), $location ) );
-				
+
 				// make sure ids are submitted.  depending on the resource type, this may be 'media' or 'ids'
 				if ( isset( $_REQUEST['media'] ) ) {
 				  $post_ids = array_map( 'intval', $_REQUEST['media'] );
@@ -599,24 +599,24 @@ final class Image_Watermark {
 		global $post_type, $pagenow;
 
 		if ( $pagenow === 'upload.php' ) {
-			
+
 			if ( ! current_user_can( 'upload_files' ) )
 				return;
-			
+
 			// hide media library notice
 			if ( isset( $_GET['iw_action'] ) && $_GET['iw_action'] == 'hide_library_notice' ) {
 				$this->options['watermark_image']['media_library_notice'] = false;
 				update_option( 'image_watermark_options', $this->options );
 			}
-			
+
 			// check if manual watermarking is enabled
 			if ( ! empty( $this->options['watermark_image']['manual_watermarking'] ) && ( ! isset( $this->options['watermark_image']['media_library_notice']) || $this->options['watermark_image']['media_library_notice'] === true ) ) {
 				$mode = get_user_option( 'media_library_mode', get_current_user_id() ) ? get_user_option( 'media_library_mode', get_current_user_id() ) : 'grid';
-				
+
 				if ( isset( $_GET['mode'] ) && in_array( $_GET['mode'], array( 'grid', 'list' ) ) ) {
 					$mode = $_GET['mode'];
 				}
-				
+
 				// display notice in grid mode only
 				if ( $mode === 'grid' ) {
 					// get current admin url
@@ -627,23 +627,23 @@ final class Image_Watermark {
 					echo '<div class="error notice"><p>' . sprintf( __( '<strong>Image Watermark:</strong> Bulk watermarking is available in list mode only, under <em>Bulk Actions</em> dropdown. <a href="%1$s">Got to List Mode</a> or <a href="%2$s">Hide this notice</a>', 'image-watermark' ), esc_url( admin_url( 'upload.php?mode=list' ) ), esc_url( $current_url ) ) . '</p></div>';
 				}
 			}
-			
+
 			if ( isset( $_REQUEST['watermarked'], $_REQUEST['watermarkremoved'], $_REQUEST['skipped'] ) && $post_type === 'attachment' ) {
 				$watermarked      = (int) $_REQUEST['watermarked'];
 				$watermarkremoved = (int) $_REQUEST['watermarkremoved'];
 				$skipped          = (int) $_REQUEST['skipped'];
-	
+
 				if ( $watermarked === 0 ) {
 					echo '<div class="error"><p>' . __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				} elseif ( $watermarked > 0 ) {
 					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was succesfully applied to 1 image.', 'Watermark was succesfully applied to %s images.', $watermarked, 'image-watermark' ), number_format_i18n( $watermarked ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
-				}	
+				}
 				if ( $watermarkremoved === 0 ) {
 					echo '<div class="error"><p>' . __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				} elseif ( $watermarkremoved > 0 ) {
 					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was succesfully removed from 1 image.', 'Watermark was succesfully removed from %s images.', $watermarkremoved, 'image-watermark' ), number_format_i18n( $watermarkremoved ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				}
-	
+
 				$_SERVER['REQUEST_URI'] = esc_url( remove_query_arg( array( 'watermarked', 'skipped' ), $_SERVER['REQUEST_URI'] ) );
 			}
 		}
@@ -702,12 +702,12 @@ final class Image_Watermark {
 		// something went wrong or is it automatic mode?
 		if ( $method !== 'manual'
 			&& (
-				$this->is_admin === true 
-				&& ! ( 
-					( isset( $this->options['watermark_cpt_on'][0] ) && $this->options['watermark_cpt_on'][0] === 'everywhere' ) 
-					|| ( $post_id > 0 && in_array( get_post_type( $post_id ), array_keys( $this->options['watermark_cpt_on'] ) ) === true ) 
-					) 
-				) 
+				$this->is_admin === true
+				&& ! (
+					( isset( $this->options['watermark_cpt_on'][0] ) && $this->options['watermark_cpt_on'][0] === 'everywhere' )
+					|| ( $post_id > 0 && in_array( get_post_type( $post_id ), array_keys( $this->options['watermark_cpt_on'] ) ) === true )
+					)
+				)
 			)
 			return $data;
 
@@ -728,7 +728,7 @@ final class Image_Watermark {
 
 			// loop through active image sizes
 			foreach ( $this->options['watermark_on'] as $image_size => $active_size ) {
-				
+
 				if ( $active_size === 1 ) {
 					switch ( $image_size ) {
 						case 'full':
@@ -909,7 +909,7 @@ final class Image_Watermark {
 	private function do_backup( $data, $upload_dir, $attachment_id ) {
 		// get the filepath for the backup image we're creating
 		$backup_filepath = $this->get_image_backup_filepath( $data['file'] );
-		
+
 		// Make sure the backup isn't created yet
 		if ( ! file_exists( $backup_filepath ) ) {
 			// The original (full size) image
@@ -972,7 +972,7 @@ final class Image_Watermark {
 	 * @return	string $filename
 	 */
 	private function get_image_filename( $filepath ) {
-		return basename(  $filepath ); 
+		return basename(  $filepath );
 	}
 
 	/**
@@ -1082,7 +1082,7 @@ final class Image_Watermark {
 	 * @param	$options			Options
 	 * @return	array				Image coordinates
 	 */
-	private function calculate_image_coordinates( $image_width, $image_height, $watermark_width, $watermark_height, $options ) { 
+	private function calculate_image_coordinates( $image_width, $image_height, $watermark_width, $watermark_height, $options ) {
 		switch ( $options['watermark_image']['position'] ) {
 			case 'top_left':
 				$dest_x = $dest_y = 0;
@@ -1187,7 +1187,7 @@ final class Image_Watermark {
 
 	/**
 	 * Create new image function.
-	 * 
+	 *
 	 * @param	resource	$dst_im
 	 * @param	resource	$src_im
 	 * @param	int			$dst_x
@@ -1214,7 +1214,7 @@ final class Image_Watermark {
 
 	/**
 	 * Resize image.
-	 * 
+	 *
 	 * @param	resource	$image		Image resource
 	 * @param	int			$width		Image width
 	 * @param	int			$height		Image height
@@ -1259,7 +1259,7 @@ final class Image_Watermark {
 
 	/**
 	 * Add links to Support Forum.
-	 * 
+	 *
 	 * @param 	array $links
 	 * @param 	string $file
 	 * @return 	array
@@ -1281,7 +1281,7 @@ final class Image_Watermark {
 
 	/**
 	 * Add links to Settings page.
-	 * 
+	 *
 	 * @param 	array $links
 	 * @param 	string $file
 	 * @return 	array

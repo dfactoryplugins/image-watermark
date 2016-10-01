@@ -708,6 +708,11 @@ final class Image_Watermark {
 		$post = get_post( (int) $attachment_id );
 		$post_id = ( ! empty( $post ) ? (int) $post->post_parent : 0 );
 
+		if ( $attachment_id == $this->options['watermark_image']['url'] ) {
+			// This is the current watermark, do not apply
+			return array( 'error' => __( 'Watermark prevented, this is your selected watermark image', 'image-watermark' ) );
+		}
+
 		// something went wrong or is it automatic mode?
 		if ( $method !== 'manual'
 			&& (

@@ -16,7 +16,7 @@ jQuery( document ).ready( function ( $ ) {
 	 * __skipped => 		'Skipped files'
 	 * __running => 		'Bulk action is currently running, please wait.'
 	 * __dismiss => 		'Dismiss this notice.' // Wordpress default string
-	 * 
+	 *
 	 */
 
 	watermarkImageActions = {
@@ -31,7 +31,7 @@ jQuery( document ).ready( function ( $ ) {
 		init: function() {
 
 			// Normal (list) mode
-			$(document).on('click', '.bulkactions input#doaction', function(e) {
+			$(document).on('click', '.bulkactions input#doaction, .bulkactions input#doaction2', function(e) {
 				// Get the selected bulk action
 				action = $(this).parent().children('select').val();
 
@@ -61,8 +61,8 @@ jQuery( document ).ready( function ( $ ) {
 						});
 
 						// remove current notices
-						$('.iw-notice').slideUp('fast', function() {	
-							$(this).remove(); 
+						$('.iw-notice').slideUp('fast', function() {
+							$(this).remove();
 						});
 
 						// begin the update!
@@ -109,8 +109,8 @@ jQuery( document ).ready( function ( $ ) {
 						watermarkImageActions.selected.push( id );
 
 						// remove current notices
-						$('.iw-notice').slideUp( 'fast', function() {	
-							$( this ).remove(); 
+						$('.iw-notice').slideUp( 'fast', function() {
+							$( this ).remove();
 						});
 
 						// begin the update!
@@ -124,8 +124,8 @@ jQuery( document ).ready( function ( $ ) {
 
 			// Since these are added later we'll need to enable dismissing again
 			$(document).on('click', '.iw-notice.is-dismissible .notice-dismiss', function() {
-				$(this).parents('.iw-notice').slideUp( 'fast', function() {	
-					$(this).remove(); 
+				$(this).parents('.iw-notice').slideUp( 'fast', function() {
+					$(this).remove();
 				} );
 			});
 
@@ -151,6 +151,10 @@ jQuery( document ).ready( function ( $ ) {
 						'iw-action': watermarkImageActions.action,
 						'attachment_id': id
 					};
+
+					if ( watermarkImageActions.action_location == 'upload-list' ) {
+						watermarkImageActions.scroll_to( '#post-' + id, 'bottom' );
+					}
 
 					// the ajax post!
 					$.post( ajaxurl, data, function( response ) {
@@ -193,19 +197,20 @@ jQuery( document ).ready( function ( $ ) {
 		},
 
 		result: function( response, id ) {
-			
+
 			// Was the ajax post successful?
 			if ( true === response.success ) {
 
 				// defaults
-				type = false;
-				message = '';
+				var type = false;
+				var message = '';
+				var overwrite = true;
 				// store response data
 				watermarkImageActions.response = response.data;
 
 				// Check what kind of action is done (watermarked, watermarkremoved or skipped)
 				switch ( response.data ) {
-					case 'watermarked': 
+					case 'watermarked':
 						// The css classes for the notice
 						type = 'iw-notice updated iw-watermarked';
 						// another successful update
@@ -223,7 +228,7 @@ jQuery( document ).ready( function ( $ ) {
 						// reload the image
 						watermarkImageActions.reload_image( id );
 					break;
-					case 'watermarkremoved': 
+					case 'watermarkremoved':
 						// The css classes for the notice
 						type = 'iw-notice updated iw-watermarkremoved';
 						// another successful update
@@ -241,7 +246,7 @@ jQuery( document ).ready( function ( $ ) {
 						// reload the image
 						watermarkImageActions.reload_image( id );
 					break;
-					case 'skipped': 
+					case 'skipped':
 						// The css classes for the notice
 						type = 'iw-notice error iw-skipped';
 						// another skipped update
@@ -251,10 +256,20 @@ jQuery( document ).ready( function ( $ ) {
 						// update the row feedback
 						watermarkImageActions.row_image_feedback( 'error', id );
 					break;
+					default:
+						// The css classes for the notice
+						type = 'iw-notice error iw-message';
+						// The error message
+						message = response.data;
+						// update the row feedback
+						watermarkImageActions.row_image_feedback( 'error', id );
+						// This can be anything so don't overwrite
+						overwrite = false;
+					break;
 				}
 				if ( false !== type ) {
 					// we have a valid terun type, show the notice! (Overwrite current notice if available)
-					watermarkImageActions.notice( type, message, true );
+					watermarkImageActions.notice( type, message, overwrite );
 				}
 			} else {
 				// No success...
@@ -271,7 +286,7 @@ jQuery( document ).ready( function ( $ ) {
 				container_selector;
 
 			switch ( watermarkImageActions.action_location ) {
-				case 'upload-list': 
+				case 'upload-list':
 					container_selector = '.wp-list-table #post-'+id+' .media-icon';
 					css = {
 						display: 'table',
@@ -293,7 +308,7 @@ jQuery( document ).ready( function ( $ ) {
 					};
 					break;
 
-				case 'edit': 
+				case 'edit':
 					container_selector = '.wp_attachment_holder #thumbnail-head-'+id+'';
 					css = {
 						display: 'table',
@@ -403,9 +418,9 @@ jQuery( document ).ready( function ( $ ) {
 			// remove the overlay
 			setTimeout( function() {
 				$( '.iw-overlay' ).each( function() {
-					$(this).fadeOut('fast', function() { 
-						$(this).remove(); 
-					}); 
+					$(this).fadeOut('fast', function() {
+						$(this).remove();
+					});
 				});
 			}, 100 );
 		},
@@ -449,8 +464,8 @@ jQuery( document ).ready( function ( $ ) {
 				});
 				// Do animation (one rotation)
 				icon.animate(
-					{ borderSpacing: 360 }, 
-					{ 
+					{ borderSpacing: 360 },
+					{
 						duration: 1000,
 						step: function(now, fx) {
 							$(this).css('-webkit-transform', 'rotate('+now+'deg)');
@@ -461,7 +476,7 @@ jQuery( document ).ready( function ( $ ) {
 								icon.stop();
 								watermarkImageActions.rotate_icon( icon );
 							}
-						}, 
+						},
 					}
 				);
 			}
@@ -474,6 +489,43 @@ jQuery( document ).ready( function ( $ ) {
 			}
 			return url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue;
 		},
+
+		scroll_to: function( elementSelector, verticalTarget ) {
+
+			var offset = $( elementSelector ).offset();
+			var offsetTop = offset.top;
+
+			// If the element it above the current viewport, scroll to it
+			if ( offset.top < $( window ).scrollTop() ) {
+				$( window ).scrollTop( offsetTop );
+				return; // No further actions needed
+			}
+
+			var windowTopOffset = $( window ).scrollTop();
+			var windowBottomOffset = windowTopOffset + $( window ).outerHeight();
+
+			switch ( verticalTarget ) {
+				case 'top':
+					offsetTop = offsetTop - $( elementSelector ).outerHeight();
+				break;
+				case 'bottom':
+					if ( offset.top < windowBottomOffset ) {
+						return; // The element is in the viewport
+					}
+					offsetTop = offsetTop - $( window ).outerHeight();
+					offsetTop = offsetTop + $( elementSelector ).outerHeight();
+				break;
+				case 'center':
+					if ( offsetTop < windowBottomOffset && offsetTop >= windowTopOffset ) {
+						return; // The element is in the viewport
+					}
+					offsetTop = offsetTop - ( $( window ).outerHeight() / 2 );
+					offsetTop = offsetTop + ( $( elementSelector ).outerHeight() / 2 );
+				break;
+			}
+
+			$( window ).scrollTop( offsetTop );
+		}
 	};
 
 	// We need that nonce!

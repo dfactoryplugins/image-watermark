@@ -2,9 +2,9 @@
 Contributors: dfactory
 Donate link: http://www.dfactory.eu/
 Tags: image, images, picture, photo, watermark, watermarking, protection, image protection, image security, plugin
-Requires at least: 3.5
-Tested up to: 4.6
-Stable tag: 1.6
+Requires at least: 4.0
+Tested up to: 4.7
+Stable tag: 1.6.1
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -21,11 +21,12 @@ For more information, check out plugin page at [dFactory](http://www.dfactory.eu
 * Bulk watermark - Apply watermark option in Media Library actions
 * Watermark images already uploaded to Media Library
 * GD LIbrary and ImageMagic support
-* Choose the position of watermark image
-* Upload custom watermark image
+* Image backup functionality
+* Option to remove watermark
+* Flexible watermark position
 * Watermark image preview
 * Set watermark offset
-* Select post types where watermark will be aplied to images or select adding watermark during any image upload
+* Select post types where watermark will be aplied to uploaded images or select adding watermark during any image upload
 * Select from 3 methods of aplying watermark size: original, custom or scaled
 * Set watermark transparency / opacity
 * Select image format (baseline or progressive)
@@ -52,6 +53,11 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.6.1 =
+* Fix: Minor bug with AJAX requests, thanks to [JoryHogeveen](https://github.com/JoryHogeveen)
+* Fix: Prevent watermarking the watermark image, thanks to [JoryHogeveen](https://github.com/JoryHogeveen)
+* Tweak: Code cleanup
 
 = 1.6.0 =
 * New: Image backup functionality, thanks to [JoryHogeveen](https://github.com/JoryHogeveen)
@@ -161,6 +167,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.6.0 =
-* New: Image backup functionality, thanks to [JoryHogeveen](https://github.com/JoryHogeveen)
-* New: Option to remove watermark (if backup is available)
+= 1.6.1 =
+* Fix: Minor bug with AJAX requests * Fix: Prevent watermarking the watermark image * Tweak: Code cleanup

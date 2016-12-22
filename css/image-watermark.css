@@ -1,27 +1,86 @@
 /* Image Watermark settings */
-.df-credits { float: right; width: 280px; background: #fff; margin: 20px -300px 20px 20px; position: relative; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05); }
-.df-credits .inner { padding-left: 10px; padding-right: 10px; }
-.df-credits h3 { font-size: 14px; line-height: 1.4; margin: 0;  padding: 8px 12px; border-bottom: 1px solid #eee; }
-.df-credits .df-link { font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif; font-style:italic; padding-bottom: 10px; margin: 0; }
-.df-credits .df-link a { vertical-align: middle; padding: 5px 0 0 4px; }
-.image-watermark-settings .df-credits form { min-width: 260px; margin-bottom: 1em; }
-.image-watermark-settings .df-credits form input { margin: 0; padding: 0; }
-.image-watermark-settings { margin-right: 300px; }
-.image-watermark-settings hr, .df-credits hr { border: solid #eee; border-width: 1px 0 0; clear: both; height: 0; }
-.image-watermark-settings form { float: left; min-width: 100%; width: auto; }
-.image-watermark-settings fieldset span.description { margin-bottom: 8px; margin-top: 4px; display: block; }
-.image-watermark-settings.ui-button { margin-bottom: 5px; }
-.image-watermark-settings .description { font-size: 13px; margin-bottom: 8px; }
+.df-sidebar { 
+    float: right; 
+    width: 280px; 
+    margin: 20px -300px 20px 20px; 
+    position: relative; 
+}
+.df-sidebar .df-credits {
+    background: #fff; 
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+}
+.df-sidebar .inner { 
+    padding-left: 10px; 
+    padding-right: 10px; 
+}
+.df-sidebar h3 { 
+    font-size: 14px; 
+    line-height: 1.4; 
+    margin: 0;  
+    padding: 8px 12px; 
+    border-bottom: 1px solid #eee; 
+}
+.df-sidebar .df-link { 
+    font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif; 
+    font-style:italic; 
+    padding-bottom: 10px; 
+    margin: 0; 
+}
+.df-sidebar .df-link a { 
+    vertical-align: middle; 
+    padding: 5px 0 0 4px; 
+}
+.image-watermark-settings .df-credits form { 
+    min-width: 260px; 
+    margin-bottom: 1em; 
+}
+.image-watermark-settings .df-credits form input { 
+    margin: 0; 
+    padding: 0; 
+}
+.image-watermark-settings {
+    margin-right: 300px; 
+}
+.image-watermark-settings hr, .df-credits hr { 
+    border: solid #eee; 
+    border-width: 1px 0 0; 
+    clear: both; 
+    height: 0; 
+}
+.image-watermark-settings form { 
+    float: left; 
+    min-width: 100%; 
+    width: auto; 
+}
+.image-watermark-settings fieldset span.description { 
+    margin-bottom: 8px; 
+    margin-top: 4px; 
+    display: block; 
+}
+.image-watermark-settings.ui-button { 
+    margin-bottom: 5px; 
+}
+.image-watermark-settings .description { 
+    font-size: 13px; 
+    margin-bottom: 8px; 
+}
+.image-watermark-settings #watermark_position td {
+    padding: 15px 20px;
+}
+.image-watermark-settings #watermark_position td input {
+    margin: 0;
+}
 
 /* All Mobile Sizes (devices and browser) */
 @media only screen and (max-width: 959px) {
-	.df-credits { width: 100%; float: none; margin: 20px 0; }
-	.image-watermark-settings { margin-right: 0; }
+    .df-sidebar { width: 100%; float: none; margin: 20px 0; }
+    .image-watermark-settings { margin-right: 0; }
 }
 
 /* Larger sizes */
 @media only screen and (min-width: 959px) {
-	.df-credits { position: fixed; right: 0; margin: 0 20px; }
+    .df-sidebar { position: fixed; right: 0; margin: 0 20px; }
 }
 
 #cpt-select { margin-top: 5px; }
@@ -30,27 +89,27 @@
 .wplike-slider span.right { margin-left: 10px; }
 
 #image_watermark_buttons {
-	margin: 10px 0;
+    margin: 10px 0;
 }
 
 .iw-overlay .spinner {
-	margin: 0;
-	height: 20px;
-	width: 40px;
-	padding: 0;
+    margin: 0;
+    height: 20px;
+    width: 40px;
+    padding: 0;
 }
 
 div.iw-notice {
-	margin: 12px 0;
+    margin: 12px 0;
 }
 
 .iw-watermark-action {
-	text-decoration: none;
+    text-decoration: none;
 }
 .delete-watermark, .media-frame a.delete-watermark {
-	color: #bc0b0b;
+    color: #bc0b0b;
 }
 
 .delete-watermark:hover, .delete-watermark:focus, .media-frame a.delete-watermark:hover, .media-frame a.delete-watermark:focus {
-	color: #f00;
+    color: #f00;
 }

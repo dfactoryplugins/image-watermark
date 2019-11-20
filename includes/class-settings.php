@@ -56,9 +56,8 @@ class Image_Watermark_Settings {
 		add_settings_section( 'image_watermark_general', __( 'General settings', 'image-watermark' ), '', 'image_watermark_options' );
 
 		// is imagick available?
-		if ( isset( Image_Watermark()->extensions['imagick'] ) ) {
+		if ( isset( Image_Watermark()->extensions['imagick'] ) )
 			add_settings_field( 'iw_extension', __( 'PHP library', 'image-watermark' ), array( $this, 'iw_extension' ), 'image_watermark_options', 'image_watermark_general' );
-		}
 
 		add_settings_field( 'iw_automatic_watermarking', __( 'Automatic watermarking', 'image-watermark' ), array( $this, 'iw_automatic_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
 		add_settings_field( 'iw_manual_watermarking', __( 'Manual watermarking', 'image-watermark' ), array( $this, 'iw_manual_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
@@ -70,6 +69,7 @@ class Image_Watermark_Settings {
 		add_settings_section( 'image_watermark_position', __( 'Watermark position', 'image-watermark' ), '', 'image_watermark_options' );
 		add_settings_field( 'iw_alignment', __( 'Watermark alignment', 'image-watermark' ), array( $this, 'iw_alignment' ), 'image_watermark_options', 'image_watermark_position' );
 		add_settings_field( 'iw_offset', __( 'Watermark offset', 'image-watermark' ), array( $this, 'iw_offset' ), 'image_watermark_options', 'image_watermark_position' );
+		add_settings_field( 'iw_offset_unit', __( 'Offset unit', 'image-watermark' ), array( $this, 'iw_offset_unit' ), 'image_watermark_options', 'image_watermark_position' );
 
 		// watermark image
 		add_settings_section( 'image_watermark_image', __( 'Watermark image', 'image-watermark' ), '', 'image_watermark_options' );
@@ -77,7 +77,7 @@ class Image_Watermark_Settings {
 		add_settings_field( 'iw_watermark_preview', __( 'Watermark preview', 'image-watermark' ), array( $this, 'iw_watermark_preview' ), 'image_watermark_options', 'image_watermark_image' );
 		add_settings_field( 'iw_watermark_size', __( 'Watermark size', 'image-watermark' ), array( $this, 'iw_watermark_size' ), 'image_watermark_options', 'image_watermark_image' );
 		add_settings_field( 'iw_watermark_size_custom', __( 'Watermark custom size', 'image-watermark' ), array( $this, 'iw_watermark_size_custom' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_watermark_size_scaled', __( 'Scale of watermark in relation to image width', 'image-watermark' ), array( $this, 'iw_watermark_size_scaled' ), 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_watermark_size_scaled', __( 'Watermark scale', 'image-watermark' ), array( $this, 'iw_watermark_size_scaled' ), 'image_watermark_options', 'image_watermark_image' );
 		add_settings_field( 'iw_watermark_opacity', __( 'Watermark transparency / opacity', 'image-watermark' ), array( $this, 'iw_watermark_opacity' ), 'image_watermark_options', 'image_watermark_image' );
 		add_settings_field( 'iw_image_quality', __( 'Image quality', 'image-watermark' ), array( $this, 'iw_image_quality' ), 'image_watermark_options', 'image_watermark_image' );
 		add_settings_field( 'iw_image_format', __( 'Image format', 'image-watermark' ), array( $this, 'iw_image_format' ), 'image_watermark_options', 'image_watermark_image' );
@@ -122,7 +122,7 @@ class Image_Watermark_Settings {
 						<h3 class="hndle">' . __( 'Image Watermark', 'image-watermark' ) . ' ' . Image_Watermark()->defaults['version'] . '</h3>
 						<div class="inside">
 							<h4 class="inner">' . __( 'Need support?', 'image-watermark' ) . '</h4>
-							<p class="inner">' . __( 'If you are having problems with this plugin, checkout plugin', 'image-watermark' ) . '  <a href="http://www.dfactory.eu/docs/image-watermark-plugin/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=documentation" target="_blank" title="' . __( 'Documentation', 'image-watermark' ) . '">' . __( 'Documentation', 'image-watermark' ) . '</a> ' . __( 'or talk about them in the', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/support/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=support" target="_blank" title="' . __( 'Support forum', 'image-watermark' ) . '">' . __( 'Support forum', 'image-watermark' ) . '</a></p>
+							<p class="inner">' . __( 'If you are having problems with this plugin, checkout plugin', 'image-watermark' ) . '  <a href="http://www.dfactory.eu/docs/image-watermark/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=documentation" target="_blank" title="' . __( 'Documentation', 'image-watermark' ) . '">' . __( 'Documentation', 'image-watermark' ) . '</a> ' . __( 'or talk about them in the', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/support/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=support" target="_blank" title="' . __( 'Support forum', 'image-watermark' ) . '">' . __( 'Support forum', 'image-watermark' ) . '</a></p>
 							<hr />
 							<h4 class="inner">' . __( 'Do you like this plugin?', 'image-watermark' ) . '</h4>
 							<p class="inner"><a href="http://wordpress.org/support/view/plugin-reviews/image-watermark" target="_blank" title="' . __( 'Rate it 5', 'image-watermark' ) . '">' . __( 'Rate it 5', 'image-watermark' ) . '</a> ' . __( 'on WordPress.org', 'image-watermark' ) . '<br />' .
@@ -132,10 +132,6 @@ class Image_Watermark_Settings {
 							<hr />
 							<p class="df-link inner">' . __( 'Created by', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=created-by" target="_blank" title="dFactory - Quality plugins for WordPress"><img src="' . plugins_url( '../images/logo-dfactory.png', __FILE__ ) . '" title="dFactory - Quality plugins for WordPress" alt="dFactory - Quality plugins for WordPress" /></a></p>
 						</div>
-					</div>
-					<div class="df-promo">
-						<h4 class="inner">' . __( 'Need image optimization?', 'image-watermark' ) . '</h4>
-						<p class="inner">' . sprintf( __( 'Speed up your site with <a href="%s" target="_blank">ShortPixel</a>. Sign up as Image Watermark user and get 50&#37; extra monthly optimizations!', 'image-watermark' ), 'https://shortpixel.com/h/af/E0IQA8M124741' ) . '</p>
 					</div>
 				</div>
 				<form action="options.php" method="post">
@@ -234,6 +230,7 @@ class Image_Watermark_Settings {
 			}
 			$input['watermark_image']['position'] = isset( $_POST['iw_options']['watermark_image']['position'] ) && in_array( esc_attr( $_POST['iw_options']['watermark_image']['position'] ), $positions ) ? esc_attr( $_POST['iw_options']['watermark_image']['position'] ) : Image_Watermark()->defaults['options']['watermark_image']['position'];
 
+			$input['watermark_image']['offset_unit'] = isset( $_POST['iw_options']['watermark_image']['offset_unit'] ) && in_array( $_POST['iw_options']['watermark_image']['offset_unit'], array( 'pixels', 'percentages' ), true ) ? $_POST['iw_options']['watermark_image']['offset_unit'] : Image_Watermark()->defaults['options']['watermark_image']['offset_unit'];
 			$input['watermark_image']['offset_width'] = isset( $_POST['iw_options']['watermark_image']['offset_width'] ) ? (int) $_POST['iw_options']['watermark_image']['offset_width'] : Image_Watermark()->defaults['options']['watermark_image']['offset_width'];
 			$input['watermark_image']['offset_height'] = isset( $_POST['iw_options']['watermark_image']['offset_height'] ) ? (int) $_POST['iw_options']['watermark_image']['offset_height'] : Image_Watermark()->defaults['options']['watermark_image']['offset_height'];
 			$input['watermark_image']['url'] = isset( $_POST['iw_options']['watermark_image']['url'] ) ? (int) $_POST['iw_options']['watermark_image']['url'] : Image_Watermark()->defaults['options']['watermark_image']['url'];
@@ -317,7 +314,7 @@ class Image_Watermark_Settings {
 		?>
 		<label for="iw_manual_watermarking">
 			<input id="iw_manual_watermarking" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['manual_watermarking'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][manual_watermarking]">
-<?php echo __( 'Enable Apply Watermark option for images in Media Library.', 'image-watermark' ); ?>
+<?php echo __( 'Enable Apply Watermark option for Media Library images.', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -341,7 +338,8 @@ class Image_Watermark_Settings {
 				?>
 			</div>
 			<p class="description">
-<?php echo __( 'Check image sizes on which watermark should appear.<br /><strong>IMPORTANT:</strong> checking full size is NOT recommended as it\'s the original image. You may need it later - for removing or changing watermark, image sizes regeneration or any other image manipulations. Use it only if you know what you are doing.', 'image-watermark' ); ?>
+				<?php echo __( 'Check the image sizes watermark will be applied to.', 'image-watermark' ); ?><br />
+				<?php echo __( '<strong>IMPORTANT:</strong> checking full size is NOT recommended as it\'s the original image. You may need it later - for removing or changing watermark, image sizes regeneration or any other image manipulations. Use it only if you know what you are doing.', 'image-watermark' ); ?>
 			</p>
 			
 			<?php
@@ -435,7 +433,22 @@ class Image_Watermark_Settings {
 			}
 		?>
 			</table>
-			<p class="description"><?php echo __( 'Choose the position of watermark image.', 'image-watermark' ); ?></p>
+			<p class="description"><?php echo __( 'Select the watermark alignment.', 'image-watermark' ); ?></p>
+		</fieldset>
+		<?php
+	}
+
+	/**
+	 * Watermark offset unit option.
+	 * 
+	 * @return void
+	 */
+	public function iw_offset_unit() {
+		?>
+		<fieldset id="iw_offset_unit">
+			<input type="radio" id="offset_pixels" value="pixels" name="iw_options[watermark_image][offset_unit]" <?php checked( Image_Watermark()->options['watermark_image']['offset_unit'], 'pixels', true ); ?> /><label for="offset_pixels"><?php _e( 'pixels', 'image-watermark' ); ?></label>
+			<input type="radio" id="offset_percentages" value="percentages" name="iw_options[watermark_image][offset_unit]" <?php checked( Image_Watermark()->options['watermark_image']['offset_unit'], 'percentages', true ); ?> /><label for="offset_percentages"><?php _e( 'percentages', 'image-watermark' ); ?></label>
+			<p class="description"><?php _e( 'Select the watermark offset unit.', 'image-watermark' ); ?></p>
 		</fieldset>
 		<?php
 	}
@@ -443,14 +456,15 @@ class Image_Watermark_Settings {
 	/**
 	 * Watermark offset option.
 	 * 
-	 * @return mixed
+	 * @return void
 	 */
 	public function iw_offset() {
 		?>
 		<fieldset id="iw_offset">
-			<?php echo __( 'x:', 'image-watermark' ); ?> <input type="text" size="5"  name="iw_options[watermark_image][offset_width]" value="<?php echo Image_Watermark()->options['watermark_image']['offset_width']; ?>"> <?php echo __( 'px', 'image-watermark' ); ?>
+			<?php echo __( 'x:', 'image-watermark' ); ?> <input type="number" class="small-text" name="iw_options[watermark_image][offset_width]" value="<?php echo Image_Watermark()->options['watermark_image']['offset_width']; ?>">
 			<br />
-			<?php echo __( 'y:', 'image-watermark' ); ?> <input type="text" size="5"  name="iw_options[watermark_image][offset_height]" value="<?php echo Image_Watermark()->options['watermark_image']['offset_height']; ?>"> <?php echo __( 'px', 'image-watermark' ); ?>
+			<?php echo __( 'y:', 'image-watermark' ); ?> <input type="number" class="small-text" name="iw_options[watermark_image][offset_height]" value="<?php echo Image_Watermark()->options['watermark_image']['offset_height']; ?>">
+			<p class="description"><?php _e( 'Enter watermark offset value.', 'image-watermark' ); ?></p>
 		</fieldset>
 		<?php
 	}
@@ -458,7 +472,7 @@ class Image_Watermark_Settings {
 	/**
 	 * Watermark image option.
 	 * 
-	 * @return mixed
+	 * @return void
 	 */
 	public function iw_watermark_image() {
 		if ( Image_Watermark()->options['watermark_image']['url'] !== NULL && Image_Watermark()->options['watermark_image']['url'] != 0 ) {
@@ -525,12 +539,9 @@ class Image_Watermark_Settings {
 		?>
 		<fieldset id="iw_watermark_size">
 			<div id="watermark-type">
-				<label for="type1"><?php _e( 'original', 'image-watermark' ); ?></label>
-				<input type="radio" id="type1" value="0" name="iw_options[watermark_image][watermark_size_type]" <?php checked( Image_Watermark()->options['watermark_image']['watermark_size_type'], 0, true ); ?> />
-				<label for="type2"><?php _e( 'custom', 'image-watermark' ); ?></label>
-				<input type="radio" id="type2" value="1" name="iw_options[watermark_image][watermark_size_type]" <?php checked( Image_Watermark()->options['watermark_image']['watermark_size_type'], 1, true ); ?> />
-				<label for="type3"><?php _e( 'scaled', 'image-watermark' ); ?></label>
-				<input type="radio" id="type3" value="2" name="iw_options[watermark_image][watermark_size_type]" <?php checked( Image_Watermark()->options['watermark_image']['watermark_size_type'], 2, true ); ?> />
+				<input type="radio" id="type1" value="0" name="iw_options[watermark_image][watermark_size_type]" <?php checked( Image_Watermark()->options['watermark_image']['watermark_size_type'], 0, true ); ?> /><label for="type1"><?php _e( 'original', 'image-watermark' ); ?></label>
+				<input type="radio" id="type2" value="1" name="iw_options[watermark_image][watermark_size_type]" <?php checked( Image_Watermark()->options['watermark_image']['watermark_size_type'], 1, true ); ?> /><label for="type2"><?php _e( 'custom', 'image-watermark' ); ?></label>
+				<input type="radio" id="type3" value="2" name="iw_options[watermark_image][watermark_size_type]" <?php checked( Image_Watermark()->options['watermark_image']['watermark_size_type'], 2, true ); ?> /><label for="type3"><?php _e( 'scaled', 'image-watermark' ); ?></label>
 			</div>
 			<p class="description"><?php _e( 'Select method of aplying watermark size.', 'image-watermark' ); ?></p>
 		</fieldset>
@@ -564,11 +575,11 @@ class Image_Watermark_Settings {
 			<div>
 				<input type="text" id="iw_size_input" maxlength="3" class="hide-if-js" name="iw_options[watermark_image][width]" value="<?php echo Image_Watermark()->options['watermark_image']['width']; ?>" />
 				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_size_span" title="<?php echo Image_Watermark()->options['watermark_image']['width']; ?>"></span><span class="right hide-if-no-js">100</span>
+					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_size_span" title="<?php echo Image_Watermark()->options['watermark_image']['width']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['watermark_image']['width']; ?>%;"><?php echo Image_Watermark()->options['watermark_image']['width']; ?></span></span><span class="right hide-if-no-js">100</span>
 				</div>
 			</div>
 		</fieldset>
-		<p class="description"><?php _e( 'This value will be used if "scaled" method if selected above. <br />Enter a number ranging from 0 to 100. 100 makes width of watermark image equal to width of the image it is applied to.', 'image-watermark' ); ?></p>
+		<p class="description"><?php _e( 'Enter a number ranging from 0 to 100. 100 makes width of watermark image equal to width of the image it is applied to.', 'image-watermark' ); ?></p>
 		<?php
 	}
 
@@ -583,7 +594,7 @@ class Image_Watermark_Settings {
 			<div>
 				<input type="text" id="iw_opacity_input" maxlength="3" class="hide-if-js" name="iw_options[watermark_image][transparent]" value="<?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>" />
 				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_opacity_span" title="<?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>"></span><span class="right hide-if-no-js">100</span>
+					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_opacity_span" title="<?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>%;"><?php echo Image_Watermark()->options['watermark_image']['transparent']; ?></span></span><span class="right hide-if-no-js">100</span>
 				</div>
 			</div>
 		</fieldset>
@@ -602,7 +613,7 @@ class Image_Watermark_Settings {
 			<div>
 				<input type="text" id="iw_quality_input" maxlength="3" class="hide-if-js" name="iw_options[watermark_image][quality]" value="<?php echo Image_Watermark()->options['watermark_image']['quality']; ?>" />
 				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_quality_span" title="<?php echo Image_Watermark()->options['watermark_image']['quality']; ?>"></span><span class="right hide-if-no-js">100</span>
+					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_quality_span" title="<?php echo Image_Watermark()->options['watermark_image']['quality']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['watermark_image']['quality']; ?>%;"><?php echo Image_Watermark()->options['watermark_image']['quality']; ?></span></span><span class="right hide-if-no-js">100</span>
 				</div>
 			</div>
 		</fieldset>
@@ -619,10 +630,8 @@ class Image_Watermark_Settings {
 		?>
 		<fieldset id="iw_image_format">
 			<div id="jpeg-format">
-				<label for="baseline"><?php _e( 'baseline', 'image-watermark' ); ?></label>
-				<input type="radio" id="baseline" value="baseline" name="iw_options[watermark_image][jpeg_format]" <?php checked( Image_Watermark()->options['watermark_image']['jpeg_format'], 'baseline', true ); ?> />
-				<label for="progressive"><?php _e( 'progressive', 'image-watermark' ); ?></label>
-				<input type="radio" id="progressive" value="progressive" name="iw_options[watermark_image][jpeg_format]" <?php checked( Image_Watermark()->options['watermark_image']['jpeg_format'], 'progressive', true ); ?> />
+				<input type="radio" id="baseline" value="baseline" name="iw_options[watermark_image][jpeg_format]" <?php checked( Image_Watermark()->options['watermark_image']['jpeg_format'], 'baseline', true ); ?> /><label for="baseline"><?php _e( 'baseline', 'image-watermark' ); ?></label>
+				<input type="radio" id="progressive" value="progressive" name="iw_options[watermark_image][jpeg_format]" <?php checked( Image_Watermark()->options['watermark_image']['jpeg_format'], 'progressive', true ); ?> /><label for="progressive"><?php _e( 'progressive', 'image-watermark' ); ?></label>
 			</div>
 		</fieldset>
 		<p class="description"><?php _e( 'Select baseline or progressive image format.', 'image-watermark' ); ?></p>
@@ -696,7 +705,7 @@ class Image_Watermark_Settings {
 			<div>
 				<input type="text" id="iw_backup_quality_input" maxlength="3" class="hide-if-js" name="iw_options[backup][backup_quality]" value="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>" />
 				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_backup_quality_span" title="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>"></span><span class="right hide-if-no-js">100</span>
+					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_backup_quality_span" title="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['backup']['backup_quality']; ?>%;"><?php echo Image_Watermark()->options['backup']['backup_quality']; ?></span></span><span class="right hide-if-no-js">100</span>
 				</div>
 			</div>
 		</fieldset>

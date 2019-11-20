@@ -1,10 +1,10 @@
 === Image Watermark ===
 Contributors: dfactory
 Donate link: http://www.dfactory.eu/
-Tags: image, images, picture, photo, watermark, watermarking, protection, image protection, image security, plugin
+Tags: image, images, picture, photo, watermark, watermarking, protection, image protection, image security
 Requires at least: 4.0
-Tested up to: 4.7
-Stable tag: 1.6.1
+Tested up to: 5.3
+Stable tag: 1.6.6
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -53,6 +53,26 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.6.6 =
+* Tweak: PHP 7.3 compatibility
+
+= 1.6.5 =
+* Fix: Improved support for PHP 7 and above
+* Fix: Backup folders handling of date based organized uploads
+
+= 1.6.4 =
+* Fix: Transparent PNG issues with ImageMagic library
+
+= 1.6.3.1 =
+* Fix: The plugin directory upload fix.
+
+= 1.6.3 =
+* Fix: PNG files watermarking issue
+
+= 1.6.2 =
+* New: Option to select watermark offset unit - pixels or percentages
+* Tweak: Added values to slider settings fields
 
 = 1.6.1 =
 * Fix: Minor bug with AJAX requests, thanks to [JoryHogeveen](https://github.com/JoryHogeveen)
@@ -167,5 +187,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.6.1 =
-* Fix: Minor bug with AJAX requests * Fix: Prevent watermarking the watermark image * Tweak: Code cleanup
+= 1.6.6 =
+* Tweak: PHP 7.3 compatibility

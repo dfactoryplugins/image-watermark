@@ -113,3 +113,13 @@ div.iw-notice {
 .delete-watermark:hover, .delete-watermark:focus, .media-frame a.delete-watermark:hover, .media-frame a.delete-watermark:focus {
     color: #f00;
 }
+
+.iw-current-value {
+	position: relative;
+	bottom: 25px;
+	display: inline-block;
+	width: 17px;
+	text-align: center;
+	margin-left: -.6em;
+	font-size: 0.9em;
+}

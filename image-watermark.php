@@ -120,7 +120,7 @@ final class Image_Watermark {
 		// filters
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_extend_links' ), 10, 2 );
 		add_filter( 'plugin_action_links', array( $this, 'plugin_settings_link' ), 10, 2 );
-		add_filter( 'wp_handle_upload', array( $this, 'handle_upload_files' ) );
+		add_filter( 'wp_handle_upload', array( $this, 'handle_upload_files' ), 0 );
 		add_filter( 'attachment_fields_to_edit', array( $this, 'attachment_fields_to_edit' ), 10, 2 );
 
 		// define our backup location
@@ -431,15 +431,19 @@ wp-logo-jpg					+		+
 					$this->is_admin = false;
 			}
 
+			// use wp_update_attachment_metadata hook for WP Stateless compatibility
+			$has_wp_stateless = class_exists( 'wpCloud\StatelessMedia\Utility' );
+			$hook_name = $has_wp_stateless ? 'wp_update_attachment_metadata' : 'wp_generate_attachment_metadata';
+
 			// admin
 			if ( $this->is_admin === true ) {
 				if ( $this->options['watermark_image']['plugin_off'] == 1 && wp_attachment_is_image( $this->options['watermark_image']['url'] ) && in_array( $file['type'], $this->allowed_mime_types ) ) {
-					add_filter( 'wp_generate_attachment_metadata', array( $this, 'apply_watermark' ), 10, 2 );
+					add_filter( $hook_name, array( $this, 'apply_watermark' ), 0, 2 );
 				}
-				// frontend
+			// frontend
 			} else {
 				if ( $this->options['watermark_image']['frontend_active'] == 1 && wp_attachment_is_image( $this->options['watermark_image']['url'] ) && in_array( $file['type'], $this->allowed_mime_types ) ) {
-					add_filter( 'wp_generate_attachment_metadata', array( $this, 'apply_watermark' ), 10, 2 );
+					add_filter( $hook_name, array( $this, 'apply_watermark' ), 0, 2 );
 				}
 			}
 		}
@@ -757,11 +761,12 @@ wp-logo-jpg					+		+
 							break;
 
 						default:
-							if ( ! empty( $data['sizes'] ) && array_key_exists( $image_size, $data['sizes'] ) )
+							if ( ! empty( $data['sizes'] ) && array_key_exists( $image_size, $data['sizes'] ) ) {
 								$filepath = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . dirname( $data['file'] ) . DIRECTORY_SEPARATOR . $data['sizes'][$image_size]['file'];
-							else
+							} else {
 								// early getaway
 								continue 2;
+							}
 					}
 
 					do_action( 'iw_before_apply_watermark', $attachment_id, $image_size );

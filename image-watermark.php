@@ -993,6 +993,10 @@ wp-logo-jpg					+		+
 		// get watermark path
 		$watermark_file = wp_get_attachment_metadata( $options['watermark_image']['url'], true );
 		$watermark_path = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . $watermark_file['file'];
+		
+		// if the watermark is on cloud storage
+		$has_wp_stateless = class_exists( 'wpCloud\StatelessMedia\Utility' );
+		$watermark_path = $has_wp_stateless ? wp_get_attachment_url( $options['watermark_image']['url'] ) : $watermark_path;
 
 		// imagick extension
 		if ( $this->extension === 'imagick' ) {

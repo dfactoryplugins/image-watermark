@@ -22,7 +22,7 @@ class Image_Watermark_Update {
 
 	/**
 	 * Check if update is required.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function check_update() {

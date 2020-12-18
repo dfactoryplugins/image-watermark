@@ -19,6 +19,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Class constructor.
+	 *
+	 * @return void
 	 */
 	public function __construct( )	{
 		// actions
@@ -29,6 +31,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Load available image sizes.
+	 *
+	 * @return void
 	 */
 	public function load_image_sizes() {
 		$this->image_sizes = get_intermediate_image_sizes();
@@ -48,6 +52,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Register settings.
+	 *
+	 * @return void
 	 */
 	public function register_settings() {
 		register_setting( 'image_watermark_options', 'image_watermark_options', array( $this, 'validate_options' ) );
@@ -96,6 +102,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Create options page in menu.
+	 *
+	 * @return void
 	 */
 	public function options_page() {
 		add_options_page(
@@ -105,6 +113,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Options page output.
+	 *
+	 * @return void
 	 */
 	public function options_page_output() {
 
@@ -157,12 +167,18 @@ class Image_Watermark_Settings {
 		?>
 			<script type="text/javascript">
 				//<![CDATA[
-				jQuery(document).ready( function ($) {
-					// close postboxes that should be closed
-					$('.if-js-closed').removeClass('if-js-closed').addClass('closed');
-					// postboxes setup
-					postboxes.add_postbox_toggles('watermark-options');
-				});
+				( function( $ ) {
+
+					// ready event
+					$( function() {
+						// close postboxes that should be closed
+						$( '.if-js-closed' ).removeClass( 'if-js-closed' ).addClass( 'closed' );
+
+						// postboxes setup
+						postboxes.add_postbox_toggles( 'watermark-options' );
+					} );
+
+				} )( jQuery );
 				//]]>
 			</script>
 		<?php
@@ -170,7 +186,7 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Validate options.
-	 * 
+	 *
 	 * @param array $input
 	 * @return array
 	 */
@@ -270,8 +286,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * PHP extension.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_extension() {
 		echo '
@@ -293,8 +309,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Automatic watermarking option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_automatic_watermarking() {
 		?>
@@ -307,8 +323,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Manual watermarking option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_manual_watermarking() {
 		?>
@@ -321,8 +337,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Enable watermark for option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_enable_for() {
 		?>
@@ -378,8 +394,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Frontend watermarking option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_frontend_watermarking() {
 		?>
@@ -393,8 +409,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Remove data on deactivation option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_deactivation() {
 		?>
@@ -407,8 +423,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark alignment option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_alignment() {
 		?>
@@ -440,7 +456,7 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark offset unit option.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function iw_offset_unit() {
@@ -455,7 +471,7 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark offset option.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function iw_offset() {
@@ -471,7 +487,7 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark image option.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function iw_watermark_image() {
@@ -493,8 +509,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark image preview.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_watermark_preview() {
 		if ( Image_Watermark()->options['watermark_image']['url'] !== NULL && Image_Watermark()->options['watermark_image']['url'] != 0 ) {
@@ -532,8 +548,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark size option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_watermark_size() {
 		?>
@@ -550,8 +566,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark custom size option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_watermark_size_custom() {
 		?>
@@ -566,8 +582,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark scaled size option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_watermark_size_scaled() {
 		?>
@@ -585,8 +601,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Watermark custom size option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_watermark_opacity() {
 		?>
@@ -604,8 +620,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Image quality option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_image_quality() {
 		?>
@@ -623,8 +639,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Image format option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_image_format() {
 		?>
@@ -640,8 +656,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Right click image protection option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_protection_right_click() {
 		?>
@@ -654,8 +670,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Drag and drop image protection option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_protection_drag_drop() {
 		?>
@@ -668,8 +684,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Logged-in users image protection option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_protection_logged() {
 		?>
@@ -681,9 +697,9 @@ class Image_Watermark_Settings {
 	}
 
 	/**
-	 * Backup the original image
-	 * 
-	 * @return mixed
+	 * Backup the original image.
+	 *
+	 * @return void
 	 */
 	public function iw_backup_image() {
 		?>
@@ -696,8 +712,8 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Image backup quality option.
-	 * 
-	 * @return mixed
+	 *
+	 * @return void
 	 */
 	public function iw_backup_image_quality() {
 		?>
@@ -712,7 +728,7 @@ class Image_Watermark_Settings {
 		<p class="description"><?php _e( 'Set output image quality.', 'image-watermark' ); ?></p>
 		<?php
 	}
-	
+
 	/**
 	 * This function is similar to the function in the Settings API, only the output HTML is changed.
 	 * Print out the settings fields for a particular settings section
@@ -722,30 +738,31 @@ class Image_Watermark_Settings {
 	 * @since 0.1
 	 *
 	 * @param string $page Slug title of the admin page who's settings fields you want to show.
-	 * @param string $section Slug title of the settings section who's fields you want to show.
+	 * @return void
 	 */
 	function do_settings_sections( $page ) {
 		global $wp_settings_sections, $wp_settings_fields;
-	 
+
 		if ( ! isset( $wp_settings_sections[$page] ) )
 			return;
-	 
+
 		foreach ( (array) $wp_settings_sections[$page] as $section ) {
 			echo '<div id="" class="stuffbox postbox '.$section['id'].'">';
-			echo '<button type="button" class="handlediv button-link" aria-expanded="true"><span class="screen-reader-text">' . __('Toggle panel', 'image-watermark') . '</span><span class="toggle-indicator" aria-hidden="true"></span></button>';
+			echo '<button type="button" class="handlediv button-link" aria-expanded="true"><span class="screen-reader-text">' . __( 'Toggle panel', 'image-watermark') . '</span><span class="toggle-indicator" aria-hidden="true"></span></button>';
 			if ( $section['title'] )
 				echo "<h3 class=\"hndle\"><span>{$section['title']}</span></h3>\n";
-	 
+
 			if ( $section['callback'] )
 				call_user_func( $section['callback'], $section );
-	 
-			if ( ! isset( $wp_settings_fields ) || !isset( $wp_settings_fields[$page] ) || !isset( $wp_settings_fields[$page][$section['id']] ) )
+
+			if ( ! isset( $wp_settings_fields ) || ! isset( $wp_settings_fields[$page] ) || ! isset( $wp_settings_fields[$page][$section['id']] ) )
 				continue;
+
 			echo '<div class="inside"><table class="form-table">';
+
 			do_settings_fields( $page, $section['id'] );
-			echo '</table></div>';
-			echo '</div>';
+
+			echo '</table></div></div>';
 		}
 	}
-
 }

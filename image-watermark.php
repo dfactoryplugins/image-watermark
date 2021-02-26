@@ -118,6 +118,9 @@ final class Image_Watermark {
 		add_action( 'admin_notices', array( $this, 'bulk_admin_notices' ) );
 		add_action( 'delete_attachment', array( $this, 'delete_attachment' ) );
 		add_action( 'wp_ajax_iw_watermark_bulk_action', array( $this, 'watermark_action_ajax' ) );
+		add_action( 'wp_ajax_iw_install_imagein', array( $this, 'install_imagein' ) );
+		add_action( 'admin_notices', array( $this, 'deprecation_notice' ) );
+		add_action( 'init', array( $this, 'deprecation_update' ) );
 
 		// filters
 		add_filter( 'plugin_row_meta', array( $this, 'plugin_extend_links' ), 10, 2 );
@@ -252,6 +255,16 @@ final class Image_Watermark {
 	 */
 	public function load_textdomain() {
 		load_plugin_textdomain( 'image-watermark', false, basename( dirname( __FILE__ ) ) . '/languages' );
+
+		$this->upgrade_strings = array(
+			'no_capability'						=> __( 'You are not allowed to install plugins.', 'image-watermark' ),
+			'activation_success'				=> __( 'ImageIn is already installed and was succesfully activated.', 'image-watermark' ),
+			'activation_error'					=> __( 'ImageIn is already installed but was not activated. Please refresh the page and try again.', 'image-watermark' ),
+			'already_active'					=> __( 'ImageIn is already installed and active.', 'image-watermark' ),
+			'instalation_failed'				=> sprintf( __( 'ImageIn could not be installed. Please refresh the page and try again or download it from official %s.', 'image-watermark' ), '<a href="https://wordpress.org/plugins/imagein/">WordPress plugins</a>' ),
+			'installation_activation_failed'	=> __( 'Installation was succesfull but ImageIn could not be activated. Please refresh the page and try again or try to activate it by yourself.', 'image-watermark' ),
+			'installation_activation_success'	=> __( 'Installation and activation was succesfull.', 'image-watermark' )
+		);
 	}
 
 	/**
@@ -301,6 +314,18 @@ final class Image_Watermark {
 	 */
 	public function admin_enqueue_scripts( $page ) {
 		global $pagenow;
+
+		wp_enqueue_script( 'watermark-admin-deprecation', plugins_url( '/js/admin-deprecation.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], true );
+		wp_localize_script(
+			'watermark-admin-deprecation',
+			'iwDeprecation',
+			array(
+				'nonce'					=> wp_create_nonce( 'image-watermark-install-imagein' ),
+				'installing'			=> __( 'Installing...', 'image-watermark' ),
+				'installationFailed'	=> __( 'Installation failed. Please refresh the page and try again.', 'image-watermark' ),
+				'strings'				=> $this->upgrade_strings
+			)
+		);
 
 		wp_register_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
 
@@ -508,6 +533,68 @@ final class Image_Watermark {
 		}
 
 		return $form_fields;
+	}
+
+	/**
+	 * Deprecation notice.
+	 *
+	 * @return void
+	 */
+	function deprecation_notice() {
+		if ( ! current_user_can( 'update_plugins' ) )
+			return;
+
+		echo '
+		<div id="iw-upgrade-notice" class="notice notice-warning">
+			<p>' . sprintf( __( '<strong>Image Watermark</strong> plugin is now deprecated and will no longer be updated. Please use our more powerfull image handling plugin instead - %s.', 'image-watermark' ), '<a href="https://wordpress.org/plugins/imagein/">ImageIn</a>' ) . '</p>
+			<p>' . __( 'If you press the following button it will deactivate <strong>Image Watermark</strong> and then install and activate <strong>ImageIn</strong> keeping the old settings.', 'image-watermark' ) . '</p>
+			<p><a href="#" id="iw_install_imagein" class="button">'. __( 'Install Now' ) . '</a></p>
+			<p class="iw-upgrade-status hidden"></p>
+		</div>';
+	}
+
+	/**
+	 * Deprecation update.
+	 *
+	 * @return void
+	 */
+	function deprecation_update() {
+		if ( ! is_admin() || ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || ! isset( $_POST['action'] ) || $_POST['action'] !== 'iw_install_imagein' || ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'image-watermark-install-imagein' ) )
+			return;
+
+		include_once( IMAGE_WATERMARK_PATH . 'install.php' );
+
+		$this->upgrade = IW_Deprecation_Upgrade::instance( __DIR__ );
+		$this->upgrade->load_hooks();
+	}
+
+	/**
+	 * Deactivate Image Watermark, install and activate ImageIn.
+	 *
+	 * @return void
+	 */
+	public function install_imagein() {
+		if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'image-watermark-install-imagein' ) )
+			wp_send_json_error();
+
+		$current_plugin = plugin_basename( __FILE__ );
+
+		$data = array(
+			'success'	=> false,
+			'status'	=> $this->upgrade->status
+		);
+
+		switch ( $this->upgrade->status ) {
+			case 'activation_success':
+			case 'already_active':
+			case 'installation_activation_success':
+				deactivate_plugins( $current_plugin );
+
+				$data['success'] = true;
+				break;
+		}
+
+		wp_send_json_success( $data );
 	}
 
 	/**

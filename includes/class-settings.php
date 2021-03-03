@@ -35,6 +35,9 @@ class Image_Watermark_Settings {
 	 * @return void
 	 */
 	public function load_image_sizes() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		$this->image_sizes = get_intermediate_image_sizes();
 		$this->image_sizes[] = 'full';
 
@@ -56,6 +59,9 @@ class Image_Watermark_Settings {
 	 * @return void
 	 */
 	public function register_settings() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		register_setting( 'image_watermark_options', 'image_watermark_options', array( $this, 'validate_options' ) );
 
 		// general
@@ -106,9 +112,10 @@ class Image_Watermark_Settings {
 	 * @return void
 	 */
 	public function options_page() {
-		add_options_page(
-			__( 'Image Watermark Options', 'image-watermark' ), __( 'Watermark', 'image-watermark' ), 'manage_options', 'watermark-options', array( $this, 'options_page_output' )
-		);
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
+		add_options_page( __( 'Image Watermark Options', 'image-watermark' ), __( 'Watermark', 'image-watermark' ), 'manage_options', 'watermark-options', array( $this, 'options_page_output' ) );
 	}
 
 	/**

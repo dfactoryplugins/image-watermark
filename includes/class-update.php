@@ -26,6 +26,9 @@ class Image_Watermark_Update {
 	 * @return void
 	 */
 	public function check_update() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		if( ! current_user_can( 'manage_options' ) || ! current_user_can( 'install_plugins' ) )
 			return;
 

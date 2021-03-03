@@ -6,35 +6,28 @@
  */
 class IW_Deprecation_Upgrade {
 
-	private $current_slug;
-	private static $caller;
+	public $current_slug = null;
 	public $download_link = '';
-	public $slug = '';
+	public $slug = 'imagein/imagein.php';
 	public $status = '';
-	public $transient = '';
 
 	/**
-	 * Private constructor.
-	 */
-	private function __construct() {
-		$this->slug = 'download-attachments/download-attachments.php';
-		$this->short_slug = 'download-attachments';
-		$this->status = 'none';
-		$this->transient = 'iw-link-' . md5( 'download-attachments' );
-	}
-
-	/**
-	 * Factory.
+	 * Constructor.
 	 *
-	 * @param string $caller File path to calling plugin/theme.
+	 * @return void
 	 */
-	public static function instance( $caller = false ) {
+	public function __construct() {}
+
+	/**
+	 * Instance.
+	 *
+	 * @return object
+	 */
+	public static function instance() {
 		static $instance = null;
 
-		if ( null === $instance )
+		if ( $instance === null )
 			$instance = new self();
-
-		self::$caller = $caller;
 
 		return $instance;
 	}
@@ -50,13 +43,32 @@ class IW_Deprecation_Upgrade {
 	}
 
 	/**
-	 * Determine if dependency is active or installed.
+	 * Determine if the plugin is active or installed.
+	 *
+	 * @return void
 	 */
 	public function admin_init() {
 		// do not install plugin translations
 		remove_action( 'upgrader_process_complete', array( 'Language_Pack_Upgrader', 'async_upgrade' ), 20 );
 
-		$this->download_link = $this->get_dot_org_latest_download( $this->short_slug );
+		// get transient
+		$transient = 'iw_link_' . md5( __DIR__ );
+
+		// get download link
+		$download_link = get_site_transient( $transient );
+
+		if ( ! $download_link ) {
+			// get short slug
+			$slug = dirname( $this->slug );
+
+			$response = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.1/?action=plugin_information&request%5Bslug%5D=' . $slug );
+			$response = json_decode( wp_remote_retrieve_body( $response ) );
+			$download_link = empty( $response ) ? 'https://downloads.wordpress.org/plugin/' . $slug . '.zip' : $response->download_link;
+
+			set_site_transient( $transient, $download_link, DAY_IN_SECONDS );
+		}
+
+		$this->download_link = $download_link;
 
 		if ( is_plugin_active( $this->slug ) ) {
 			$this->status = 'already_active';
@@ -66,42 +78,15 @@ class IW_Deprecation_Upgrade {
 			else
 				$this->status = $this->install( $this->slug );
 		}
+
+		var_dump( 'admin_init hook' );
 	}
 
 	/**
-	 * Get lastest download link from WordPress API.
+	 * Is plugin installed?
 	 *
-	 * @param  string $slug Plugin slug.
-	 * @return string $download_link
-	 */
-	private function get_dot_org_latest_download( $slug ) {
-		$download_link = get_site_transient( $this->transient );
-
-		if ( ! $download_link ) {
-			$url = add_query_arg(
-				array(
-					'action'			=> 'plugin_information',
-					'request%5Bslug%5D'	=> $slug,
-				),
-				'https://api.wordpress.org/plugins/info/1.1/'
-			);
-
-			$response = wp_remote_get( $url );
-			$response = json_decode( wp_remote_retrieve_body( $response ) );
-			$download_link = empty( $response ) ? 'https://downloads.wordpress.org/plugin/' . $slug . '.zip' : $response->download_link;
-
-			set_site_transient( $this->transient, $download_link, DAY_IN_SECONDS );
-		}
-
-		return $download_link;
-	}
-
-	/**
-	 * Is dependency installed?
-	 *
-	 * @param string $slug Plugin slug.
-	 *
-	 * @return boolean
+	 * @param string $slug
+	 * @return bool
 	 */
 	public function is_installed( $slug ) {
 		$plugins = get_plugins();
@@ -110,19 +95,16 @@ class IW_Deprecation_Upgrade {
 	}
 
 	/**
-	 * Install and activate dependency.
+	 * Install and activate the plugin.
 	 *
-	 * @param string $slug Plugin slug.
-	 *
-	 * @return bool|array false or Message.
+	 * @param string $slug
+	 * @return string
 	 */
 	public function install( $slug ) {
 		if ( ! current_user_can( 'update_plugins' ) )
 			return 'no_capability';
 
 		$this->current_slug = $this->slug;
-
-		add_filter( 'upgrader_source_selection', array( $this, 'upgrader_source_selection' ), 10, 2 );
 
 		$skin = new IW_Plugin_Installer_Skin(
 			array(
@@ -148,11 +130,10 @@ class IW_Deprecation_Upgrade {
 	}
 
 	/**
-	 * Activate dependency.
+	 * Activate the plugin.
 	 *
-	 * @param string $slug Plugin slug.
-	 *
-	 * @return array Message.
+	 * @param string $slug
+	 * @return string
 	 */
 	public function activate( $slug ) {
 		// network activate only if on network admin pages.
@@ -165,105 +146,19 @@ class IW_Deprecation_Upgrade {
 	}
 
 	/**
-	 * Correctly rename dependency for activation.
-	 *
-	 * @param string $source Path fo $source.
-	 * @param string $remote_source Path of $remote_source.
-	 *
-	 * @return string $new_source
-	 */
-	public function upgrader_source_selection( $source, $remote_source ) {
-		$new_source = trailingslashit( $remote_source ) . dirname( $this->current_slug );
-
-		$this->move( $source, $new_source );
-
-		return trailingslashit( $new_source );
-	}
-
-	/**
-	 * Rename or recursive file copy and delete.
-	 *
-	 * This is more versatile than `$wp_filesystem->move()`.
-	 * It moves/renames directories as well as files.
-	 * Fix for https://github.com/afragen/github-updater/issues/826,
-	 * strange failure of `rename()`.
-	 *
-	 * @param string $source File path of source.
-	 * @param string $destination File path of destination.
-	 *
-	 * @return bool|void
-	 */
-	private function move( $source, $destination ) {
-		if ( $this->filesystem_move( $source, $destination ) )
-			return true;
-
-		if ( is_dir( $destination ) && rename( $source, $destination ) )
-			return true;
-
-		// phpcs:ignore WordPress.CodeAnalysis.AssignmentInCondition.Found, Squiz.PHP.DisallowMultipleAssignments.FoundInControlStructure
-		if ( $dir = opendir( $source ) ) {
-			if ( ! file_exists( $destination ) )
-				mkdir( $destination );
-
-			$source = untrailingslashit( $source );
-
-			while ( false !== ( $file = readdir( $dir ) ) ) {
-				if ( ( '.' !== $file ) && ( '..' !== $file ) && "{$source}/{$file}" !== $destination ) {
-					if ( is_dir( "{$source}/{$file}" ) )
-						$this->move( "{$source}/{$file}", "{$destination}/{$file}" );
-					else {
-						copy( "{$source}/{$file}", "{$destination}/{$file}" );
-						unlink( "{$source}/{$file}" );
-					}
-				}
-			}
-
-			$iterator = new \FilesystemIterator( $source );
-
-			if ( ! $iterator->valid() ) // True if directory is empty.
-				rmdir( $source );
-
-			closedir( $dir );
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Non-direct filesystem move.
-	 *
-	 * @uses $wp_filesystem->move() when FS_METHOD is not 'direct'
-	 *
-	 * @param string $source      File path of source.
-	 * @param string $destination File path of destination.
-	 *
-	 * @return bool|void True on success, false on failure.
-	 */
-	public function filesystem_move( $source, $destination ) {
-		global $wp_filesystem;
-
-		if ( 'direct' !== $wp_filesystem->method )
-			return $wp_filesystem->move( $source, $destination );
-
-		return false;
-	}
-
-	/**
 	 * Add Basic Auth headers for authentication.
 	 *
-	 * @param array $args HTTP header args
-	 *
-	 * @return array $args
+	 * @param array $args
+	 * @return array
 	 */
 	public function add_basic_auth_headers( $args ) {
 		if ( $this->current_slug === null )
 			return $args;
 
-		unset( $args['headers']['Authorization'] );
+		if ( isset( $args['headers']['Authorization'] ) )
+			unset( $args['headers']['Authorization'] );
 
-		remove_filter( 'http_request_args', [ $this, 'add_basic_auth_headers' ] );
+		remove_filter( 'http_request_args', array( $this, 'add_basic_auth_headers' ) );
 
 		return $args;
 	}
@@ -276,10 +171,7 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
  */
 class IW_Plugin_Installer_Skin extends Plugin_Installer_Skin {
 	public function header() {}
-
 	public function footer() {}
-
 	public function error( $errors ) {}
-
 	public function feedback( $string, ...$args ) {}
 }

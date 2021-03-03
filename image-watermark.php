@@ -130,6 +130,7 @@ final class Image_Watermark {
 
 		// define our backup location
 		$upload_dir = wp_upload_dir();
+
 		define( 'IMAGE_WATERMARK_BACKUP_DIR', apply_filters( 'image_watermark_backup_dir', $upload_dir['basedir'] . DIRECTORY_SEPARATOR . 'iw-backup' ) );
 
 		// create backup folder and security if enabled
@@ -236,9 +237,9 @@ final class Image_Watermark {
 				);
 
 				foreach ( $old_new as $old => $new ) {
-					if ( $new ) {
+					if ( $new )
 						$options[$new] = get_option( $old );
-					}
+
 					delete_option( $old );
 				}
 
@@ -254,6 +255,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function load_textdomain() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		load_plugin_textdomain( 'image-watermark', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 		$this->upgrade_strings = array(
@@ -274,6 +278,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function admin_print_scripts() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		global $pagenow;
 
 		if ( $pagenow === 'upload.php' ) {
@@ -303,6 +310,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function wp_enqueue_media( $page ) {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		wp_enqueue_style( 'watermark-style', plugins_url( 'css/image-watermark.css', __FILE__ ), array(), $this->defaults['version'] );
 	}
 
@@ -313,6 +323,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function admin_enqueue_scripts( $page ) {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		global $pagenow;
 
 		wp_enqueue_script( 'watermark-admin-deprecation', plugins_url( '/js/admin-deprecation.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], true );
@@ -398,6 +411,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function wp_enqueue_scripts() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		$right_click = true;
 
 		if ( ($this->options['image_protection']['forlogged'] == 0 && is_user_logged_in()) || ($this->options['image_protection']['draganddrop'] == 0 && $this->options['image_protection']['rightclick'] == 0) )
@@ -423,6 +439,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function check_extensions() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		$ext = null;
 
 		if ( $this->check_imagick() ) {
@@ -455,6 +474,9 @@ final class Image_Watermark {
 	 * @return resource
 	 */
 	public function handle_upload_files( $file ) {
+		if ( class_exists( 'ImageIn', false ) )
+			return $file;
+
 		// is extension available?
 		if ( $this->extension ) {
 			// determine ajax frontend or backend request
@@ -506,6 +528,9 @@ final class Image_Watermark {
 	 * return array
 	 */
 	public function attachment_fields_to_edit( $form_fields, $post ) {
+		if ( class_exists( 'ImageIn', false ) )
+			return $form_fields;
+
 		if ( $this->options['watermark_image']['manual_watermarking'] == 1 && $this->options['backup']['backup_image'] ) {
 			$data = wp_get_attachment_metadata( $post->ID, false );
 
@@ -564,7 +589,7 @@ final class Image_Watermark {
 
 		include_once( IMAGE_WATERMARK_PATH . 'install.php' );
 
-		$this->upgrade = IW_Deprecation_Upgrade::instance( __DIR__ );
+		$this->upgrade = IW_Deprecation_Upgrade::instance();
 		$this->upgrade->load_hooks();
 	}
 
@@ -588,6 +613,11 @@ final class Image_Watermark {
 			case 'activation_success':
 			case 'already_active':
 			case 'installation_activation_success':
+				// ImageIn should be activated by now
+				if ( class_exists( 'ImageIn', false ) )
+					$this->import_settings( $this->options );
+
+				// deactivate Image Watermark
 				deactivate_plugins( $current_plugin );
 
 				$data['success'] = true;
@@ -598,11 +628,177 @@ final class Image_Watermark {
 	}
 
 	/**
+	 * Import settings from Image Watermark to ImageIn.
+	 *
+	 * @param array $iw_settings Image Watermark settings
+	 * @return void
+	 */
+	public function import_settings( $iw_settings ) {
+		var_dump( 'import_settings' );
+		// get main ImageIn instance
+		$imagein = ImageIn();
+
+		// get options
+		$im_settings = $imagein->options;
+
+		// watermark automatic
+		if ( isset( $iw_settings['watermark_image']['plugin_off'] ) )
+			$im_settings['watermark']['automatic'] = ( $iw_settings['watermark_image']['plugin_off'] === '1' || $iw_settings['watermark_image']['plugin_off'] === true || $iw_settings['watermark_image']['plugin_off'] === 1 );
+
+		// watermark manual
+		if ( isset( $iw_settings['watermark_image']['manual_watermarking'] ) )
+			$im_settings['watermark']['manual'] = ( $iw_settings['watermark_image']['manual_watermarking'] === '1' || $iw_settings['watermark_image']['manual_watermarking'] === true || $iw_settings['watermark_image']['manual_watermarking'] === 1 );
+
+		// watermark image sizes
+		if ( ! empty( $iw_settings['watermark_on'] ) ) {
+			// load image sizes
+			$imagein->mediasizes->load_image_sizes();
+
+			// get all available image sizes including full size
+			$image_sizes = array_keys( $imagein->mediasizes->get_options_image_sizes() );
+			var_dump( $image_sizes );
+
+			$sizes = array();
+
+			foreach ( $iw_settings['watermark_on'] as $size => $active ) {
+				if ( in_array( $size, $image_sizes, true ) )
+					$sizes[] = $size;
+			}
+
+			// update sizes
+			$im_settings['watermark']['image_sizes'] = $sizes;
+		}
+var_dump( $im_settings['watermark']['image_sizes'] );
+		// watermark post types and post types type
+		if ( ! empty( $iw_settings['watermark_cpt_on'] ) ) {
+			if ( in_array( 'everywhere', $iw_settings['watermark_cpt_on'], true ) ) {
+				$im_settings['watermark']['post_types_type'] = 'all';
+				$im_settings['watermark']['post_types'] = array();
+			} else {
+				// load post types
+				$imagein->watermark->load_post_types();
+
+				// get available post types
+				$post_types = array_keys( $imagein->watermark->get_post_types() );
+
+				foreach ( $iw_settings['watermark_cpt_on'] as $post_type => $active ) {
+					if ( in_array( $post_type, $post_types, true ) )
+						$im_settings['watermark']['post_types'][] = $post_type;
+				}
+
+				// any post types?
+				if ( empty( $im_settings['watermark']['post_types'] ) )
+					$im_settings['watermark']['post_types_type'] = 'all';
+				else
+					$im_settings['watermark']['post_types_type'] = 'selected';
+			}
+		}
+
+		// watermark frontend uploading
+		if ( isset( $iw_settings['watermark_image']['frontend_active'] ) )
+			$im_settings['watermark']['frontend_upload'] = ( $iw_settings['watermark_image']['frontend_active'] === '1' || $iw_settings['watermark_image']['frontend_active'] === true || $iw_settings['watermark_image']['frontend_active'] === 1 );
+
+		// watermark position
+		if ( isset( $iw_settings['watermark_image']['position'] ) )
+			$im_settings['watermark']['position'] = $iw_settings['watermark_image']['position'];
+
+		// watermark offset unit
+		if ( isset( $iw_settings['watermark_image']['offset_unit'] ) )
+			$im_settings['watermark']['offset_unit'] = $iw_settings['watermark_image']['offset_unit'];
+
+		// watermark offset width
+		if ( isset( $iw_settings['watermark_image']['offset_width'] ) )
+			$im_settings['watermark']['offset_width'] = (int) $iw_settings['watermark_image']['offset_width'];
+
+		// watermark offset height
+		if ( isset( $iw_settings['watermark_image']['offset_height'] ) )
+			$im_settings['watermark']['offset_height'] = (int) $iw_settings['watermark_image']['offset_height'];
+
+		// watermark size
+		if ( isset( $iw_settings['watermark_image']['watermark_size_type'] ) ) {
+			// watermark original size
+			if ( $iw_settings['watermark_image']['watermark_size_type'] === 0 ) {
+				$im_settings['watermark']['size'] = 'original';
+			// watermark custom size
+			} elseif ( $iw_settings['watermark_image']['watermark_size_type'] === 1 ) {
+				$im_settings['watermark']['size'] = 'custom';
+
+				// watermark custom width
+				if ( isset( $iw_settings['watermark_image']['absolute_width'] ) )
+					$im_settings['watermark']['custom_width'] = (int) $iw_settings['watermark_image']['absolute_width'];
+				else
+					$im_settings['watermark']['custom_width'] = $imagein->defaults['watermark']['custom_width'];
+
+				// watermark custom height
+				if ( isset( $iw_settings['watermark_image']['absolute_height'] ) )
+					$im_settings['watermark']['custom_height'] = (int) $iw_settings['watermark_image']['absolute_height'];
+				else
+					$im_settings['watermark']['custom_height'] = $imagein->defaults['watermark']['custom_height'];
+			// watermark scaled size
+			} elseif ( $iw_settings['watermark_image']['watermark_size_type'] === 2 ) {
+				$im_settings['watermark']['size'] = 'scaled';
+
+				if ( isset( $iw_settings['watermark_image']['width'] ) )
+					$im_settings['watermark']['scale'] = (int) $iw_settings['watermark_image']['width'];
+				else
+					$im_settings['watermark']['scale'] = $imagein->defaults['watermark']['scale'];
+			}
+		}
+
+		// watermark format
+		if ( isset( $iw_settings['watermark_image']['jpeg_format'] ) )
+			$im_settings['watermark']['format'] = $iw_settings['watermark_image']['jpeg_format'];
+
+		// watermark transparency
+		if ( isset( $iw_settings['watermark_image']['transparent'] ) )
+			$im_settings['watermark']['transparency'] = (int) $iw_settings['watermark_image']['transparent'];
+
+		// watermark ID
+		if ( isset( $iw_settings['watermark_image']['url'] ) ) {
+			$im_settings['watermark']['image_id'] = (int) $iw_settings['watermark_image']['url'];
+
+			if ( ! wp_attachment_is_image( $im_settings['watermark']['image_id'] ) )
+				$im_settings['watermark']['image_id'] = 0;
+		}
+
+		// update watermark settings
+		update_option( 'imagein_watermark_settings', $im_settings['watermark'] );
+
+		// protection right click
+		if ( isset( $iw_settings['image_protection']['rightclick'] ) )
+			$im_settings['protection']['right_click'] = ( $iw_settings['image_protection']['rightclick'] === '1' || $iw_settings['image_protection']['rightclick'] === true || $iw_settings['image_protection']['rightclick'] === 1 );
+
+		// protection drag and drop
+		if ( isset( $iw_settings['image_protection']['draganddrop'] ) )
+			$im_settings['protection']['drag_and_drop'] = ( $iw_settings['image_protection']['draganddrop'] === '1' || $iw_settings['image_protection']['draganddrop'] === true || $iw_settings['image_protection']['draganddrop'] === 1 );
+
+		// protection logged in users
+		if ( isset( $iw_settings['image_protection']['forlogged'] ) )
+			$im_settings['protection']['loggedin_users'] = ( $iw_settings['image_protection']['forlogged'] === '1' || $iw_settings['image_protection']['forlogged'] === true || $iw_settings['image_protection']['forlogged'] === 1 );
+
+		// update protection settings
+		update_option( 'imagein_protection_settings', $im_settings['protection'] );
+
+		// backup image
+		if ( isset( $iw_settings['backup']['backup_image'] ) )
+			$im_settings['backups']['backup_image'] = ( $iw_settings['backup']['backup_image'] === '1' || $iw_settings['backup']['backup_image'] === true || $iw_settings['backup']['backup_image'] === 1 );
+//@TODO ustalic folder z iw
+		// if ( $im_settings['backups']['backup_image'] )
+			// backup_folder
+
+		// update backups settings
+		update_option( 'imagein_backups_settings', $im_settings['backups'] );
+	}
+
+	/**
 	 * Apply watermark for selected images on media page.
 	 *
 	 * @return void
 	 */
 	public function watermark_action_ajax() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		// Security & data check
 		if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || ! isset( $_POST['_iw_nonce'] ) || ! isset( $_POST['iw-action'] ) || ! isset( $_POST['attachment_id'] ) || ! is_numeric( $_POST['attachment_id'] ) || ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) )
 			wp_send_json_error( __( 'Cheatin uh?', 'image-watermark' ) );
@@ -645,6 +841,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function watermark_bulk_action() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		global $pagenow;
 
 		if ( $pagenow == 'upload.php' && $this->extension ) {
@@ -717,6 +916,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function bulk_admin_notices() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		global $post_type, $pagenow;
 
 		if ( $pagenow === 'upload.php' ) {
@@ -1290,6 +1492,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function delete_attachment( $attachment_id ) {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		// see get_attached_file() in wp-includes/post.php
 		$filepath = get_post_meta( $attachment_id, '_wp_attached_file', true );
 		$backup_filepath = $this->get_image_backup_filepath( $filepath );
@@ -1304,6 +1509,9 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	function folder_writable_admin_notice() {
+		if ( class_exists( 'ImageIn', false ) )
+			return;
+
 		if ( current_user_can( 'manage_options' ) && $this->is_backup_folder_writable !== true ) {
 			?>
 			<div class="notice notice-error is-dismissible">
@@ -1552,6 +1760,9 @@ final class Image_Watermark {
 	 * @return array
 	 */
 	public function plugin_extend_links( $links, $file ) {
+		if ( class_exists( 'ImageIn', false ) )
+			return $links;
+
 		if ( ! current_user_can( 'install_plugins' ) )
 			return $links;
 
@@ -1569,6 +1780,9 @@ final class Image_Watermark {
 	 * @return array
 	 */
 	function plugin_settings_link( $links, $file ) {
+		if ( class_exists( 'ImageIn', false ) )
+			return $links;
+
 		if ( ! is_admin() || ! current_user_can( 'manage_options' ) )
 			return $links;
 

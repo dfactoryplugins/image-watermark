@@ -17,12 +17,16 @@
 				nonce: iwDeprecation.nonce
 			} ).done( function( response ) {
 				if ( response.success ) {
-					if ( response.data.success )
+					var html = iwDeprecation.strings[response.data.status];
+
+					if ( response.data.success ) {
 						notice.addClass( 'notice-success' ).removeClass( 'notice-warning' );
-					else
+
+						html = html + ' ' + iwDeprecation.goToDashboard;
+					} else
 						notice.addClass( 'notice-error' ).removeClass( 'notice-warning' );
 
-					$( '#iw-upgrade-notice' ).find( '.iw-upgrade-status' ).removeClass( 'hidden' ).html( iwDeprecation.strings[response.data.status] );
+					$( '#iw-upgrade-notice' ).find( '.iw-upgrade-status' ).removeClass( 'hidden' ).html( html );
 				} else {
 					notice.addClass( 'notice-error' ).removeClass( 'notice-warning' );
 

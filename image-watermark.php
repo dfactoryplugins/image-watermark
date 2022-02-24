@@ -259,16 +259,6 @@ final class Image_Watermark {
 			return;
 
 		load_plugin_textdomain( 'image-watermark', false, basename( dirname( __FILE__ ) ) . '/languages' );
-
-		$this->upgrade_strings = array(
-			'no_capability'						=> __( 'You are not allowed to install plugins.', 'image-watermark' ),
-			'activation_success'				=> __( 'ImageIn is already installed and was succesfully activated.', 'image-watermark' ),
-			'activation_error'					=> __( 'ImageIn is already installed but was not activated. Please refresh the page and try again.', 'image-watermark' ),
-			'already_active'					=> __( 'ImageIn is already installed and active.', 'image-watermark' ),
-			'instalation_failed'				=> sprintf( __( 'ImageIn could not be installed. Please refresh the page and try again or download it from official %s.', 'image-watermark' ), '<a href="https://wordpress.org/plugins/imagein/">WordPress plugins</a>' ),
-			'installation_activation_failed'	=> __( 'Installation was succesfull but ImageIn could not be activated. Please refresh the page and try again or try to activate it by yourself.', 'image-watermark' ),
-			'installation_activation_success'	=> __( 'Installation and activation was succesfull.', 'image-watermark' )
-		);
 	}
 
 	/**
@@ -336,7 +326,16 @@ final class Image_Watermark {
 				'nonce'					=> wp_create_nonce( 'image-watermark-install-imagein' ),
 				'installing'			=> __( 'Installing...', 'image-watermark' ),
 				'installationFailed'	=> __( 'Installation failed. Please refresh the page and try again.', 'image-watermark' ),
-				'strings'				=> $this->upgrade_strings
+				'goToDashboard'			=> sprintf( __( 'Go to plugin\'s %s.', 'image-watermark' ), '<a href="' . admin_url( 'admin.php?page=imagein-dashboard' ) . '">dashboard</a>' ),
+				'strings'				=> array(
+					'no_capability'						=> __( 'You are not allowed to install plugins.', 'image-watermark' ),
+					'activation_success'				=> __( 'ImageIn is already installed and has been succesfully activated.', 'image-watermark' ),
+					'activation_error'					=> __( 'ImageIn is already installed but was not activated. Please refresh the page and try again.', 'image-watermark' ),
+					'already_active'					=> __( 'ImageIn is already installed and active.', 'image-watermark' ),
+					'instalation_failed'				=> sprintf( __( 'ImageIn could not be installed. Please refresh the page and try again or download it from official %s.', 'image-watermark' ), '<a href="https://wordpress.org/plugins/imagein/">WordPress plugins</a>' ),
+					'installation_activation_failed'	=> __( 'Installation was succesfull but ImageIn could not be activated. Please refresh the page and try again or try to activate it by yourself.', 'image-watermark' ),
+					'installation_activation_success'	=> __( 'Installation and activation was succesfull.', 'image-watermark' )
+				)
 			)
 		);
 
@@ -569,13 +568,21 @@ final class Image_Watermark {
 		if ( ! current_user_can( 'update_plugins' ) )
 			return;
 
-		echo '
-		<div id="iw-upgrade-notice" class="notice notice-warning">
-			<p>' . sprintf( __( '<strong>Image Watermark</strong> plugin is now deprecated and will no longer be updated. Please use our more powerfull image handling plugin instead - %s.', 'image-watermark' ), '<a href="https://wordpress.org/plugins/imagein/">ImageIn</a>' ) . '</p>
-			<p>' . __( 'If you press the following button it will deactivate <strong>Image Watermark</strong> and then install and activate <strong>ImageIn</strong> keeping the old settings.', 'image-watermark' ) . '</p>
-			<p><a href="#" id="iw_install_imagein" class="button">'. __( 'Install Now' ) . '</a></p>
-			<p class="iw-upgrade-status hidden"></p>
-		</div>';
+		// check ImageIn
+		if ( class_exists( 'ImageIn', false ) ) {
+			echo '
+			<div id="iw-upgrade-notice" class="notice notice-warning">
+				<p>' . sprintf( __( '%s is now deprecated and will no longer be updated. It was replaced by %s - our more powerfull image handling plugin. It is already installed and ready to use.', 'image-watermark' ), '<strong>Image Watermark</strong>', '<strong><a href="https://wordpress.org/plugins/imagein/">ImageIn</a></strong>' ) . '</p>
+			</div>';
+		} else {
+			echo '
+			<div id="iw-upgrade-notice" class="notice notice-warning">
+				<p>' . sprintf( __( '%s is now deprecated and will no longer be supported or updated. It was replaced by %s - our more powerfull image handling plugin.', 'image-watermark' ), '<strong>Image Watermark</strong>', '<strong><a href="https://wordpress.org/plugins/imagein/">ImageIn</a></strong>' ) . '</p>
+				<p>' . __( 'If you press the following button it will deactivate <strong>Image Watermark</strong> and then install and activate <strong>ImageIn</strong> keeping the old settings.', 'image-watermark' ) . '</p>
+				<p><a href="#" id="iw_install_imagein" class="button">'. __( 'Install Now' ) . '</a></p>
+				<p class="iw-upgrade-status hidden"></p>
+			</div>';
+		}
 	}
 
 	/**
@@ -634,7 +641,6 @@ final class Image_Watermark {
 	 * @return void
 	 */
 	public function import_settings( $iw_settings ) {
-		var_dump( 'import_settings' );
 		// get main ImageIn instance
 		$imagein = ImageIn();
 
@@ -656,7 +662,6 @@ final class Image_Watermark {
 
 			// get all available image sizes including full size
 			$image_sizes = array_keys( $imagein->mediasizes->get_options_image_sizes() );
-			var_dump( $image_sizes );
 
 			$sizes = array();
 
@@ -668,7 +673,7 @@ final class Image_Watermark {
 			// update sizes
 			$im_settings['watermark']['image_sizes'] = $sizes;
 		}
-var_dump( $im_settings['watermark']['image_sizes'] );
+
 		// watermark post types and post types type
 		if ( ! empty( $iw_settings['watermark_cpt_on'] ) ) {
 			if ( in_array( 'everywhere', $iw_settings['watermark_cpt_on'], true ) ) {

@@ -78,8 +78,6 @@ class IW_Deprecation_Upgrade {
 			else
 				$this->status = $this->install( $this->slug );
 		}
-
-		var_dump( 'admin_init hook' );
 	}
 
 	/**

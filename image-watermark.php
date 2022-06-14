@@ -109,7 +109,6 @@ final class Image_Watermark {
 		// actions
 		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-		add_action( 'admin_print_scripts', array( $this, 'admin_print_scripts' ), 20 );
 		add_action( 'wp_enqueue_media', array( $this, 'wp_enqueue_media' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 		add_action( 'load-upload.php', array( $this, 'watermark_bulk_action' ) );
@@ -262,39 +261,6 @@ final class Image_Watermark {
 	}
 
 	/**
-	 * Admin inline scripts.
-	 *
-	 * @global $pagenow
-	 * @return void
-	 */
-	public function admin_print_scripts() {
-		if ( class_exists( 'ImageIn', false ) )
-			return;
-
-		global $pagenow;
-
-		if ( $pagenow === 'upload.php' ) {
-			if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
-				?>
-				<script type="text/javascript">
-					jQuery( function( $ ) {
-						$( document ).ready( function() {
-							var backup = <?php echo (int) $this->options['backup']['backup_image']; ?>;
-
-							$( "<option>" ).val( "applywatermark" ).text( "<?php _e( 'Apply watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action'], select[name='action2']" );
-
-							if ( backup === 1 ) {
-								$( "<option>" ).val( "removewatermark" ).text( "<?php _e( 'Remove watermark', 'image-watermark' ); ?>" ).appendTo( "select[name='action'], select[name='action2']" );
-							}
-						});
-					});
-				</script>
-				<?php
-			}
-		}
-	}
-
-	/**
 	 * Enqueue admin scripts and styles.
 	 *
 	 * @return void
@@ -377,8 +343,23 @@ final class Image_Watermark {
 			wp_enqueue_script( 'postbox' );
 		}
 
-		if ( $pagenow === 'upload.php' )
+		if ( $pagenow === 'upload.php' ) {
+			if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+				wp_enqueue_script( 'watermark-admin-media', plugins_url( '/js/admin-media.js', __FILE__ ), array( 'jquery' ), $this->defaults['version'], false );
+
+				wp_localize_script(
+					'watermark-admin-media',
+					'iwMediaArgs',
+					array(
+						'backupImage'		=> (int) $this->options['backup']['backup_image'],
+						'applyWatermark'	=> __( 'Apply watermark', 'image-watermark' ),
+						'removeWatermark'	=> __( 'Remove watermark', 'image-watermark' )
+					)
+				);
+			}
+
 			wp_enqueue_style( 'watermark-style' );
+		}
 
 		// image modal could be loaded in various places
 		if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
@@ -546,10 +527,9 @@ final class Image_Watermark {
 						<div class="clear"></div>
 					</div>
 					<script>
-						jQuery( document ).ready( function( $ ) {
-							if ( typeof watermarkImageActions !== "undefined" ) {
-								$( "#image_watermark_buttons" ).show();
-							}
+						jQuery( function() {
+							if ( typeof watermarkImageActions !== "undefined" )
+								jQuery( "#image_watermark_buttons" ).show();
 						} );
 					</script>'
 				);

@@ -3,17 +3,17 @@
 	// ready event
 	$( function() {
 		/**
-		 * wp_localize_script object: iwImageActionArgs
+		 * wp_localize_script object: iwArgsImageActions
 		 *
 		 * Params:
 		 *
 		 * _nonce
 		 * __applied_none => 	'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.'
-		 * __applied_one => 	'Watermark was succesfully applied to 1 image.
-		 * __applied_multi => 	'Watermark was succesfully applied to %s images.'
+		 * __applied_one => 	'Watermark was successfully applied to 1 image.
+		 * __applied_multi => 	'Watermark was successfully applied to %s images.'
 		 * __removed_none => 	'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.'
-		 * __removed_one => 	'Watermark was succesfully removed from 1 image.'
-		 * __removed_multi => 	'Watermark was succesfully removed from %s images.'
+		 * __removed_one => 	'Watermark was successfully removed from 1 image.'
+		 * __removed_multi => 	'Watermark was successfully removed from %s images.'
 		 * __skipped => 		'Skipped files'
 		 * __running => 		'Bulk action is currently running, please wait.'
 		 * __dismiss => 		'Dismiss this notice.' // Wordpress default string
@@ -33,7 +33,7 @@
 					// Get the selected bulk action
 					action = $( this ).parent().children( 'select' ).val();
 
-					if ( ! iwImageActionArgs.backup_image && action === 'removewatermark' )
+					if ( ! iwArgsImageActions.backup_image && action === 'removewatermark' )
 						return;
 
 					// Validate action
@@ -66,7 +66,7 @@
 							watermarkImageActions.post_loop();
 						} else {
 							// script is running, can't run two at the same time
-							watermarkImageActions.notice( 'iw-notice error', iwImageActionArgs.__running, false );
+							watermarkImageActions.notice( 'iw-notice error', iwArgsImageActions.__running, false );
 						}
 					}
 				} );
@@ -137,7 +137,7 @@
 
 						// post data
 						data = {
-							'_iw_nonce': iwImageActionArgs._nonce,
+							'_iw_nonce': iwArgsImageActions._nonce,
 							'action': 'iw_watermark_bulk_action',
 							'iw-action': watermarkImageActions.action,
 							'attachment_id': id
@@ -206,9 +206,9 @@
 
 							// did we have more success updates?
 							if ( 1 < watermarkImageActions.successCount )
-								message = iwImageActionArgs.__applied_multi.replace( '%s', watermarkImageActions.successCount );
+								message = iwArgsImageActions.__applied_multi.replace( '%s', watermarkImageActions.successCount );
 							else
-								message = iwImageActionArgs.__applied_one;
+								message = iwArgsImageActions.__applied_one;
 
 							// update the row feedback
 							watermarkImageActions.row_image_feedback( 'success', id );
@@ -226,9 +226,9 @@
 
 							// did we have more success updates?
 							if ( 1 < watermarkImageActions.successCount )
-								message = iwImageActionArgs.__removed_multi.replace( '%s', watermarkImageActions.successCount );
+								message = iwArgsImageActions.__removed_multi.replace( '%s', watermarkImageActions.successCount );
 							else
-								message = iwImageActionArgs.__removed_one;
+								message = iwArgsImageActions.__removed_one;
 
 							// update the row feedback
 							watermarkImageActions.row_image_feedback( 'success', id );
@@ -245,7 +245,7 @@
 							watermarkImageActions.skippedCount += 1;
 
 							// adjust the message with the number of skipped updates
-							message = iwImageActionArgs.__skipped + ': ' + watermarkImageActions.skippedCount;
+							message = iwArgsImageActions.__skipped + ': ' + watermarkImageActions.skippedCount;
 
 							// update the row feedback
 							watermarkImageActions.row_image_feedback( 'error', id );
@@ -406,12 +406,12 @@
 
 						$( prefix + selector + ' > p' ).html( message );
 					} else {
-						$( prefix ).after( '<div class="' + type + '" style="display: none;"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwImageActionArgs.__dismiss + '</span></button></div>' );
+						$( prefix ).after( '<div class="' + type + '" style="display: none;"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwArgsImageActions.__dismiss + '</span></button></div>' );
 						$( '.iw-notice' ).slideDown( 'fast' );
 					}
 				} else {
 					// create a new notice
-					$( prefix ).after( '<div class="' + type + '" style="display: none;"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwImageActionArgs.__dismiss + '</span></button></div>' );
+					$( prefix ).after( '<div class="' + type + '" style="display: none;"><p>' + message + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">' + iwArgsImageActions.__dismiss + '</span></button></div>' );
 					$( '.iw-notice' ).slideDown( 'fast' );
 				}
 			},
@@ -548,7 +548,7 @@
 		};
 
 		// We need that nonce!
-		if ( typeof iwImageActionArgs._nonce !== 'undefined' )
+		if ( typeof iwArgsImageActions._nonce !== 'undefined' )
 			watermarkImageActions.init();
 	} );
 

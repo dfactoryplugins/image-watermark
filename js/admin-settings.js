@@ -11,7 +11,7 @@
 		} );
 
 		$( document ).on( 'click', '#reset_image_watermark_options', function() {
-			return confirm( iwArgs.resetToDefaults );
+			return confirm( iwArgsSettings.resetToDefaults );
 		} );
 
 		// size slider

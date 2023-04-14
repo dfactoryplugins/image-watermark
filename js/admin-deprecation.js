@@ -10,19 +10,19 @@
 
 			button.addClass( 'updating-message' );
 			button.addClass( 'disabled' );
-			button.text( iwDeprecation.installing );
+			button.text( iwArgsDeprecation.installing );
 
 			$.post( ajaxurl, {
 				action: 'iw_install_imagein',
-				nonce: iwDeprecation.nonce
+				nonce: iwArgsDeprecation.nonce
 			} ).done( function( response ) {
 				if ( response.success ) {
-					var html = iwDeprecation.strings[response.data.status];
+					var html = iwArgsDeprecation.strings[response.data.status];
 
 					if ( response.data.success ) {
 						notice.addClass( 'notice-success' ).removeClass( 'notice-warning' );
 
-						html = html + ' ' + iwDeprecation.goToDashboard;
+						html = html + ' ' + iwArgsDeprecation.goToDashboard;
 					} else
 						notice.addClass( 'notice-error' ).removeClass( 'notice-warning' );
 
@@ -30,14 +30,14 @@
 				} else {
 					notice.addClass( 'notice-error' ).removeClass( 'notice-warning' );
 
-					$( '#iw-upgrade-notice' ).find( '.iw-upgrade-status' ).removeClass( 'hidden' ).html( iwDeprecation.installationFailed );
+					$( '#iw-upgrade-notice' ).find( '.iw-upgrade-status' ).removeClass( 'hidden' ).html( iwArgsDeprecation.installationFailed );
 				}
 			} ).always( function( data ) {
 				button.parent().remove();
 			} ).fail( function() {
 				notice.addClass( 'notice-error' ).removeClass( 'notice-warning' );
 
-				$( '#iw-upgrade-notice' ).find( '.iw-upgrade-status' ).removeClass( 'hidden' ).html( iwDeprecation.installationFailed );
+				$( '#iw-upgrade-notice' ).find( '.iw-upgrade-status' ).removeClass( 'hidden' ).html( iwArgsDeprecation.installationFailed );
 			} );
 		} );
 	} );

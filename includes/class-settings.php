@@ -12,10 +12,10 @@ new Image_Watermark_Settings( );
  */
 class Image_Watermark_Settings {
 	private $image_sizes;
-	private $watermark_positions = array(
-		'x'	 => array( 'left', 'center', 'right' ),
-		'y'	 => array( 'top', 'middle', 'bottom' )
-	);
+	private $watermark_positions = [
+		'x'	 => [ 'left', 'center', 'right' ],
+		'y'	 => [ 'top', 'middle', 'bottom' ]
+	];
 
 	/**
 	 * Class constructor.
@@ -24,9 +24,9 @@ class Image_Watermark_Settings {
 	 */
 	public function __construct( )	{
 		// actions
-		add_action( 'admin_init', array( $this, 'register_settings' ), 11 );
-		add_action( 'admin_menu', array( $this, 'options_page' ) );
-		add_action( 'wp_loaded', array( $this, 'load_image_sizes' ) );
+		add_action( 'admin_init', [ $this, 'register_settings' ], 11 );
+		add_action( 'admin_menu', [ $this, 'options_page' ] );
+		add_action( 'wp_loaded', [ $this, 'load_image_sizes' ] );
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Image_Watermark_Settings {
 	 * @return array
 	 */
 	private function get_post_types() {
-		return array_merge( array( 'post', 'page' ), get_post_types( array( '_builtin' => false ), 'names' ) );
+		return array_merge( [ 'post', 'page' ], get_post_types( [ '_builtin' => false ], 'names' ) );
 	}
 
 	/**
@@ -62,48 +62,48 @@ class Image_Watermark_Settings {
 		if ( class_exists( 'ImageIn', false ) )
 			return;
 
-		register_setting( 'image_watermark_options', 'image_watermark_options', array( $this, 'validate_options' ) );
+		register_setting( 'image_watermark_options', 'image_watermark_options', [ $this, 'validate_options' ] );
 
 		// general
 		add_settings_section( 'image_watermark_general', __( 'General settings', 'image-watermark' ), '', 'image_watermark_options' );
 
 		// is imagick available?
 		if ( isset( Image_Watermark()->extensions['imagick'] ) )
-			add_settings_field( 'iw_extension', __( 'PHP library', 'image-watermark' ), array( $this, 'iw_extension' ), 'image_watermark_options', 'image_watermark_general' );
+			add_settings_field( 'iw_extension', __( 'PHP library', 'image-watermark' ), [ $this, 'iw_extension' ], 'image_watermark_options', 'image_watermark_general' );
 
-		add_settings_field( 'iw_automatic_watermarking', __( 'Automatic watermarking', 'image-watermark' ), array( $this, 'iw_automatic_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
-		add_settings_field( 'iw_manual_watermarking', __( 'Manual watermarking', 'image-watermark' ), array( $this, 'iw_manual_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
-		add_settings_field( 'iw_enable_for', __( 'Enable watermark for', 'image-watermark' ), array( $this, 'iw_enable_for' ), 'image_watermark_options', 'image_watermark_general' );
-		add_settings_field( 'iw_frontend_watermarking', __( 'Frontend watermarking', 'image-watermark' ), array( $this, 'iw_frontend_watermarking' ), 'image_watermark_options', 'image_watermark_general' );
-		add_settings_field( 'iw_deactivation', __( 'Deactivation', 'image-watermark' ), array( $this, 'iw_deactivation' ), 'image_watermark_options', 'image_watermark_general' );
+		add_settings_field( 'iw_automatic_watermarking', __( 'Automatic watermarking', 'image-watermark' ), [ $this, 'iw_automatic_watermarking' ], 'image_watermark_options', 'image_watermark_general' );
+		add_settings_field( 'iw_manual_watermarking', __( 'Manual watermarking', 'image-watermark' ), [ $this, 'iw_manual_watermarking' ], 'image_watermark_options', 'image_watermark_general' );
+		add_settings_field( 'iw_enable_for', __( 'Enable watermark for', 'image-watermark' ), [ $this, 'iw_enable_for' ], 'image_watermark_options', 'image_watermark_general' );
+		add_settings_field( 'iw_frontend_watermarking', __( 'Frontend watermarking', 'image-watermark' ), [ $this, 'iw_frontend_watermarking' ], 'image_watermark_options', 'image_watermark_general' );
+		add_settings_field( 'iw_deactivation', __( 'Deactivation', 'image-watermark' ), [ $this, 'iw_deactivation' ], 'image_watermark_options', 'image_watermark_general' );
 
 		// watermark position
 		add_settings_section( 'image_watermark_position', __( 'Watermark position', 'image-watermark' ), '', 'image_watermark_options' );
-		add_settings_field( 'iw_alignment', __( 'Watermark alignment', 'image-watermark' ), array( $this, 'iw_alignment' ), 'image_watermark_options', 'image_watermark_position' );
-		add_settings_field( 'iw_offset', __( 'Watermark offset', 'image-watermark' ), array( $this, 'iw_offset' ), 'image_watermark_options', 'image_watermark_position' );
-		add_settings_field( 'iw_offset_unit', __( 'Offset unit', 'image-watermark' ), array( $this, 'iw_offset_unit' ), 'image_watermark_options', 'image_watermark_position' );
+		add_settings_field( 'iw_alignment', __( 'Watermark alignment', 'image-watermark' ), [ $this, 'iw_alignment' ], 'image_watermark_options', 'image_watermark_position' );
+		add_settings_field( 'iw_offset', __( 'Watermark offset', 'image-watermark' ), [ $this, 'iw_offset' ], 'image_watermark_options', 'image_watermark_position' );
+		add_settings_field( 'iw_offset_unit', __( 'Offset unit', 'image-watermark' ), [ $this, 'iw_offset_unit' ], 'image_watermark_options', 'image_watermark_position' );
 
 		// watermark image
 		add_settings_section( 'image_watermark_image', __( 'Watermark image', 'image-watermark' ), '', 'image_watermark_options' );
-		add_settings_field( 'iw_watermark_image', __( 'Watermark image', 'image-watermark' ), array( $this, 'iw_watermark_image' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_watermark_preview', __( 'Watermark preview', 'image-watermark' ), array( $this, 'iw_watermark_preview' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_watermark_size', __( 'Watermark size', 'image-watermark' ), array( $this, 'iw_watermark_size' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_watermark_size_custom', __( 'Watermark custom size', 'image-watermark' ), array( $this, 'iw_watermark_size_custom' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_watermark_size_scaled', __( 'Watermark scale', 'image-watermark' ), array( $this, 'iw_watermark_size_scaled' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_watermark_opacity', __( 'Watermark transparency / opacity', 'image-watermark' ), array( $this, 'iw_watermark_opacity' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_image_quality', __( 'Image quality', 'image-watermark' ), array( $this, 'iw_image_quality' ), 'image_watermark_options', 'image_watermark_image' );
-		add_settings_field( 'iw_image_format', __( 'Image format', 'image-watermark' ), array( $this, 'iw_image_format' ), 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_watermark_image', __( 'Watermark image', 'image-watermark' ), [ $this, 'iw_watermark_image' ], 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_watermark_preview', __( 'Watermark preview', 'image-watermark' ), [ $this, 'iw_watermark_preview' ], 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_watermark_size', __( 'Watermark size', 'image-watermark' ), [ $this, 'iw_watermark_size' ], 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_watermark_size_custom', __( 'Watermark custom size', 'image-watermark' ), [ $this, 'iw_watermark_size_custom' ], 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_watermark_size_scaled', __( 'Watermark scale', 'image-watermark' ), [ $this, 'iw_watermark_size_scaled' ], 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_watermark_opacity', __( 'Watermark transparency / opacity', 'image-watermark' ), [ $this, 'iw_watermark_opacity' ], 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_image_quality', __( 'Image quality', 'image-watermark' ), [ $this, 'iw_image_quality' ], 'image_watermark_options', 'image_watermark_image' );
+		add_settings_field( 'iw_image_format', __( 'Image format', 'image-watermark' ), [ $this, 'iw_image_format' ], 'image_watermark_options', 'image_watermark_image' );
 
 		// watermark protection
 		add_settings_section( 'image_watermark_protection', __( 'Image protection', 'image-watermark' ), '', 'image_watermark_options' );
-		add_settings_field( 'iw_protection_right_click', __( 'Right click', 'image-watermark' ), array( $this, 'iw_protection_right_click' ), 'image_watermark_options', 'image_watermark_protection' );
-		add_settings_field( 'iw_protection_drag_drop', __( 'Drag and drop', 'image-watermark' ), array( $this, 'iw_protection_drag_drop' ), 'image_watermark_options', 'image_watermark_protection' );
-		add_settings_field( 'iw_protection_logged', __( 'Logged-in users', 'image-watermark' ), array( $this, 'iw_protection_logged' ), 'image_watermark_options', 'image_watermark_protection' );
+		add_settings_field( 'iw_protection_right_click', __( 'Right click', 'image-watermark' ), [ $this, 'iw_protection_right_click' ], 'image_watermark_options', 'image_watermark_protection' );
+		add_settings_field( 'iw_protection_drag_drop', __( 'Drag and drop', 'image-watermark' ), [ $this, 'iw_protection_drag_drop' ], 'image_watermark_options', 'image_watermark_protection' );
+		add_settings_field( 'iw_protection_logged', __( 'Logged-in users', 'image-watermark' ), [ $this, 'iw_protection_logged' ], 'image_watermark_options', 'image_watermark_protection' );
 
 		// Backup
 		add_settings_section( 'image_watermark_backup', __( 'Image backup', 'image-watermark' ), '', 'image_watermark_options' );
-		add_settings_field( 'iw_backup_image', __( 'Backup full size image', 'image-watermark' ), array( $this, 'iw_backup_image' ), 'image_watermark_options', 'image_watermark_backup' );
-		add_settings_field( 'iw_backup_image_quality', __( 'Backup image quality', 'image-watermark' ), array( $this, 'iw_backup_image_quality' ), 'image_watermark_options', 'image_watermark_backup' );	
+		add_settings_field( 'iw_backup_image', __( 'Backup full size image', 'image-watermark' ), [ $this, 'iw_backup_image' ], 'image_watermark_options', 'image_watermark_backup' );
+		add_settings_field( 'iw_backup_image_quality', __( 'Backup image quality', 'image-watermark' ), [ $this, 'iw_backup_image_quality' ], 'image_watermark_options', 'image_watermark_backup' );	
 	}
 
 	/**
@@ -115,7 +115,7 @@ class Image_Watermark_Settings {
 		if ( class_exists( 'ImageIn', false ) )
 			return;
 
-		add_options_page( __( 'Image Watermark Options', 'image-watermark' ), __( 'Watermark', 'image-watermark' ), 'manage_options', 'watermark-options', array( $this, 'options_page_output' ) );
+		add_options_page( __( 'Image Watermark Options', 'image-watermark' ), __( 'Watermark', 'image-watermark' ), 'manage_options', 'watermark-options', [ $this, 'options_page_output' ] );
 	}
 
 	/**
@@ -124,35 +124,30 @@ class Image_Watermark_Settings {
 	 * @return void
 	 */
 	public function options_page_output() {
-
 		if ( ! current_user_can( 'manage_options' ) )
 			return;
 
 		echo '
 		<div class="wrap">
-			<h2>' . __( 'Image Watermark', 'image-watermark' ) . '</h2>';
-
-		echo '
-			<div class="image-watermark-settings metabox-holder">
-				<div class="df-sidebar">
-					<div class="df-credits">
-						<h3 class="hndle">' . __( 'Image Watermark', 'image-watermark' ) . ' ' . Image_Watermark()->defaults['version'] . '</h3>
-						<div class="inside">
-							<h4 class="inner">' . __( 'Need support?', 'image-watermark' ) . '</h4>
-							<p class="inner">' . __( 'If you are having problems with this plugin, checkout plugin', 'image-watermark' ) . '  <a href="http://www.dfactory.eu/docs/image-watermark/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=documentation" target="_blank" title="' . __( 'Documentation', 'image-watermark' ) . '">' . __( 'Documentation', 'image-watermark' ) . '</a> ' . __( 'or talk about them in the', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/support/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=support" target="_blank" title="' . __( 'Support forum', 'image-watermark' ) . '">' . __( 'Support forum', 'image-watermark' ) . '</a></p>
-							<hr />
-							<h4 class="inner">' . __( 'Do you like this plugin?', 'image-watermark' ) . '</h4>
-							<p class="inner"><a href="http://wordpress.org/support/view/plugin-reviews/image-watermark" target="_blank" title="' . __( 'Rate it 5', 'image-watermark' ) . '">' . __( 'Rate it 5', 'image-watermark' ) . '</a> ' . __( 'on WordPress.org', 'image-watermark' ) . '<br />' .
-		__( 'Blog about it & link to the', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/plugins/image-watermark/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=blog-about" target="_blank" title="' . __( 'plugin page', 'image-watermark' ) . '">' . __( 'plugin page', 'image-watermark' ) . '</a><br />' .
-		__( 'Check out our other', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/plugins/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=other-plugins" target="_blank" title="' . __( 'WordPress plugins', 'image-watermark' ) . '">' . __( 'WordPress plugins', 'image-watermark' ) . '</a>
-							</p>
-							<hr />
-							<p class="df-link inner">' . __( 'Created by', 'image-watermark' ) . ' <a href="http://www.dfactory.eu/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=created-by" target="_blank" title="dFactory - Quality plugins for WordPress"><img src="' . plugins_url( '../images/logo-dfactory.png', __FILE__ ) . '" title="dFactory - Quality plugins for WordPress" alt="dFactory - Quality plugins for WordPress" /></a></p>
-						</div>
+			<h2>' . __( 'Image Watermark', 'image-watermark' ) . '</h2>
+			<div class="image-watermark-settings">
+				<div class="df-credits">
+					<h3 class="hndle">' . esc_html__( 'Image Watermark', 'image-watermark' ) . ' ' . esc_html( Image_Watermark()->defaults['version'] ) . '</h3>
+					<div class="inside">
+						<h4 class="inner">' . esc_html__( 'Need support?', 'image-watermark' ) . '</h4>
+						<p class="inner">' . sprintf( esc_html__( 'If you are having problems with this plugin, please browse it\'s %s or talk about them in the %s.', 'image-watermark' ), '<a href="http://www.dfactory.co/docs/image-watermark/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=docs" target="_blank">' . esc_html__( 'Documentation', 'image-watermark' ) . '</a>', '<a href="http://www.dfactory.co/support/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=support" target="_blank">' . esc_html__( 'Support forum', 'image-watermark' ) . '</a>' ) . '</p
+						<hr />
+						<h4 class="inner">' . esc_html__( 'Do you like this plugin?', 'image-watermark' ) . '</h4>
+						<p class="inner">' . sprintf( esc_html__( '%s on WordPress.org', 'image-watermark' ), '<a href="https://wordpress.org/support/plugin/image-watermark/reviews/?filter=5" target="_blank">' . esc_html__( 'Rate it 5', 'image-watermark' ) . '</a>' ) . '<br />' .
+						sprintf( esc_html__( 'Blog about it & link to the %s.', 'image-watermark' ), '<a href="http://www.dfactory.co/products/image-watermark/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=blog-about" target="_blank">' . esc_html__( 'plugin page', 'image-watermark' ) . '</a>' ) . '<br />' .
+						sprintf( esc_html__( 'Check out our other %s.', 'image-watermark' ), '<a href="http://www.dfactory.co/products/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=other-plugins" target="_blank">' . esc_html__( 'WordPress plugins', 'image-watermark' ) . '</a>' ) . '
+						</p>
+						<hr />
+						<p class="df-link inner"><a href="http://www.dfactory.co/?utm_source=image-watermark-settings&utm_medium=link&utm_campaign=created-by" target="_blank" title="Digital Factory"><img src="' . IMAGE_WATERMARK_URL . '/images/df-black-sm.png" alt="Digital Factory" /></a></p>
 					</div>
 				</div>
-				<form action="options.php" method="post">
-					<div id="main-sortables" class="meta-box-sortables ui-sortable">';
+				<form action="options.php" method="post">';
+
 		settings_fields( 'image_watermark_options' );
 		$this->do_settings_sections( 'image_watermark_options' );
 
@@ -166,29 +161,10 @@ class Image_Watermark_Settings {
 
 		echo '
 					</p>
-					</div>
 				</form>
 			</div>
 			<div class="clear"></div>
 		</div>';
-		?>
-			<script type="text/javascript">
-				//<![CDATA[
-				( function( $ ) {
-
-					// ready event
-					$( function() {
-						// close postboxes that should be closed
-						$( '.if-js-closed' ).removeClass( 'if-js-closed' ).addClass( 'closed' );
-
-						// postboxes setup
-						postboxes.add_postbox_toggles( 'watermark-options' );
-					} );
-
-				} )( jQuery );
-				//]]>
-			</script>
-		<?php
 	}
 
 	/**
@@ -202,10 +178,10 @@ class Image_Watermark_Settings {
 			return $input;
 
 		if ( isset( $_POST['save_image_watermark_options'] ) ) {
-			$input['watermark_image']['plugin_off'] = isset( $_POST['iw_options']['watermark_image']['plugin_off'] ) ? ((bool) $_POST['iw_options']['watermark_image']['plugin_off'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['plugin_off'];
-			$input['watermark_image']['manual_watermarking'] = isset( $_POST['iw_options']['watermark_image']['manual_watermarking'] ) ? ((bool) $_POST['iw_options']['watermark_image']['manual_watermarking'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['manual_watermarking'];
+			$input['watermark_image']['plugin_off'] = isset( $_POST['iw_options']['watermark_image']['plugin_off'] ) ? ( (bool) $_POST['iw_options']['watermark_image']['plugin_off'] == 1 ? true : false ) : Image_Watermark()->defaults['options']['watermark_image']['plugin_off'];
+			$input['watermark_image']['manual_watermarking'] = isset( $_POST['iw_options']['watermark_image']['manual_watermarking'] ) ? ( (bool) $_POST['iw_options']['watermark_image']['manual_watermarking'] == 1 ? true : false ) : Image_Watermark()->defaults['options']['watermark_image']['manual_watermarking'];
 
-			$watermark_on = array();
+			$watermark_on = [];
 
 			if ( isset( $_POST['iw_options']['watermark_on'] ) && is_array( $_POST['iw_options']['watermark_on'] ) ) {
 				foreach ( $this->image_sizes as $size ) {
@@ -219,10 +195,10 @@ class Image_Watermark_Settings {
 
 			$input['watermark_cpt_on'] = Image_Watermark()->defaults['options']['watermark_cpt_on'];
 
-			if ( isset( $_POST['iw_options']['watermark_cpt_on'] ) && in_array( esc_attr( $_POST['iw_options']['watermark_cpt_on'] ), array( 'everywhere', 'specific' ) ) ) {
+			if ( isset( $_POST['iw_options']['watermark_cpt_on'] ) && in_array( $_POST['iw_options']['watermark_cpt_on'], [ 'everywhere', 'specific' ] ) ) {
 				if ( $_POST['iw_options']['watermark_cpt_on'] === 'specific' ) {
 					if ( isset( $_POST['iw_options']['watermark_cpt_on_type'] ) ) {
-						$tmp = array();
+						$tmp = [];
 
 						foreach ( $this->get_post_types() as $cpt ) {
 							if ( in_array( $cpt, array_keys( $_POST['iw_options']['watermark_cpt_on_type'] ) ) ) {
@@ -240,20 +216,20 @@ class Image_Watermark_Settings {
 			// extension
 			$input['watermark_image']['extension'] = isset( $_POST['iw_options']['watermark_image']['extension'], Image_Watermark()->extensions[$_POST['iw_options']['watermark_image']['extension']] ) ? $_POST['iw_options']['watermark_image']['extension'] : Image_Watermark()->defaults['options']['watermark_image']['extension'];
 
-			$input['watermark_image']['frontend_active'] = isset( $_POST['iw_options']['watermark_image']['frontend_active'] ) ? ((bool) $_POST['iw_options']['watermark_image']['frontend_active'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['frontend_active'];
-			$input['watermark_image']['deactivation_delete'] = isset( $_POST['iw_options']['watermark_image']['deactivation_delete'] ) ? ((bool) $_POST['iw_options']['watermark_image']['deactivation_delete'] == 1 ? true : false) : Image_Watermark()->defaults['options']['watermark_image']['deactivation_delete'];
+			$input['watermark_image']['frontend_active'] = isset( $_POST['iw_options']['watermark_image']['frontend_active'] ) ? ( (bool) $_POST['iw_options']['watermark_image']['frontend_active'] == 1 ? true : false ) : Image_Watermark()->defaults['options']['watermark_image']['frontend_active'];
+			$input['watermark_image']['deactivation_delete'] = isset( $_POST['iw_options']['watermark_image']['deactivation_delete'] ) ? ( (bool) $_POST['iw_options']['watermark_image']['deactivation_delete'] == 1 ? true : false ) : Image_Watermark()->defaults['options']['watermark_image']['deactivation_delete'];
 
 
-			$positions = array();
+			$positions = [];
 
 			foreach ( $this->watermark_positions['y'] as $position_y ) {
 				foreach ( $this->watermark_positions['x'] as $position_x ) {
 					$positions[] = $position_y . '_' . $position_x;
 				}
 			}
-			$input['watermark_image']['position'] = isset( $_POST['iw_options']['watermark_image']['position'] ) && in_array( esc_attr( $_POST['iw_options']['watermark_image']['position'] ), $positions ) ? esc_attr( $_POST['iw_options']['watermark_image']['position'] ) : Image_Watermark()->defaults['options']['watermark_image']['position'];
+			$input['watermark_image']['position'] = isset( $_POST['iw_options']['watermark_image']['position'] ) && in_array( $_POST['iw_options']['watermark_image']['position'], $positions ) ? $_POST['iw_options']['watermark_image']['position'] : Image_Watermark()->defaults['options']['watermark_image']['position'];
 
-			$input['watermark_image']['offset_unit'] = isset( $_POST['iw_options']['watermark_image']['offset_unit'] ) && in_array( $_POST['iw_options']['watermark_image']['offset_unit'], array( 'pixels', 'percentages' ), true ) ? $_POST['iw_options']['watermark_image']['offset_unit'] : Image_Watermark()->defaults['options']['watermark_image']['offset_unit'];
+			$input['watermark_image']['offset_unit'] = isset( $_POST['iw_options']['watermark_image']['offset_unit'] ) && in_array( $_POST['iw_options']['watermark_image']['offset_unit'], [ 'pixels', 'percentages' ], true ) ? $_POST['iw_options']['watermark_image']['offset_unit'] : Image_Watermark()->defaults['options']['watermark_image']['offset_unit'];
 			$input['watermark_image']['offset_width'] = isset( $_POST['iw_options']['watermark_image']['offset_width'] ) ? (int) $_POST['iw_options']['watermark_image']['offset_width'] : Image_Watermark()->defaults['options']['watermark_image']['offset_width'];
 			$input['watermark_image']['offset_height'] = isset( $_POST['iw_options']['watermark_image']['offset_height'] ) ? (int) $_POST['iw_options']['watermark_image']['offset_height'] : Image_Watermark()->defaults['options']['watermark_image']['offset_height'];
 			$input['watermark_image']['url'] = isset( $_POST['iw_options']['watermark_image']['url'] ) ? (int) $_POST['iw_options']['watermark_image']['url'] : Image_Watermark()->defaults['options']['watermark_image']['url'];
@@ -263,11 +239,11 @@ class Image_Watermark_Settings {
 			$input['watermark_image']['width'] = isset( $_POST['iw_options']['watermark_image']['width'] ) ? (int) $_POST['iw_options']['watermark_image']['width'] : Image_Watermark()->defaults['options']['watermark_image']['width'];
 			$input['watermark_image']['transparent'] = isset( $_POST['iw_options']['watermark_image']['transparent'] ) ? (int) $_POST['iw_options']['watermark_image']['transparent'] : Image_Watermark()->defaults['options']['watermark_image']['transparent'];
 			$input['watermark_image']['quality'] = isset( $_POST['iw_options']['watermark_image']['quality'] ) ? (int) $_POST['iw_options']['watermark_image']['quality'] : Image_Watermark()->defaults['options']['watermark_image']['quality'];
-			$input['watermark_image']['jpeg_format'] = isset( $_POST['iw_options']['watermark_image']['jpeg_format'] ) && in_array( esc_attr( $_POST['iw_options']['watermark_image']['jpeg_format'] ), array( 'baseline', 'progressive' ) ) ? esc_attr( $_POST['iw_options']['watermark_image']['jpeg_format'] ) : Image_Watermark()->defaults['options']['watermark_image']['jpeg_format'];
+			$input['watermark_image']['jpeg_format'] = isset( $_POST['iw_options']['watermark_image']['jpeg_format'] ) && in_array( $_POST['iw_options']['watermark_image']['jpeg_format'], [ 'baseline', 'progressive' ] ) ? $_POST['iw_options']['watermark_image']['jpeg_format'] : Image_Watermark()->defaults['options']['watermark_image']['jpeg_format'];
 
-			$input['image_protection']['rightclick'] = isset( $_POST['iw_options']['image_protection']['rightclick'] ) ? ((bool) $_POST['iw_options']['image_protection']['rightclick'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['rightclick'];
-			$input['image_protection']['draganddrop'] = isset( $_POST['iw_options']['image_protection']['draganddrop'] ) ? ((bool) $_POST['iw_options']['image_protection']['draganddrop'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['draganddrop'];
-			$input['image_protection']['forlogged'] = isset( $_POST['iw_options']['image_protection']['forlogged'] ) ? ((bool) $_POST['iw_options']['image_protection']['forlogged'] == 1 ? true : false) : Image_Watermark()->defaults['options']['image_protection']['forlogged'];
+			$input['image_protection']['rightclick'] = isset( $_POST['iw_options']['image_protection']['rightclick'] ) ? ( (bool) $_POST['iw_options']['image_protection']['rightclick'] == 1 ? true : false ) : Image_Watermark()->defaults['options']['image_protection']['rightclick'];
+			$input['image_protection']['draganddrop'] = isset( $_POST['iw_options']['image_protection']['draganddrop'] ) ? ( (bool) $_POST['iw_options']['image_protection']['draganddrop'] == 1 ? true : false ) : Image_Watermark()->defaults['options']['image_protection']['draganddrop'];
+			$input['image_protection']['forlogged'] = isset( $_POST['iw_options']['image_protection']['forlogged'] ) ? ( (bool) $_POST['iw_options']['image_protection']['forlogged'] == 1 ? true : false ) : Image_Watermark()->defaults['options']['image_protection']['forlogged'];
 
 			$input['backup']['backup_image'] = isset( $_POST['iw_options']['backup']['backup_image'] );
 			$input['backup']['backup_quality'] = isset( $_POST['iw_options']['backup']['backup_quality'] ) ? (int) $_POST['iw_options']['backup']['backup_quality'] : Image_Watermark()->defaults['options']['backup']['backup_quality'];
@@ -309,7 +285,7 @@ class Image_Watermark_Settings {
 
 		echo '
 				</select>
-				<p class="description">' . esc_html__( 'Select extension.', 'wp-media-folder' ) . '</p>
+				<p class="description">' . esc_html__( 'Select extension.', 'image-watermark' ) . '</p>
 			</fieldset>
 		</div>';
 	}
@@ -322,8 +298,7 @@ class Image_Watermark_Settings {
 	public function iw_automatic_watermarking() {
 		?>
 		<label for="iw_automatic_watermarking">
-			<input id="iw_automatic_watermarking" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['plugin_off'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][plugin_off]">
-<?php echo __( 'Enable watermark for uploaded images.', 'image-watermark' ); ?>
+			<input id="iw_automatic_watermarking" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['plugin_off'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][plugin_off]"><?php echo __( 'Enable watermark for uploaded images.', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -336,8 +311,7 @@ class Image_Watermark_Settings {
 	public function iw_manual_watermarking() {
 		?>
 		<label for="iw_manual_watermarking">
-			<input id="iw_manual_watermarking" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['manual_watermarking'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][manual_watermarking]">
-<?php echo __( 'Enable Apply Watermark option for Media Library images.', 'image-watermark' ); ?>
+			<input id="iw_manual_watermarking" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['manual_watermarking'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][manual_watermarking]"><?php echo __( 'Enable Apply Watermark option for Media Library images.', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -354,7 +328,7 @@ class Image_Watermark_Settings {
 				<?php
 				foreach ( $this->image_sizes as $image_size ) {
 					?>
-					<input name="iw_options[watermark_on][<?php echo $image_size; ?>]" type="checkbox" id="<?php echo $image_size; ?>" value="1" <?php echo (in_array( $image_size, array_keys( Image_Watermark()->options['watermark_on'] ) ) ? ' checked="checked"' : ''); ?> />
+					<input name="iw_options[watermark_on][<?php echo $image_size; ?>]" type="checkbox" id="<?php echo $image_size; ?>" value="1" <?php echo ( in_array( $image_size, array_keys( Image_Watermark()->options['watermark_on'] ) ) ? ' checked="checked"' : '' ); ?> />
 					<label for="<?php echo $image_size; ?>"><?php echo $image_size; ?></label>
 					<?php
 				}
@@ -371,7 +345,7 @@ class Image_Watermark_Settings {
 			if ( in_array( 'everywhere', $watermark_cpt_on ) && count( $watermark_cpt_on ) === 1 ) {
 				$first_checked = true;
 				$second_checked = false;
-				$watermark_cpt_on = array();
+				$watermark_cpt_on = [];
 			} else {
 				$first_checked = false;
 				$second_checked = true;
@@ -379,15 +353,15 @@ class Image_Watermark_Settings {
 			?>
 			
 			<div id="cpt-specific">
-				<input id="df_option_everywhere" type="radio" name="iw_options[watermark_cpt_on]" value="everywhere" <?php echo ($first_checked === true ? 'checked="checked"' : ''); ?>/><label for="df_option_everywhere"><?php _e( 'everywhere', 'image-watermark' ); ?></label>
-				<input id="df_option_cpt" type="radio" name="iw_options[watermark_cpt_on]" value="specific" <?php echo ($second_checked === true ? 'checked="checked"' : ''); ?> /><label for="df_option_cpt"><?php _e( 'on selected post types only', 'image-watermark' ); ?></label>
+				<input id="df_option_everywhere" type="radio" name="iw_options[watermark_cpt_on]" value="everywhere" <?php echo ( $first_checked === true ? 'checked="checked"' : '' ); ?>/><label for="df_option_everywhere"><?php _e( 'everywhere', 'image-watermark' ); ?></label>
+				<input id="df_option_cpt" type="radio" name="iw_options[watermark_cpt_on]" value="specific" <?php echo ( $second_checked === true ? 'checked="checked"' : '' ); ?> /><label for="df_option_cpt"><?php _e( 'on selected post types only', 'image-watermark' ); ?></label>
 			</div>
 			
-			<div id="cpt-select" <?php echo ($second_checked === false ? 'style="display: none;"' : ''); ?>>
+			<div id="cpt-select" <?php echo ( $second_checked === false ? 'style="display: none;"' : '' ); ?>>
 			<?php
 			foreach ( $this->get_post_types() as $cpt ) {
 				?>
-				<input name="iw_options[watermark_cpt_on_type][<?php echo $cpt; ?>]" type="checkbox" id="<?php echo $cpt; ?>" value="1" <?php echo (in_array( $cpt, $watermark_cpt_on ) ? ' checked="checked"' : ''); ?> />
+				<input name="iw_options[watermark_cpt_on_type][<?php echo $cpt; ?>]" type="checkbox" id="<?php echo $cpt; ?>" value="1" <?php echo ( in_array( $cpt, $watermark_cpt_on ) ? ' checked="checked"' : '' ); ?> />
 				<label for="<?php echo $cpt; ?>"><?php echo $cpt; ?></label>
 				<?php
 			}
@@ -407,8 +381,7 @@ class Image_Watermark_Settings {
 	public function iw_frontend_watermarking() {
 		?>
 		<label for="iw_frontend_watermarking">
-			<input id="iw_frontend_watermarking" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['frontend_active'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][frontend_active]">
-<?php echo __( 'Enable frontend image uploading. (uploading script is not included, but you may use a plugin or custom code).', 'image-watermark' ); ?>
+			<input id="iw_frontend_watermarking" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['frontend_active'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][frontend_active]"><?php echo __( 'Enable frontend image uploading. (uploading script is not included, but you may use a plugin or custom code).', 'image-watermark' ); ?>
 		</label>
 		<span class="description"><?php echo __( '<br /><strong>Notice:</strong> This functionality works only if uploaded images are processed using WordPress native upload methods.', 'image-watermark' ); ?></span>
 		<?php
@@ -422,8 +395,7 @@ class Image_Watermark_Settings {
 	public function iw_deactivation() {
 		?>
 		<label for="iw_deactivation">
-			<input id="iw_deactivation" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['deactivation_delete'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][deactivation_delete]">
-<?php echo __( 'Delete all database settings on plugin deactivation.', 'image-watermark' ); ?>
+			<input id="iw_deactivation" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['watermark_image']['deactivation_delete'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[watermark_image][deactivation_delete]"><?php echo __( 'Delete all database settings on plugin deactivation.', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -447,7 +419,7 @@ class Image_Watermark_Settings {
 				foreach ( $this->watermark_positions['x'] as $x ) {
 				?>
 					<td title="<?php echo ucfirst( $y . ' ' . $x ); ?>">
-						<input name="iw_options[watermark_image][position]" type="radio" value="<?php echo $y . '_' . $x; ?>"<?php echo ($watermark_position == $y . '_' . $x ? ' checked="checked"' : NULL); ?> />
+						<input name="iw_options[watermark_image][position]" type="radio" value="<?php echo $y . '_' . $x; ?>"<?php echo ( $watermark_position == $y . '_' . $x ? ' checked="checked"' : '' ); ?> />
 					</td>
 					<?php }
 					?>
@@ -498,8 +470,8 @@ class Image_Watermark_Settings {
 	 * @return void
 	 */
 	public function iw_watermark_image() {
-		if ( Image_Watermark()->options['watermark_image']['url'] !== NULL && Image_Watermark()->options['watermark_image']['url'] != 0 ) {
-			$image = wp_get_attachment_image_src( Image_Watermark()->options['watermark_image']['url'], array( 300, 300 ), false );
+		if ( Image_Watermark()->options['watermark_image']['url'] !== null && Image_Watermark()->options['watermark_image']['url'] != 0 ) {
+			$image = wp_get_attachment_image_src( Image_Watermark()->options['watermark_image']['url'], [ 300, 300 ], false );
 			$image_selected = true;
 		} else {
 			$image_selected = false;
@@ -520,8 +492,8 @@ class Image_Watermark_Settings {
 	 * @return void
 	 */
 	public function iw_watermark_preview() {
-		if ( Image_Watermark()->options['watermark_image']['url'] !== NULL && Image_Watermark()->options['watermark_image']['url'] != 0 ) {
-			$image = wp_get_attachment_image_src( Image_Watermark()->options['watermark_image']['url'], array( 300, 300 ), false );
+		if ( Image_Watermark()->options['watermark_image']['url'] !== null && Image_Watermark()->options['watermark_image']['url'] != 0 ) {
+			$image = wp_get_attachment_image_src( Image_Watermark()->options['watermark_image']['url'], [ 300, 300 ], false );
 			$image_selected = true;
 		} else
 			$image_selected = false;
@@ -530,7 +502,7 @@ class Image_Watermark_Settings {
 			<div id="previewImg_imageDiv">
 			<?php
 				if ( $image_selected ) {
-					$image = wp_get_attachment_image_src( Image_Watermark()->options['watermark_image']['url'], array( 300, 300 ), false );
+					$image = wp_get_attachment_image_src( Image_Watermark()->options['watermark_image']['url'], [ 300, 300 ], false );
 					?>
 					<img id="previewImg_image" src="<?php echo $image[0]; ?>" alt="" width="300" />
 				<?php } else { ?>
@@ -669,8 +641,7 @@ class Image_Watermark_Settings {
 	public function iw_protection_right_click() {
 		?>
 		<label for="iw_protection_right_click">
-			<input id="iw_protection_right_click" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['image_protection']['rightclick'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[image_protection][rightclick]">
-<?php _e( 'Disable right mouse click on images', 'image-watermark' ); ?>
+			<input id="iw_protection_right_click" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['image_protection']['rightclick'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[image_protection][rightclick]"><?php _e( 'Disable right mouse click on images', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -683,8 +654,7 @@ class Image_Watermark_Settings {
 	public function iw_protection_drag_drop() {
 		?>
 		<label for="iw_protection_drag_drop">
-			<input id="iw_protection_drag_drop" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['image_protection']['draganddrop'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[image_protection][draganddrop]">
-<?php _e( 'Prevent drag and drop', 'image-watermark' ); ?>
+			<input id="iw_protection_drag_drop" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['image_protection']['draganddrop'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[image_protection][draganddrop]"><?php _e( 'Prevent drag and drop', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -697,8 +667,7 @@ class Image_Watermark_Settings {
 	public function iw_protection_logged() {
 		?>
 		<label for="iw_protection_logged">
-			<input id="iw_protection_logged" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['image_protection']['forlogged'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[image_protection][forlogged]">
-<?php _e( 'Enable image protection for logged-in users also', 'image-watermark' ); ?>
+			<input id="iw_protection_logged" type="checkbox" <?php checked( ( ! empty( Image_Watermark()->options['image_protection']['forlogged'] ) ? 1 : 0 ), 1, true ); ?> value="1" name="iw_options[image_protection][forlogged]"><?php _e( 'Enable image protection for logged-in users also', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -711,8 +680,7 @@ class Image_Watermark_Settings {
 	public function iw_backup_image() {
 		?>
 		<label for="iw_backup_size_full">
-			<input id="iw_backup_size_full" type="checkbox" <?php checked( ! empty( Image_Watermark()->options['backup']['backup_image'] ), true, true ); ?> value="1" name="iw_options[backup][backup_image]">
-<?php echo __( 'Backup the full size image.', 'image-watermark' ); ?>
+			<input id="iw_backup_size_full" type="checkbox" <?php checked( ! empty( Image_Watermark()->options['backup']['backup_image'] ), true, true ); ?> value="1" name="iw_options[backup][backup_image]"><?php echo __( 'Backup the full size image.', 'image-watermark' ); ?>
 		</label>
 		<?php
 	}
@@ -754,10 +722,10 @@ class Image_Watermark_Settings {
 			return;
 
 		foreach ( (array) $wp_settings_sections[$page] as $section ) {
-			echo '<div id="" class="stuffbox postbox '.$section['id'].'">';
-			echo '<button type="button" class="handlediv button-link" aria-expanded="true"><span class="screen-reader-text">' . __( 'Toggle panel', 'image-watermark') . '</span><span class="toggle-indicator" aria-hidden="true"></span></button>';
+			echo '<div id="" class="'.$section['id'].'">';
+
 			if ( $section['title'] )
-				echo "<h3 class=\"hndle\"><span>{$section['title']}</span></h3>\n";
+				echo "<h3><span>{$section['title']}</span></h3>\n";
 
 			if ( $section['callback'] )
 				call_user_func( $section['callback'], $section );

@@ -8,10 +8,10 @@
 					return this._frameWatermark;
 
 				this._frameWatermark = wp.media( {
-					title: iwUploadArgs.title,
-					frame: iwUploadArgs.frame,
-					button: iwUploadArgs.button,
-					multiple: iwUploadArgs.multiple,
+					title: iwArgsUpload.title,
+					frame: iwArgsUpload.frame,
+					button: iwArgsUpload.button,
+					multiple: iwArgsUpload.multiple,
 					library: {
 						type: 'image'
 					}
@@ -40,13 +40,13 @@
 					img.src = attachment.attributes.url;
 
 					img.onload = function() {
-						$( 'p#previewImageInfo' ).html( iwUploadArgs.originalSize + ': ' + this.width + ' ' + iwUploadArgs.px + ' / ' + this.height + ' ' + iwUploadArgs.px );
+						$( 'p#previewImageInfo' ).html( iwArgsUpload.originalSize + ': ' + this.width + ' ' + iwArgsUpload.px + ' / ' + this.height + ' ' + iwArgsUpload.px );
 					}
 				} else {
 					$( '#iw_turn_off_image_button' ).attr( 'disabled', 'true' );
 					$( '#iw_upload_image' ).val( 0 );
 					$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', '' ).hide();
-					$( 'p#previewImageInfo' ).html( '<strong>' + iwUploadArgs.notAllowedImg + '</strong>' );
+					$( 'p#previewImageInfo' ).html( '<strong>' + iwArgsUpload.notAllowedImg + '</strong>' );
 				}
 			},
 			init: function() {
@@ -63,7 +63,7 @@
 			$( this ).attr( 'disabled', 'true' );
 			$( '#iw_upload_image' ).val( 0 );
 			$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', '' ).hide();
-			$( 'p#previewImageInfo' ).html( iwUploadArgs.noSelectedImg );
+			$( 'p#previewImageInfo' ).html( iwArgsUpload.noSelectedImg );
 		} );
 	} );
 

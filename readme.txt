@@ -1,10 +1,11 @@
 === Image Watermark ===
 Contributors: dfactory
-Donate link: http://www.dfactory.eu/
+Donate link: http://www.dfactory.co/
 Tags: image, images, picture, photo, watermark, watermarking, protection, image protection, image security
-Requires at least: 4.0
-Tested up to: 5.3
-Stable tag: 1.6.6
+Requires at least: 4.3
+Requires PHP: 5.4
+Tested up to: 6.2
+Stable tag: 1.7.2
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -12,9 +13,9 @@ Image Watermark allows you to automatically watermark images uploaded to the Wor
 
 == Description ==
 
-[Image Watermark](http://www.dfactory.eu/plugins/image-watermark/) allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
+[Image Watermark](http://www.dfactory.co/products/image-watermark/) allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
 
-For more information, check out plugin page at [dFactory](http://www.dfactory.eu/), [documentation page](https://www.dfactory.eu/docs/image-watermark-plugin/) or plugin [support forum](http://www.dfactory.eu/support/forum/image-watermark/).
+For more information, check out plugin page at [dFactory](http://www.dfactory.co/), [documentation page](http://www.dfactory.co/docs/image-watermark/) or plugin [support forum](http://www.dfactory.co/support/forum/image-watermark/).
 
 = Features include: =
 
@@ -53,6 +54,20 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.7.3 =
+* Tweak: WordPress 6.2 compatibility
+* Tweak: PHP 8.2 compatibility
+
+= 1.7.2 =
+* Fix: Missing admin-media.js file
+
+= 1.7.1 =
+* Fix: Watermark option not available in Media Library
+
+= 1.7.0 =
+* Tweak: WordPress 5.9 compatibility
+* Tweak: PHP 8.x compatibility
 
 = 1.6.6 =
 * Tweak: PHP 7.3 compatibility
@@ -102,7 +117,7 @@ No questions yet.
 * Tweak: Switch from wp_get_referer() to DOING_AJAX and is_admin(). 
 
 = 1.5.1 =
-* New: Introducing [plugin documentation](https://www.dfactory.eu/docs/image-watermark-plugin/)
+* New: Introducing [plugin documentation](http://www.dfactory.co/docs/image-watermark/)
 * Tweak: Improved transparent watermark support
 
 = 1.5.0 =
@@ -187,5 +202,7 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.6.6 =
-* Tweak: PHP 7.3 compatibility
+= 1.7.3 =
+* Tweak: WordPress 6.2 compatibility
+* Tweak: PHP 8.2 compatibility
+* Fix: Saving "Enable watermark for" option

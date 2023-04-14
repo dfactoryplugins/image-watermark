@@ -17,7 +17,7 @@ class Image_Watermark_Update {
 	 */
 	public function __construct( )	{
 		// actions
-		add_action( 'admin_init', array( $this, 'check_update' ) );
+		add_action( 'admin_init', [ $this, 'check_update' ] );
 	}
 
 	/**

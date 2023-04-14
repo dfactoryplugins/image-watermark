@@ -10,8 +10,8 @@ var IwNRCtargSrc = null;
 var IwNRCinContext = false;
 var IwNRCnotimage = new Image();
 var IwNRClimit = 0;
-var IwNRCextra = IwNRCargs.rightclick;
-var IwNRCdrag = IwNRCargs.draganddrop;
+var IwNRCextra = iwArgsNoRightClick.rightclick;
+var IwNRCdrag = iwArgsNoRightClick.draganddrop;
 
 function IwNRCdragdropAll( event ) {
 	try {

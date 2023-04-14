@@ -46,7 +46,7 @@ class Image_Watermark_Settings {
 
 	/**
 	 * Get post types.
-	 * 
+	 *
 	 * @return array
 	 */
 	private function get_post_types() {
@@ -103,7 +103,7 @@ class Image_Watermark_Settings {
 		// Backup
 		add_settings_section( 'image_watermark_backup', __( 'Image backup', 'image-watermark' ), '', 'image_watermark_options' );
 		add_settings_field( 'iw_backup_image', __( 'Backup full size image', 'image-watermark' ), [ $this, 'iw_backup_image' ], 'image_watermark_options', 'image_watermark_backup' );
-		add_settings_field( 'iw_backup_image_quality', __( 'Backup image quality', 'image-watermark' ), [ $this, 'iw_backup_image_quality' ], 'image_watermark_options', 'image_watermark_backup' );	
+		add_settings_field( 'iw_backup_image_quality', __( 'Backup image quality', 'image-watermark' ), [ $this, 'iw_backup_image_quality' ], 'image_watermark_options', 'image_watermark_backup' );
 	}
 
 	/**
@@ -185,9 +185,8 @@ class Image_Watermark_Settings {
 
 			if ( isset( $_POST['iw_options']['watermark_on'] ) && is_array( $_POST['iw_options']['watermark_on'] ) ) {
 				foreach ( $this->image_sizes as $size ) {
-					if ( in_array( $size, array_keys( $_POST['iw_options']['watermark_on'] ) ) ) {
+					if ( in_array( $size, array_keys( $_POST['iw_options']['watermark_on'] ) ) )
 						$watermark_on[$size] = 1;
-					}
 				}
 			}
 
@@ -201,14 +200,12 @@ class Image_Watermark_Settings {
 						$tmp = [];
 
 						foreach ( $this->get_post_types() as $cpt ) {
-							if ( in_array( $cpt, array_keys( $_POST['iw_options']['watermark_cpt_on_type'] ) ) ) {
+							if ( in_array( $cpt, array_keys( $_POST['iw_options']['watermark_cpt_on_type'] ) ) )
 								$tmp[$cpt] = 1;
-							}
 						}
 
-						if ( count( $tmp ) > 0 ) {
+						if ( count( $tmp ) > 0 )
 							$input['watermark_cpt_on'] = $tmp;
-						}
 					}
 				}
 			}
@@ -338,9 +335,10 @@ class Image_Watermark_Settings {
 				<?php echo __( 'Check the image sizes watermark will be applied to.', 'image-watermark' ); ?><br />
 				<?php echo __( '<strong>IMPORTANT:</strong> checking full size is NOT recommended as it\'s the original image. You may need it later - for removing or changing watermark, image sizes regeneration or any other image manipulations. Use it only if you know what you are doing.', 'image-watermark' ); ?>
 			</p>
-			
+
 			<?php
-			$watermark_cpt_on = array_keys( Image_Watermark()->options['watermark_cpt_on'] );
+			$watermark_cpt_on = Image_Watermark()->options['watermark_cpt_on'];
+			$post_types = array_keys( Image_Watermark()->options['watermark_cpt_on'] );
 
 			if ( in_array( 'everywhere', $watermark_cpt_on ) && count( $watermark_cpt_on ) === 1 ) {
 				$first_checked = true;
@@ -351,23 +349,23 @@ class Image_Watermark_Settings {
 				$second_checked = true;
 			}
 			?>
-			
+
 			<div id="cpt-specific">
 				<input id="df_option_everywhere" type="radio" name="iw_options[watermark_cpt_on]" value="everywhere" <?php echo ( $first_checked === true ? 'checked="checked"' : '' ); ?>/><label for="df_option_everywhere"><?php _e( 'everywhere', 'image-watermark' ); ?></label>
 				<input id="df_option_cpt" type="radio" name="iw_options[watermark_cpt_on]" value="specific" <?php echo ( $second_checked === true ? 'checked="checked"' : '' ); ?> /><label for="df_option_cpt"><?php _e( 'on selected post types only', 'image-watermark' ); ?></label>
 			</div>
-			
+
 			<div id="cpt-select" <?php echo ( $second_checked === false ? 'style="display: none;"' : '' ); ?>>
 			<?php
 			foreach ( $this->get_post_types() as $cpt ) {
 				?>
-				<input name="iw_options[watermark_cpt_on_type][<?php echo $cpt; ?>]" type="checkbox" id="<?php echo $cpt; ?>" value="1" <?php echo ( in_array( $cpt, $watermark_cpt_on ) ? ' checked="checked"' : '' ); ?> />
+				<input name="iw_options[watermark_cpt_on_type][<?php echo $cpt; ?>]" type="checkbox" id="<?php echo $cpt; ?>" value="1" <?php echo ( in_array( $cpt, $post_types ) ? ' checked="checked"' : '' ); ?> />
 				<label for="<?php echo $cpt; ?>"><?php echo $cpt; ?></label>
 				<?php
 			}
 				?>
 			</div>
-			
+
 			<p class="description"><?php echo __( 'Check custom post types on which watermark should be applied to uploaded images.', 'image-watermark' ); ?></p>
 		</fieldset>
 		<?php

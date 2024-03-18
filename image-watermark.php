@@ -356,7 +356,7 @@ final class Image_Watermark {
 		}
 
 		if ( $pagenow === 'upload.php' ) {
-			if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
+			if ( $this->options['watermark_image']['manual_watermarking'] == 1 && current_user_can( 'upload_files' ) ) {
 				wp_enqueue_script( 'image-watermark-admin-media', IMAGE_WATERMARK_URL . '/js/admin-media.js', [ 'jquery' ], $this->defaults['version'], false );
 
 				// prepare script data
@@ -794,11 +794,15 @@ final class Image_Watermark {
 			return;
 
 		// Security & data check
-		if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || ! isset( $_POST['_iw_nonce'] ) || ! isset( $_POST['iw-action'] ) || ! isset( $_POST['attachment_id'] ) || ! is_numeric( $_POST['attachment_id'] ) || ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) )
+		if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || ! isset( $_POST['_iw_nonce'] ) || ! isset( $_POST['iw-action'] ) || ! isset( $_POST['attachment_id'] ) || ! is_numeric( $_POST['attachment_id'] ) || ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) || ! current_user_can( 'upload_files' ) )
 			wp_send_json_error( __( 'Cheatin uh?', 'image-watermark' ) );
 
+		// cast post id
 		$post_id = (int) $_POST['attachment_id'];
-		$action = in_array( $_POST['iw-action'], [ 'applywatermark', 'removewatermark' ], true ) ? $_POST['iw-action'] : false;
+
+		// sanitize action name
+		$action = sanitize_key( $_POST['iw-action'] );
+		$action = in_array( $action, [ 'applywatermark', 'removewatermark' ], true ) ? $action : false;
 
 		// only if manual watermarking is turned and we have a valid action
 		// if the action is NOT "removewatermark" we also require a watermark image to be set

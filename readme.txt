@@ -5,7 +5,7 @@ Tags: image, images, picture, photo, watermark, watermarking, protection, image 
 Requires at least: 4.3
 Requires PHP: 5.4
 Tested up to: 6.2
-Stable tag: 1.7.2
+Stable tag: 1.7.4
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 

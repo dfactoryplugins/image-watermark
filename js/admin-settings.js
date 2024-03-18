@@ -68,7 +68,7 @@
 			}
 		} );
 
-		// quality slider
+		// backup quality slider
 		$( '#iw_backup_quality_span' ).slider( {
 			value: $( '#iw_backup_quality_input' ).val(),
 			min: 0,

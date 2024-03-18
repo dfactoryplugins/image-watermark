@@ -1,69 +1,75 @@
 /* Image Watermark settings */
-.df-sidebar { 
-    float: right; 
-    width: 280px; 
-    margin: 20px -300px 20px 20px; 
-    position: relative; 
-}
-.df-sidebar .df-credits {
-    background: #fff; 
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
-    margin-bottom: 20px;
-}
-.df-sidebar .inner { 
-    padding-left: 10px; 
-    padding-right: 10px; 
-}
-.df-sidebar h3 { 
-    font-size: 14px; 
-    line-height: 1.4; 
-    margin: 0;  
-    padding: 8px 12px; 
-    border-bottom: 1px solid #eee; 
-}
-.df-sidebar .df-link { 
-    font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif; 
-    font-style:italic; 
-    padding-bottom: 10px; 
-    margin: 0; 
-}
-.df-sidebar .df-link a { 
-    vertical-align: middle; 
-    padding: 5px 0 0 4px; 
-}
-.image-watermark-settings .df-credits form { 
-    min-width: 260px; 
-    margin-bottom: 1em; 
-}
-.image-watermark-settings .df-credits form input { 
-    margin: 0; 
-    padding: 0; 
-}
 .image-watermark-settings {
-    margin-right: 300px; 
+    margin-right: 300px;
 }
-.image-watermark-settings hr, .df-credits hr { 
-    border: solid #eee; 
-    border-width: 1px 0 0; 
-    clear: both; 
-    height: 0; 
+.image-watermark-settings form {
+    float: left;
+    min-width: 463px;
+    width: auto;
 }
-.image-watermark-settings form { 
-    float: left; 
-    min-width: 100%; 
-    width: auto; 
+.image-watermark-settings fieldset .description {
+    font-size: 13px;
+    margin-bottom: 8px;
+    margin-top: 4px;
+    display: block;
 }
-.image-watermark-settings fieldset span.description { 
-    margin-bottom: 8px; 
-    margin-top: 4px; 
-    display: block; 
+.image-watermark-settings p.help, .image-watermark-settings p.description, .image-watermark-settings span.description {
+    font-size: 13px;
+    font-style: italic;
+}
+.image-watermark-settings select {
+	vertical-align: top;
+}
+.image-watermark-settings .df-credits {
+    float: right;
+    width: 280px;
+    background: #fff;
+    margin: 20px -300px 20px 20px;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+.image-watermark-settings .df-credits .inner {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.image-watermark-settings .df-credits h3 {
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 0;
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.image-watermark-settings .df-credits .df-link {
+	padding-top: 5px;
+    padding-bottom: 10px;
+    margin: 0;
+}
+
+.image-watermark-settings .df-credits .df-link a {
+	display: block;
+	text-align: center;
+	outline: none !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
+.image-watermark-settings .df-credits .df-link a img {
+	display: block;
+	margin: 0 auto;
+	width: 80px;
+}
+
+.image-watermark-settings .df-credits hr {
+    border: solid #eee;
+    border-width: 1px 0 0;
+    clear: both;
+    height: 0;
 }
 .image-watermark-settings.ui-button { 
     margin-bottom: 5px; 
-}
-.image-watermark-settings .description { 
-    font-size: 13px; 
-    margin-bottom: 8px; 
 }
 .image-watermark-settings #watermark_position td {
     padding: 15px 20px;
@@ -73,14 +79,15 @@
 }
 
 /* All Mobile Sizes (devices and browser) */
-@media only screen and (max-width: 959px) {
-    .df-sidebar { width: 100%; float: none; margin: 20px 0; }
-    .image-watermark-settings { margin-right: 0; }
-}
-
-/* Larger sizes */
-@media only screen and (min-width: 959px) {
-    .df-sidebar { position: fixed; right: 0; margin: 0 20px; }
+@media only screen and (max-width: 960px) {
+	.image-watermark-settings .df-credits {
+		width: 100%;
+		float: none;
+		margin: 20px 0;
+	}
+	.image-watermark-settings {
+		margin-right: 0;
+	}
 }
 
 #cpt-select { margin-top: 5px; }

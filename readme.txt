@@ -4,7 +4,7 @@ Donate link: http://www.dfactory.co/
 Tags: image, images, picture, photo, watermark, watermarking, protection, image protection, image security
 Requires at least: 4.3
 Requires PHP: 5.4
-Tested up to: 6.2
+Tested up to: 6.5
 Stable tag: 1.7.4
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
@@ -54,6 +54,11 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.7.4 =
+* Fix: Potential security issue with capability check - props WordFence
+* Fix: Saving post types settings issue
+* Tweak: WordPress 6.5 compatibility
 
 = 1.7.3 =
 * Tweak: WordPress 6.2 compatibility
@@ -202,7 +207,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.7.3 =
-* Tweak: WordPress 6.2 compatibility
-* Tweak: PHP 8.2 compatibility
-* Fix: Saving "Enable watermark for" option
+= 1.7.4 =
+Fix: Potential security issue with capability check - props WordFence

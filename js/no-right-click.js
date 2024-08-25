@@ -21,7 +21,7 @@ function IwNRCdragdropAll( event ) {
 			// is this IE and are we dragging a link to the image?
 			var hr = targ.href;
 			hr = hr.toUpperCase();
-			if ( hr.indexOf( '.JPG' ) || hr.indexOf( '.PNG' ) || hr.indexOf( '.GIF' ) ) {
+			if ( hr.indexOf( '.JPG' ) || hr.indexOf( '.PNG' ) || hr.indexOf( '.GIF' )  || hr.indexOf( '.WEBP' ) ) {
 				ev.returnValue = false;
 				if ( ev.preventDefault ) {
 					ev.preventDefault();

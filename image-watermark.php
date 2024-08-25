@@ -2,7 +2,7 @@
 /*
 Plugin Name: Image Watermark
 Description: Image Watermark allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
-Version: 1.7.4
+Version: 1.8.4
 Author: dFactory
 Author URI: http://www.dfactory.co/
 Plugin URI: http://www.dfactory.co/products/image-watermark/
@@ -37,6 +37,7 @@ final class Image_Watermark {
 	private $is_admin = true;
 	private $extension = false;
 	private $allowed_mime_types = [
+		'image/webp',
 		'image/jpeg',
 		'image/pjpeg',
 		'image/png'
@@ -898,7 +899,7 @@ final class Image_Watermark {
 	public function save_image_metadata( $metadata, $file ) {
 		$mime = wp_check_filetype( $file );
 
-		if ( file_exists( $file ) && $mime['type'] !== 'image/png' ) {
+		if ( file_exists( $file ) && ($mime['type'] !== 'image/webp') && ($mime['type'] !== 'image/png') ) {
 			$exifdata = $metadata['exif'];
 			$iptcdata = $metadata['iptc'];
 
@@ -1145,6 +1146,13 @@ final class Image_Watermark {
 					imagefilledrectangle( $image, 0, 0, imagesx( $image ), imagesy( $image ), imagecolorallocatealpha( $image, 255, 255, 255, 127 ) );
 				break;
 
+			case 'image/webp':
+				$image = imagecreatefromwebp( $filepath );
+				if ( is_resource( $image ) )
+					imagefilledrectangle( $image, 0, 0, imagesx( $image ), imagesy( $image ), imagecolorallocatealpha( $image, 255, 255, 255, 127 ) );
+				break;
+				break;
+	
 			default:
 				$image = false;
 		}
@@ -1356,7 +1364,9 @@ final class Image_Watermark {
 			case 'image/png':
 				$watermark = imagecreatefrompng( $url );
 				break;
-
+			case 'image/webp':
+				$watermark = imagecreatefromwebp( $url );
+				break;
 			default:
 				return false;
 		}
@@ -1451,6 +1461,10 @@ final class Image_Watermark {
 			case 'image/png':
 				imagepng( $image, $filepath, (int) round( 9 - ( 9 * $quality / 100 ), 0 ) );
 				break;
+			case 'image/webp':
+				imagewebp( $image, $filepath, $quality );
+				break;
+	
 		}
 	}
 

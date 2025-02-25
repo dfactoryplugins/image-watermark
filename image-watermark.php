@@ -2,7 +2,7 @@
 /*
 Plugin Name: Image Watermark
 Description: Image Watermark allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
-Version: 1.8.4
+Version: 1.7.4
 Author: dFactory
 Author URI: http://www.dfactory.co/
 Plugin URI: http://www.dfactory.co/products/image-watermark/
@@ -299,7 +299,7 @@ final class Image_Watermark {
 				'title'			=> __( 'Select watermark', 'image-watermark' ),
 				'originalSize'	=> __( 'Original size', 'image-watermark' ),
 				'noSelectedImg'	=> __( 'Watermak has not been selected yet.', 'image-watermark' ),
-				'notAllowedImg'	=> __( 'This image is not supported as watermark. Use JPEG, PNG or GIF.', 'image-watermark' ),
+				'notAllowedImg'	=> __( 'This image is not supported as watermark. Use JPEG, PNG, WebP or GIF.', 'image-watermark' ),
 				'px'			=> __( 'px', 'image-watermark' ),
 				'frame'			=> 'select',
 				'button'		=> [ 'text' => __( 'Add watermark', 'image-watermark' ) ],
@@ -348,10 +348,10 @@ final class Image_Watermark {
 			$script_data = [
 				'backup_image'		=> (bool) $this->options['backup']['backup_image'],
 				'_nonce'			=> wp_create_nonce( 'image-watermark' ),
-				'__applied_none'	=> __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+				'__applied_none'	=> __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ),
 				'__applied_one'		=> __( 'Watermark was successfully applied to 1 image.', 'image-watermark' ),
 				'__applied_multi'	=> __( 'Watermark was successfully applied to %s images.', 'image-watermark' ),
-				'__removed_none'	=> __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ),
+				'__removed_none'	=> __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ),
 				'__removed_one'		=> __( 'Watermark was successfully removed from 1 image.', 'image-watermark' ),
 				'__removed_multi'	=> __( 'Watermark was successfully removed from %s images.', 'image-watermark' ),
 				'__skipped'			=> __( 'Skipped files', 'image-watermark' ),
@@ -431,7 +431,7 @@ final class Image_Watermark {
 			$script_filename = isset( $_SERVER['SCRIPT_FILENAME'] ) ? $_SERVER['SCRIPT_FILENAME'] : '';
 
 			// try to figure out if frontend AJAX request... if we are DOING_AJAX; let's look closer
-			if ( ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
+			if ( wp_doing_ajax() ) {
 				// from wp-includes/functions.php, wp_get_referer() function.
 				// required to fix: https://core.trac.wordpress.org/ticket/25294
 				$ref = '';
@@ -511,7 +511,7 @@ final class Image_Watermark {
 	 */
 	public function watermark_action_ajax() {
 		// Security & data check
-		if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX || ! isset( $_POST['_iw_nonce'] ) || ! isset( $_POST['iw-action'] ) || ! isset( $_POST['attachment_id'] ) || ! is_numeric( $_POST['attachment_id'] ) || ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) || ! current_user_can( 'upload_files' ) )
+		if ( ! wp_doing_ajax() || ! isset( $_POST['_iw_nonce'] ) || ! isset( $_POST['iw-action'] ) || ! isset( $_POST['attachment_id'] ) || ! is_numeric( $_POST['attachment_id'] ) || ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) || ! current_user_can( 'upload_files' ) )
 			wp_send_json_error( __( 'Cheatin uh?', 'image-watermark' ) );
 
 		// cast post id
@@ -667,12 +667,12 @@ final class Image_Watermark {
 				$skipped = (int) $_REQUEST['skipped'];
 
 				if ( $watermarked === 0 )
-					echo '<div class="error"><p>' . __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+					echo '<div class="error"><p>' . __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				elseif ( $watermarked > 0 )
 					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was successfully applied to 1 image.', 'Watermark was successfully applied to %s images.', $watermarked, 'image-watermark' ), number_format_i18n( $watermarked ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 
 				if ( $watermarkremoved === 0 )
-					echo '<div class="error"><p>' . __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+					echo '<div class="error"><p>' . __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				elseif ( $watermarkremoved > 0 )
 					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was successfully removed from 1 image.', 'Watermark was successfully removed from %s images.', $watermarkremoved, 'image-watermark' ), number_format_i18n( $watermarkremoved ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 
@@ -899,7 +899,7 @@ final class Image_Watermark {
 	public function save_image_metadata( $metadata, $file ) {
 		$mime = wp_check_filetype( $file );
 
-		if ( file_exists( $file ) && ($mime['type'] !== 'image/webp') && ($mime['type'] !== 'image/png') ) {
+		if ( file_exists( $file ) && $mime['type'] !== 'image/webp' && $mime['type'] !== 'image/png' ) {
 			$exifdata = $metadata['exif'];
 			$iptcdata = $metadata['iptc'];
 
@@ -1148,11 +1148,11 @@ final class Image_Watermark {
 
 			case 'image/webp':
 				$image = imagecreatefromwebp( $filepath );
+
 				if ( is_resource( $image ) )
 					imagefilledrectangle( $image, 0, 0, imagesx( $image ), imagesy( $image ), imagecolorallocatealpha( $image, 255, 255, 255, 127 ) );
 				break;
-				break;
-	
+
 			default:
 				$image = false;
 		}
@@ -1364,9 +1364,11 @@ final class Image_Watermark {
 			case 'image/png':
 				$watermark = imagecreatefrompng( $url );
 				break;
+
 			case 'image/webp':
 				$watermark = imagecreatefromwebp( $url );
 				break;
+
 			default:
 				return false;
 		}
@@ -1461,10 +1463,10 @@ final class Image_Watermark {
 			case 'image/png':
 				imagepng( $image, $filepath, (int) round( 9 - ( 9 * $quality / 100 ), 0 ) );
 				break;
+
 			case 'image/webp':
 				imagewebp( $image, $filepath, $quality );
 				break;
-	
 		}
 	}
 

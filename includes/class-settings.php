@@ -316,8 +316,7 @@ class Image_Watermark_Settings {
 				<?php
 				foreach ( $this->image_sizes as $image_size ) {
 					?>
-					<input name="iw_options[watermark_on][<?php echo $image_size; ?>]" type="checkbox" id="<?php echo $image_size; ?>" value="1" <?php echo ( in_array( $image_size, array_keys( Image_Watermark()->options['watermark_on'] ) ) ? ' checked="checked"' : '' ); ?> />
-					<label for="<?php echo $image_size; ?>"><?php echo $image_size; ?></label>
+					<input name="iw_options[watermark_on][<?php echo $image_size; ?>]" type="checkbox" id="image_size_<?php echo $image_size; ?>" value="1" <?php echo ( in_array( $image_size, array_keys( Image_Watermark()->options['watermark_on'] ) ) ? ' checked="checked"' : '' ); ?> /><label for="image_size_<?php echo $image_size; ?>"><?php echo $image_size; ?></label>
 					<?php
 				}
 				?>
@@ -350,8 +349,7 @@ class Image_Watermark_Settings {
 			<?php
 			foreach ( $this->get_post_types() as $cpt ) {
 				?>
-				<input name="iw_options[watermark_cpt_on_type][<?php echo $cpt; ?>]" type="checkbox" id="<?php echo $cpt; ?>" value="1" <?php echo ( in_array( $cpt, $post_types ) ? ' checked="checked"' : '' ); ?> />
-				<label for="<?php echo $cpt; ?>"><?php echo $cpt; ?></label>
+				<input name="iw_options[watermark_cpt_on_type][<?php echo $cpt; ?>]" type="checkbox" id="post_type_<?php echo $cpt; ?>" value="1" <?php echo ( in_array( $cpt, $post_types ) ? ' checked="checked"' : '' ); ?> /><label for="post_type_<?php echo $cpt; ?>"><?php echo $cpt; ?></label>
 				<?php
 			}
 				?>

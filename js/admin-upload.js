@@ -13,7 +13,7 @@
 					button: iwArgsUpload.button,
 					multiple: iwArgsUpload.multiple,
 					library: {
-						type: 'image'
+						type: [ 'image/gif', 'image/jpeg', 'image/png', 'image/webp' ]
 					}
 				} );
 
@@ -24,7 +24,7 @@
 			select: function() {
 				var attachment = this.frame.state().get( 'selection' ).first();
 
-				if ( $.inArray( attachment.attributes.mime, [ 'image/gif', 'image/jpg', 'image/jpeg', 'image/png', 'image/webp' ] ) !== -1 ) {
+				if ( $.inArray( attachment.attributes.mime, [ 'image/gif', 'image/jpeg', 'image/png', 'image/webp' ] ) !== -1 ) {
 					$( '#iw_upload_image' ).val( attachment.attributes.id );
 
 					if ( $( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src' ) !== '' )

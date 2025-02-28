@@ -5,7 +5,7 @@ Tags: image, images, picture, photo, watermark, watermarking, protection, image 
 Requires at least: 4.7
 Requires PHP: 7.4
 Tested up to: 6.7.2
-Stable tag: 1.7.4
+Stable tag: 1.8.0
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -54,8 +54,8 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
-= 1.?.? =
-* Fix: add compatibility for WEBP files
+= 1.8.0 =
+* New: WebP image files support
 
 = 1.7.4 =
 * Fix: Potential security issue with capability check - props WordFence
@@ -209,5 +209,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.7.4 =
-Fix: Potential security issue with capability check - props WordFence
+= 1.8.0 =
+New: WebP image files support

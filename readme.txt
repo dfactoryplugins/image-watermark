@@ -1,11 +1,11 @@
 === Image Watermark ===
 Contributors: dfactory
 Donate link: http://www.dfactory.co/
-Tags: image, images, picture, photo, watermark, watermarking, protection, image protection, image security
+Tags: image, images, watermark, watermarking, protection
 Requires at least: 4.7
 Requires PHP: 7.4
 Tested up to: 6.7.2
-Stable tag: 1.8.0
+Stable tag: 1.8.0.1
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -54,6 +54,7 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
 = 1.8.0 =
 * New: WebP image files support
 

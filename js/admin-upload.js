@@ -32,10 +32,10 @@
 					else
 						$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', attachment.attributes.url );
 
-					$( '#iw_turn_off_image_button' ).removeAttr( 'disabled' );
-					$( 'div#previewImg_imageDiv img#previewImg_image' ).show();
+				$( '#iw_turn_off_image_button' ).prop( 'disabled', false );
+				$( 'div#previewImg_imageDiv img#previewImg_image' ).show();
 
-					var img = new Image();
+				var img = new Image();
 
 					img.src = attachment.attributes.url;
 
@@ -43,7 +43,7 @@
 						$( 'p#previewImageInfo' ).html( iwArgsUpload.originalSize + ': ' + this.width + ' ' + iwArgsUpload.px + ' / ' + this.height + ' ' + iwArgsUpload.px );
 					}
 				} else {
-					$( '#iw_turn_off_image_button' ).attr( 'disabled', 'true' );
+					$( '#iw_turn_off_image_button' ).prop( 'disabled', true );
 					$( '#iw_upload_image' ).val( 0 );
 					$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', '' ).hide();
 					$( 'p#previewImageInfo' ).html( '<strong>' + iwArgsUpload.notAllowedImg + '</strong>' );
@@ -60,7 +60,7 @@
 		watermarkFileUpload.init();
 
 		$( document ).on( 'click', '#iw_turn_off_image_button', function() {
-			$( this ).attr( 'disabled', 'true' );
+			$( this ).prop( 'disabled', true );
 			$( '#iw_upload_image' ).val( 0 );
 			$( 'div#previewImg_imageDiv img#previewImg_image' ).attr( 'src', '' ).hide();
 			$( 'p#previewImageInfo' ).html( iwArgsUpload.noSelectedImg );

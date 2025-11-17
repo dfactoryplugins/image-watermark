@@ -443,24 +443,31 @@
 						selector = '.wp-list-table #post-' + id + ' .image-icon img';
 						break;
 
-					case 'media-modal':
-						selector = '.attachment-details[data-id="' + id + '"] img, .attachment[data-id="' + id + '"] img';
-						break;
+				case 'media-modal':
+					selector = '.attachment-details[data-id="' + id + '"] img, .attachment[data-id="' + id + '"] img, .attachment-info .thumbnail img, .attachment-media-view img';
+					break;
 
-					case 'edit':
-						selector = '.wp_attachment_holder img';
-						break;
-				}
-
+				case 'edit':
+					selector = '.attachment-info .thumbnail img, .attachment-media-view img, .wp_attachment_holder img';
+					break;
+			}
+				
+				console.log('IW Debug - Location:', watermarkImageActions.action_location);
+				console.log('IW Debug - Selector:', selector);
+				console.log('IW Debug - ID:', id);
+				
 				if ( selector ) {
 					image = $( selector );
+					console.log('IW Debug - Found images:', image.length);
 					image.each( function() {
+						console.log('IW Debug - Old src:', $( this ).attr( 'src' ));
 						// Remove the responsive metadata, this prevents reloading the image
 						$( this ).removeAttr( 'srcset' );
 						$( this ).removeAttr( 'sizes' );
 
 						// Reload the image (actually a browser hack by adding a time parameter to the image)
 						$( this ).attr( 'src', watermarkImageActions.replace_url_param( $( this ).attr( 'src' ), 't', time ) );
+						console.log('IW Debug - New src:', $( this ).attr( 'src' ));
 					} );
 				}
 			},

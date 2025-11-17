@@ -4,8 +4,8 @@ Donate link: http://www.dfactory.co/
 Tags: image, images, watermark, watermarking, protection
 Requires at least: 4.7
 Requires PHP: 7.4
-Tested up to: 6.7.2
-Stable tag: 1.8.0.1
+Tested up to: 6.8.3
+Stable tag: 1.9.0
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -54,6 +54,11 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.9.0 =
+* Fix: Watermarked image not refreshing in attachment edit screen after watermark is applied or removed
+* Fix: Updated image reload selectors to support modern WordPress attachment details page structure
+* Tweak: Complete modern rewrite of Right click blocking feature
 
 = 1.8.0 =
 * New: WebP image files support
@@ -210,5 +215,5 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.8.0 =
-New: WebP image files support
+= 1.9.0 =
+Fix watermarked image not refreshing in attachment edit screen after watermark is applied or removed

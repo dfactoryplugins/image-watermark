@@ -27,6 +27,10 @@
 			selected: [],
 			successCount: 0,
 			skippedCount: 0,
+			gridButtonsBound: false,
+			gridFrame: null,
+			gridButtons: null,
+			gridDomInterval: null,
 			init: function() {
 				// Normal (list) mode
 				$( document ).on( 'click', '.bulkactions input#doaction, .bulkactions input#doaction2', function( e ) {
@@ -123,6 +127,252 @@
 					} );
 				} );
 
+				// Media library grid (bulk select toolbar) mode
+				watermarkImageActions.initGridMode();
+
+			},
+			initGridMode: function() {
+				if ( watermarkImageActions.gridButtonsBound || typeof wp === 'undefined' || ! wp.media || typeof iwArgsMedia === 'undefined' ) {
+					return;
+				}
+
+				var bindFrame = function( frame ) {
+					watermarkImageActions.gridButtonsBound = true;
+					watermarkImageActions.gridFrame = frame;
+
+					frame.on( 'ready', watermarkImageActions.renderGridButtons );
+					frame.on( 'select:activate', watermarkImageActions.renderGridButtons );
+					frame.on( 'select:deactivate', watermarkImageActions.hideGridButtons );
+					frame.on( 'selection:toggle selection:action:done library:selection:add', watermarkImageActions.updateGridButtonsState );
+
+					watermarkImageActions.renderGridButtons();
+				};
+
+				var attemptBind = function() {
+					var frame = wp.media && ( wp.media.frame || ( wp.media.frames && ( wp.media.frames.browse || wp.media.frames.manage ) ) );
+
+					if ( frame && typeof frame.on === 'function' ) {
+						bindFrame( frame );
+						return true;
+					}
+
+					return false;
+				};
+
+				if ( ! attemptBind() ) {
+					var interval = setInterval( function() {
+						if ( attemptBind() ) {
+							clearInterval( interval );
+						}
+					}, 300 );
+				}
+
+				// Fallback: watch for the DOM-based bulk select toggle.
+				$( document ).on( 'click', '.select-mode-toggle-button', function() {
+					watermarkImageActions.renderGridButtons();
+
+					if ( watermarkImageActions.gridDomInterval ) {
+						clearInterval( watermarkImageActions.gridDomInterval );
+					}
+
+					// Try a few times after the click in case the toolbar redraws.
+					watermarkImageActions.gridDomInterval = setInterval( function() {
+						watermarkImageActions.renderGridButtons();
+					}, 400 );
+
+					setTimeout( function() {
+						if ( watermarkImageActions.gridDomInterval ) {
+							clearInterval( watermarkImageActions.gridDomInterval );
+							watermarkImageActions.gridDomInterval = null;
+						}
+					}, 3000 );
+				} );
+
+				// Update button state when selecting items in grid.
+				$( document ).on( 'click', '.attachments-browser .attachment, .attachments-browser .attachment .check', function() {
+					// Delay slightly to let core toggle selection classes first.
+					setTimeout( watermarkImageActions.updateGridButtonsState, 50 );
+				} );
+			},
+			ensureGridButtonsDom: function() {
+				var $toolbar = ( function() {
+					var $toolbars = $( '.media-frame.mode-grid .media-toolbar:visible' );
+
+					if ( ! $toolbars.length )
+						return null;
+
+					var $withDelete = $toolbars.filter( function() {
+						return $( this ).find( '.delete-selected-button' ).length;
+					} );
+
+					if ( $withDelete.length )
+						return $withDelete.first();
+
+					return $toolbars.last();
+				} )();
+
+				if ( ! $toolbar )
+					return false;
+
+				// Create buttons if they don't exist
+				if ( ! watermarkImageActions.gridButtons ) {
+					var $apply = $( '<button type="button" class="button media-button button-secondary button-large iw-grid-watermark-apply" />' )
+						.text( iwArgsMedia.applyWatermark )
+						.attr( 'data-action', 'applywatermark' );
+
+					var $remove = $( '<button type="button" class="button media-button button-secondary button-large iw-grid-watermark-remove" />' )
+						.text( iwArgsMedia.removeWatermark )
+						.attr( 'data-action', 'removewatermark' );
+
+					if ( ! iwArgsImageActions.backup_image ) {
+						$remove.prop( 'disabled', true ).addClass( 'hidden' );
+					}
+					$apply.prop( 'disabled', true );
+					$remove.prop( 'disabled', true );
+
+					var buttonClick = function( e ) {
+						e.preventDefault();
+						var action = $( this ).attr( 'data-action' );
+						if ( action ) {
+							watermarkImageActions.startGridAction( action );
+						}
+					};
+
+					$apply.on( 'click', buttonClick );
+					$remove.on( 'click', buttonClick );
+
+					watermarkImageActions.gridButtons = $apply.add( $remove );
+				}
+
+				// Check if buttons are already in this toolbar
+				var parentEl = watermarkImageActions.gridButtons.parent().get(0);
+					if ( parentEl !== $toolbar.get(0) ) {
+						watermarkImageActions.gridButtons.detach();
+
+						var $deleteButton = $toolbar.find( '.delete-selected-button' ).first();
+					var $cancelButton = $toolbar.find( '.cancel-selection' ).first();
+
+						if ( $deleteButton.length ) {
+						$apply = watermarkImageActions.gridButtons.filter( '.iw-grid-watermark-apply' );
+						$remove = watermarkImageActions.gridButtons.filter( '.iw-grid-watermark-remove' );
+
+							if ( $cancelButton.length ) {
+								$cancelButton.before( $remove );
+								$cancelButton.before( $apply );
+							} else {
+								$deleteButton.after( $apply );
+								$apply.after( $remove );
+							}
+						} else {
+							$toolbar.append( watermarkImageActions.gridButtons );
+						}
+					}
+
+				return true;
+			},
+			renderGridButtons: function() {
+				var frame = watermarkImageActions.gridFrame;
+
+				if ( frame && frame.isModeActive && ! frame.isModeActive( 'grid' ) ) {
+					return;
+				}
+
+				if ( ! watermarkImageActions.ensureGridButtonsDom() ) {
+					return;
+				}
+
+				var isSelectMode = frame && frame.isModeActive ? frame.isModeActive( 'select' ) : $( '.media-frame.mode-grid' ).hasClass( 'mode-select' );
+
+				if ( isSelectMode ) {
+					watermarkImageActions.gridButtons.show();
+				} else {
+					watermarkImageActions.gridButtons.hide();
+				}
+				watermarkImageActions.updateGridButtonsState();
+			},
+			hideGridButtons: function() {
+				if ( watermarkImageActions.gridButtons ) {
+					watermarkImageActions.gridButtons.hide();
+				}
+			},
+			updateGridButtonsState: function() {
+				var $buttons = watermarkImageActions.gridButtons;
+
+				if ( ! $buttons || !$buttons.length ) {
+					return;
+				}
+
+				var selection = watermarkImageActions.gridFrame && watermarkImageActions.gridFrame.state ? watermarkImageActions.gridFrame.state().get( 'selection' ) : null,
+					selectedSupportedCount = 0,
+					disabled;
+
+				if ( selection && selection.length ) {
+					selection.each( function( model ) {
+						if ( watermarkImageActions.is_supported_model( model ) ) {
+							selectedSupportedCount++;
+						}
+					} );
+				} else {
+					$( '.attachments-browser .attachments .attachment.selected' ).each( function() {
+						if ( watermarkImageActions.is_supported_dom( $( this ) ) ) {
+							selectedSupportedCount++;
+						}
+					} );
+				}
+
+				disabled = selectedSupportedCount === 0 || watermarkImageActions.running;
+
+				$buttons.prop( 'disabled', disabled );
+
+				if ( ! iwArgsImageActions.backup_image ) {
+					$buttons.filter( '.iw-grid-watermark-remove' ).prop( 'disabled', true ).addClass( 'hidden' );
+				}
+
+				$buttons.removeClass( 'hidden' );
+			},
+			startGridAction: function( action ) {
+				if ( ! iwArgsImageActions.backup_image && action === 'removewatermark' ) {
+					return;
+				}
+
+				var selection = watermarkImageActions.gridFrame && watermarkImageActions.gridFrame.state ? watermarkImageActions.gridFrame.state().get( 'selection' ) : null,
+					ids = [];
+
+				if ( selection && selection.length ) {
+					selection.each( function( model ) {
+						if ( watermarkImageActions.is_supported_model( model ) ) {
+							ids.push( model.get( 'id' ) );
+						}
+					} );
+				} else {
+					// Fallback: get selected IDs from DOM
+					$( '.attachments-browser .attachments .attachment.selected' ).each( function() {
+						var $item = $( this );
+						var id = $item.data( 'id' );
+						if ( id && watermarkImageActions.is_supported_dom( $item ) ) {
+							ids.push( id );
+						}
+					} );
+				}
+
+				if ( ! ids.length )
+					return;
+
+				if ( false === watermarkImageActions.running ) {
+					watermarkImageActions.running = true;
+					watermarkImageActions.action = action;
+					watermarkImageActions.action_location = 'grid';
+					watermarkImageActions.selected = ids.slice( 0 );
+
+					$( '.iw-notice' ).slideUp( 'fast', function() {
+						$( this ).remove();
+					} );
+
+					watermarkImageActions.updateGridButtonsState();
+					watermarkImageActions.post_loop();
+				} else {
+					watermarkImageActions.notice( 'iw-notice error', iwArgsImageActions.__running, false );
+				}
 			},
 			post_loop: function() {
 				// do we have selected attachments?
@@ -215,6 +465,7 @@
 
 							// reload the image
 							watermarkImageActions.reload_image( id );
+							watermarkImageActions.refresh_attachment_cache( id );
 							break;
 
 						case 'watermarkremoved':
@@ -235,6 +486,7 @@
 
 							// reload the image
 							watermarkImageActions.reload_image( id );
+							watermarkImageActions.refresh_attachment_cache( id );
 							break;
 
 						case 'skipped':
@@ -286,6 +538,28 @@
 				switch ( watermarkImageActions.action_location ) {
 					case 'upload-list':
 						container_selector = '.wp-list-table #post-' + id + ' .media-icon';
+						css = {
+							display: 'table',
+							width: $( container_selector ).width() + 'px',
+							height: $( container_selector ).height() + 'px',
+							top: '0',
+							left: '0',
+							position: 'absolute',
+							font: 'normal normal normal dashicons',
+							background: 'rgba(255,255,255,0.75)',
+							content: ''
+						};
+						cssinner = {
+							'vertical-align': 'middle',
+							'text-align': 'center',
+							display: 'table-cell',
+							width: '100%',
+							height: '100%',
+						};
+						break;
+
+					case 'grid':
+						container_selector = '.attachments-browser .attachments [data-id="' + id + '"] .attachment-preview';
 						css = {
 							display: 'table',
 							width: $( container_selector ).width() + 'px',
@@ -431,44 +705,130 @@
 						} );
 					} );
 				}, 100 );
+
+				// Re-enable grid buttons after processing completes.
+				watermarkImageActions.updateGridButtonsState();
 			},
 			reload_image: function( id ) {
 				// reload the images
 				time = new Date().getTime();
-				selector = false;
+				var selectors = [];
 
-				// Get the selector based on the action location
+				// Get selectors based on the action location
 				switch ( watermarkImageActions.action_location ) {
 					case 'upload-list':
-						selector = '.wp-list-table #post-' + id + ' .image-icon img';
+						selectors.push( '.wp-list-table #post-' + id + ' .image-icon img' );
 						break;
 
-				case 'media-modal':
-					selector = '.attachment-details[data-id="' + id + '"] img, .attachment[data-id="' + id + '"] img, .attachment-info .thumbnail img, .attachment-media-view img';
-					break;
+					case 'grid':
+						selectors.push( '.attachments-browser .attachments [data-id="' + id + '"] img' );
+						// Also refresh modal/detail thumbnails in case the modal is opened after.
+						selectors.push( '.attachment-details[data-id="' + id + '"] img, .attachment[data-id="' + id + '"] img, .attachment-info .thumbnail img, .attachment-media-view img' );
+						break;
 
-				case 'edit':
-					selector = '.attachment-info .thumbnail img, .attachment-media-view img, .wp_attachment_holder img';
-					break;
-			}
-				
-				console.log('IW Debug - Location:', watermarkImageActions.action_location);
-				console.log('IW Debug - Selector:', selector);
-				console.log('IW Debug - ID:', id);
-				
-				if ( selector ) {
-					image = $( selector );
-					console.log('IW Debug - Found images:', image.length);
-					image.each( function() {
-						console.log('IW Debug - Old src:', $( this ).attr( 'src' ));
+					case 'media-modal':
+						selectors.push( '.attachment-details[data-id="' + id + '"] img, .attachment[data-id="' + id + '"] img, .attachment-info .thumbnail img, .attachment-media-view img' );
+						break;
+
+					case 'edit':
+						selectors.push( '.attachment-info .thumbnail img, .attachment-media-view img, .wp_attachment_holder img' );
+						break;
+				}
+
+				selectors = selectors.filter( Boolean );
+
+				if ( selectors.length ) {
+					$( selectors.join( ',' ) ).each( function() {
 						// Remove the responsive metadata, this prevents reloading the image
 						$( this ).removeAttr( 'srcset' );
 						$( this ).removeAttr( 'sizes' );
 
 						// Reload the image (actually a browser hack by adding a time parameter to the image)
 						$( this ).attr( 'src', watermarkImageActions.replace_url_param( $( this ).attr( 'src' ), 't', time ) );
-						console.log('IW Debug - New src:', $( this ).attr( 'src' ));
 					} );
+				}
+			},
+			is_supported_model: function( model ) {
+				if ( ! model ) {
+					return false;
+				}
+
+				var type = model.get( 'type' );
+				var mime = model.get( 'mime' ) || model.get( 'mime_type' ) || ( type && model.get( 'subtype' ) ? type + '/' + model.get( 'subtype' ) : '' );
+
+				if ( type !== 'image' && mime.indexOf( 'image/' ) !== 0 ) {
+					return false;
+				}
+
+				if ( Array.isArray( iwArgsImageActions.allowed_mimes ) && iwArgsImageActions.allowed_mimes.length ) {
+					return iwArgsImageActions.allowed_mimes.indexOf( mime ) !== -1;
+				}
+
+				return true;
+			},
+			is_supported_dom: function( $el ) {
+				if ( ! $el || !$el.length ) {
+					return false;
+				}
+
+				var type = $el.data( 'type' );
+				var subtype = $el.data( 'subtype' );
+				var mime = type && subtype ? type + '/' + subtype : '';
+
+				if ( type !== 'image' && mime.indexOf( 'image/' ) !== 0 ) {
+					return false;
+				}
+
+				if ( Array.isArray( iwArgsImageActions.allowed_mimes ) && iwArgsImageActions.allowed_mimes.length ) {
+					return iwArgsImageActions.allowed_mimes.indexOf( mime ) !== -1;
+				}
+
+				return true;
+			},
+			refresh_attachment_cache: function( id ) {
+				if ( typeof wp === 'undefined' || ! wp.media || ! wp.media.attachment ) {
+					return;
+				}
+
+				var attachment = wp.media.attachment( id );
+
+				if ( attachment ) {
+					attachment.fetch( { cache: false } ).then( function() {
+						watermarkImageActions.cache_bust_attachment_sources( attachment );
+					} );
+				}
+			},
+			cache_bust_attachment_sources: function( attachment ) {
+				var time = new Date().getTime();
+				var changed = {};
+
+				if ( attachment.get( 'url' ) ) {
+					changed.url = watermarkImageActions.replace_url_param( attachment.get( 'url' ), 't', time );
+				}
+
+				if ( attachment.get( 'sizes' ) ) {
+					var sizes = attachment.get( 'sizes' );
+					var newSizes = {};
+
+					$.each( sizes, function( key, value ) {
+						if ( value && value.url ) {
+							var cloned = $.extend( {}, value );
+							cloned.url = watermarkImageActions.replace_url_param( value.url, 't', time );
+							newSizes[ key ] = cloned;
+						} else {
+							newSizes[ key ] = value;
+						}
+					} );
+
+					changed.sizes = newSizes;
+				}
+
+				if ( attachment.get( 'icon' ) ) {
+					changed.icon = watermarkImageActions.replace_url_param( attachment.get( 'icon' ), 't', time );
+				}
+
+				if ( Object.keys( changed ).length ) {
+					attachment.set( changed );
 				}
 			},
 			rotate_icon: function( icon ) {

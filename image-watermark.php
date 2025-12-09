@@ -2,7 +2,7 @@
 /*
 Plugin Name: Image Watermark
 Description: Image Watermark allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
-Version: 1.9.0
+Version: 1.9.1
 Author: dFactory
 Author URI: http://www.dfactory.co/
 Plugin URI: http://www.dfactory.co/products/image-watermark/
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) )
  * Image Watermark class.
  *
  * @class Image_Watermark
- * @version	1.9.0
+ * @version	1.9.1
  */
 final class Image_Watermark {
 
@@ -80,7 +80,7 @@ final class Image_Watermark {
 				'backup_quality' => 90
 			]
 		],
-		'version'	 => '1.9.0'
+		'version'	 => '1.9.1'
 	];
 	public $options = [];
 
@@ -354,6 +354,7 @@ final class Image_Watermark {
 			$script_data = [
 				'backup_image'		=> (bool) $this->options['backup']['backup_image'],
 				'_nonce'			=> wp_create_nonce( 'image-watermark' ),
+				'allowed_mimes'		=> $this->get_allowed_mime_types(),
 				'__applied_none'	=> __( 'The watermark could not be applied to the selected files because no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ),
 				'__applied_one'		=> __( 'Watermark was successfully applied to 1 image.', 'image-watermark' ),
 				'__applied_multi'	=> __( 'Watermark was successfully applied to %s images.', 'image-watermark' ),
@@ -505,26 +506,6 @@ final class Image_Watermark {
 				$this->options['watermark_image']['media_library_notice'] = false;
 
 				update_option( 'image_watermark_options', $this->options );
-			}
-
-			// check if manual watermarking is enabled
-			if ( ! empty( $this->options['watermark_image']['manual_watermarking'] ) && ( ! isset( $this->options['watermark_image']['media_library_notice'] ) || $this->options['watermark_image']['media_library_notice'] === true ) ) {
-				$mode = get_user_option( 'media_library_mode', get_current_user_id() ) ? get_user_option( 'media_library_mode', get_current_user_id() ) : 'grid';
-
-				if ( isset( $_GET['mode'] ) && in_array( $_GET['mode'], [ 'grid', 'list' ] ) )
-					$mode = $_GET['mode'];
-
-				// display notice in grid mode only
-				if ( $mode === 'grid' ) {
-					// get current admin url
-					$query_string = [];
-
-					parse_str( $_SERVER['QUERY_STRING'], $query_string );
-
-					$current_url = esc_url( add_query_arg( array_merge( (array) $query_string, [ 'iw_action' => 'hide_library_notice' ] ), '', admin_url( trailingslashit( $pagenow ) ) ) );
-
-					echo '<div class="error notice"><p>' . sprintf( __( '<strong>Image Watermark:</strong> Bulk watermarking is available only in List mode, under the <em>Bulk actions</em> drop-down. <a href="%1$s">Go to List mode</a> or <a href="%2$s">Hide this notice</a>.', 'image-watermark' ), esc_url( admin_url( 'upload.php?mode=list' ) ), esc_url( $current_url ) ) . '</p></div>';
-				}
 			}
 
 			if ( isset( $_REQUEST['watermarked'], $_REQUEST['watermarkremoved'], $_REQUEST['skipped'] ) && $post_type === 'attachment' ) {

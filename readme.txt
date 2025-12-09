@@ -4,8 +4,8 @@ Donate link: http://www.dfactory.co/
 Tags: image, images, watermark, watermarking, protection
 Requires at least: 4.7
 Requires PHP: 7.4
-Tested up to: 6.8.3
-Stable tag: 1.9.0
+Tested up to: 6.9
+Stable tag: 1.9.1
 License: MIT License
 License URI: http://opensource.org/licenses/MIT
 
@@ -54,6 +54,11 @@ No questions yet.
 2. screenshot-2.png
 
 == Changelog ==
+
+= 1.9.1 =
+* New: Bulk Apply/Remove Watermark buttons in Media Library grid view with native styling.
+* Fix: Cache-busting for thumbnails and attachment details so watermark changes show immediately.
+* Fix: Bulk actions now ignore unsupported/non-image files for safer processing.
 
 = 1.9.0 =
 * Fix: Watermarked image not refreshing in attachment edit screen after watermark is applied or removed
@@ -215,5 +220,6 @@ Initial release
 
 == Upgrade Notice ==
 
-= 1.9.0 =
-Fix watermarked image not refreshing in attachment edit screen after watermark is applied or removed
+= 1.9.1 =
+
+Bulk watermarking now works in Media Library grid view, updates thumbnails immediately, and skips unsupported files.

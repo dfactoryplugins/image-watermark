@@ -36,7 +36,7 @@ class Image_Watermark_Actions_Controller {
 	 */
 	public function watermark_action_ajax() {
 		if ( ! wp_doing_ajax() || ! isset( $_POST['_iw_nonce'], $_POST['iw-action'], $_POST['attachment_id'] ) || ! is_numeric( $_POST['attachment_id'] ) || ! wp_verify_nonce( $_POST['_iw_nonce'], 'image-watermark' ) || ! current_user_can( 'upload_files' ) ) {
-			wp_send_json_error( __( 'Cheatin uh?', 'image-watermark' ) );
+			wp_send_json_error( __( 'You are not allowed to perform this action.', 'image-watermark' ) );
 		}
 
 		$post_id = (int) $_POST['attachment_id'];
@@ -70,7 +70,7 @@ class Image_Watermark_Actions_Controller {
 			}
 		}
 
-		wp_send_json_error( __( 'Cheatin uh?', 'image-watermark' ) );
+		wp_send_json_error( __( 'You are not allowed to perform this action.', 'image-watermark' ) );
 	}
 
 	/**

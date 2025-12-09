@@ -15,25 +15,25 @@ Image Watermark allows you to automatically watermark images uploaded to the Wor
 
 [Image Watermark](http://www.dfactory.co/products/image-watermark/) allows you to automatically watermark images uploaded to the WordPress Media Library and bulk watermark previously uploaded images.
 
-For more information, check out plugin page at [dFactory](http://www.dfactory.co/), [documentation page](http://www.dfactory.co/docs/image-watermark/) or plugin [support forum](http://www.dfactory.co/support/forum/image-watermark/).
+For more information, check out the plugin page at [dFactory](http://www.dfactory.co/), the [documentation page](http://www.dfactory.co/docs/image-watermark/), or the plugin [support forum](http://www.dfactory.co/support/forum/image-watermark/).
 
 = Features include: =
 
 * Bulk watermark - Apply watermark option in Media Library actions
 * Watermark images already uploaded to Media Library
-* GD LIbrary and ImageMagic support
+* GD library and ImageMagick support
 * Image backup functionality
 * Option to remove watermark
 * Flexible watermark position
 * Watermark image preview
 * Set watermark offset
-* Select post types where watermark will be aplied to uploaded images or select adding watermark during any image upload
-* Select from 3 methods of aplying watermark size: original, custom or scaled
+* Select post types where the watermark will be applied to uploaded images, or apply the watermark during any image upload
+* Choose from three watermark size modes: original, custom or scaled
 * Set watermark transparency / opacity
 * Select image format (baseline or progressive)
 * Set image quality
-* Protect your images from copying via drag&drop
-* Disable right mouse click on images
+* Protect your images from copying via drag and drop
+* Disable right-click on images
 * Disable image protection for logged-in users
 * .pot file for translations included
 
@@ -90,7 +90,7 @@ No questions yet.
 * Fix: Backup folders handling of date based organized uploads
 
 = 1.6.4 =
-* Fix: Transparent PNG issues with ImageMagic library
+* Fix: Transparent PNG issues with ImageMagick library
 
 = 1.6.3.1 =
 * Fix: The plugin directory upload fix.
@@ -114,7 +114,7 @@ No questions yet.
 = 1.5.6 =
 * New: PHP image processing library option, if more than one available.
 * Fix: Manual / Media library watermarking not working.
-* Fix: Image sizes not being generated proparly in GD library.
+* Fix: Image sizes not being generated properly in GD library.
 
 = 1.5.5 =
 * Fix: Determine AJAX frontend or backend request
@@ -145,7 +145,7 @@ No questions yet.
 * New: Option to donate this plugin :)
 
 = 1.3.3 =
-* New: RUssian translation, thanks to [Sly](http://wpguru.ru)
+* New: Russian translation, thanks to [Sly](http://wpguru.ru)
 
 = 1.3.2 =
 * New: Chinese translation, thanks to [xiaoyaole](http://www.luoxiao123.cn/)
@@ -201,9 +201,9 @@ No questions yet.
 * Tweak: Small css changes
 
 = 1.0.2 =
-* New: Add watermark to custom images sizes registered in theme
+* New: Add watermark to custom image sizes registered in theme
 * Tweak: Admin notices on settings page if no watermark image selected
-* Tweak: JavaScript enquequing on front-end
+* Tweak: JavaScript enqueuing on front-end
 * Tweak: General code cleanup
 * Tweak: Changed label for enabling image protection for logged-in users
 

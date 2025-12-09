@@ -94,7 +94,7 @@ class Image_Watermark_Upload_Handler {
 		$options = apply_filters( 'iw_watermark_options', $this->plugin->options );
 
 		if ( $attachment_id === (int) $options['watermark_image']['url'] ) {
-			return [ 'error' => __( 'Watermark prevented, this is your selected watermark image', 'image-watermark' ) ];
+			return [ 'error' => __( 'Watermark not applied because this is your selected watermark image.', 'image-watermark' ) ];
 		}
 
 		if ( $method !== 'manual' && ( $this->is_admin === true && ! ( ( isset( $options['watermark_cpt_on'][0] ) && $options['watermark_cpt_on'][0] === 'everywhere' ) || ( $post_id > 0 && in_array( get_post_type( $post_id ), array_keys( $options['watermark_cpt_on'] ), true ) === true ) ) ) ) {

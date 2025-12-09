@@ -302,13 +302,13 @@ final class Image_Watermark {
 
 			// prepare script data
 			$script_data = [
-				'title'			=> __( 'Select watermark', 'image-watermark' ),
+				'title'			=> __( 'Select watermark image', 'image-watermark' ),
 				'originalSize'	=> __( 'Original size', 'image-watermark' ),
-				'noSelectedImg'	=> __( 'Watermak has not been selected yet.', 'image-watermark' ),
-				'notAllowedImg'	=> __( 'This image is not supported as watermark. Use JPEG, PNG, WebP or GIF.', 'image-watermark' ),
+				'noSelectedImg'	=> __( 'No watermark image has been selected yet.', 'image-watermark' ),
+				'notAllowedImg'	=> __( 'This image cannot be used as a watermark. Use a JPEG, PNG, WebP, or GIF image.', 'image-watermark' ),
 				'px'			=> __( 'px', 'image-watermark' ),
 				'frame'			=> 'select',
-				'button'		=> [ 'text' => __( 'Add watermark', 'image-watermark' ) ],
+				'button'		=> [ 'text' => __( 'Add watermark image', 'image-watermark' ) ],
 				'multiple'		=> false
 			];
 
@@ -318,7 +318,7 @@ final class Image_Watermark {
 
 			// prepare script data
 			$script_data = [
-				'resetToDefaults' => __( 'Are you sure you want to reset settings to defaults?', 'image-watermark' )
+				'resetToDefaults' => __( 'Are you sure you want to reset all settings to their default values?', 'image-watermark' )
 			];
 
 			wp_add_inline_script( 'image-watermark-admin-settings', 'var iwArgsSettings = ' . wp_json_encode( $script_data ) . ";\n", 'before' );
@@ -354,14 +354,14 @@ final class Image_Watermark {
 			$script_data = [
 				'backup_image'		=> (bool) $this->options['backup']['backup_image'],
 				'_nonce'			=> wp_create_nonce( 'image-watermark' ),
-				'__applied_none'	=> __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ),
+				'__applied_none'	=> __( 'The watermark could not be applied to the selected files because no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ),
 				'__applied_one'		=> __( 'Watermark was successfully applied to 1 image.', 'image-watermark' ),
 				'__applied_multi'	=> __( 'Watermark was successfully applied to %s images.', 'image-watermark' ),
-				'__removed_none'	=> __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ),
+				'__removed_none'	=> __( 'The watermark could not be removed from the selected files because no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ),
 				'__removed_one'		=> __( 'Watermark was successfully removed from 1 image.', 'image-watermark' ),
 				'__removed_multi'	=> __( 'Watermark was successfully removed from %s images.', 'image-watermark' ),
-				'__skipped'			=> __( 'Skipped files', 'image-watermark' ),
-				'__running'			=> __( 'Bulk action is currently running, please wait.', 'image-watermark' ),
+				'__skipped'			=> __( 'Skipped images', 'image-watermark' ),
+				'__running'			=> __( 'A bulk action is currently running. Please wait…', 'image-watermark' ),
 				'__dismiss'			=> __( 'Dismiss this notice.' ) // WordPress default string
 			];
 
@@ -523,7 +523,7 @@ final class Image_Watermark {
 
 					$current_url = esc_url( add_query_arg( array_merge( (array) $query_string, [ 'iw_action' => 'hide_library_notice' ] ), '', admin_url( trailingslashit( $pagenow ) ) ) );
 
-					echo '<div class="error notice"><p>' . sprintf( __( '<strong>Image Watermark:</strong> Bulk watermarking is available in list mode only, under <em>Bulk Actions</em> dropdown. <a href="%1$s">Got to List Mode</a> or <a href="%2$s">Hide this notice</a>', 'image-watermark' ), esc_url( admin_url( 'upload.php?mode=list' ) ), esc_url( $current_url ) ) . '</p></div>';
+					echo '<div class="error notice"><p>' . sprintf( __( '<strong>Image Watermark:</strong> Bulk watermarking is available only in List mode, under the <em>Bulk actions</em> drop-down. <a href="%1$s">Go to List mode</a> or <a href="%2$s">Hide this notice</a>.', 'image-watermark' ), esc_url( admin_url( 'upload.php?mode=list' ) ), esc_url( $current_url ) ) . '</p></div>';
 				}
 			}
 
@@ -540,14 +540,14 @@ final class Image_Watermark {
 				}
 
 				if ( $watermarked === 0 )
-					echo '<div class="error"><p>' . __( 'Watermark could not be applied to selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+					echo '<div class="error"><p>' . __( 'The watermark could not be applied to the selected files because no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Skipped images', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				elseif ( $watermarked > 0 )
-					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was successfully applied to 1 image.', 'Watermark was successfully applied to %s images.', $watermarked, 'image-watermark' ), number_format_i18n( $watermarked ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was successfully applied to 1 image.', 'Watermark was successfully applied to %s images.', $watermarked, 'image-watermark' ), number_format_i18n( $watermarked ) ) . ($skipped > 0 ? ' ' . __( 'Skipped images', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 
 				if ( $watermarkremoved === 0 )
-					echo '<div class="error"><p>' . __( 'Watermark could not be removed from selected files or no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Images skipped', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+					echo '<div class="error"><p>' . __( 'The watermark could not be removed from the selected files because no valid images (JPEG, PNG, WebP) were selected.', 'image-watermark' ) . ($skipped > 0 ? ' ' . __( 'Skipped images', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 				elseif ( $watermarkremoved > 0 )
-					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was successfully removed from 1 image.', 'Watermark was successfully removed from %s images.', $watermarkremoved, 'image-watermark' ), number_format_i18n( $watermarkremoved ) ) . ($skipped > 0 ? ' ' . __( 'Skipped files', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
+					echo '<div class="updated"><p>' . sprintf( _n( 'Watermark was successfully removed from 1 image.', 'Watermark was successfully removed from %s images.', $watermarkremoved, 'image-watermark' ), number_format_i18n( $watermarkremoved ) ) . ($skipped > 0 ? ' ' . __( 'Skipped images', 'image-watermark' ) . ': ' . $skipped . '.' : '') . '</p></div>';
 
 				if ( ! empty( $messages ) ) {
 					echo '<div class="error"><p>' . implode( '<br />', array_map( 'esc_html', $messages ) ) . '</p></div>';
@@ -662,7 +662,7 @@ final class Image_Watermark {
 		if ( current_user_can( 'manage_options' ) && $this->is_backup_folder_writable !== true ) {
 			?>
 			<div class="notice notice-error is-dismissible">
-				<p><?php _e( 'Image Watermark', 'image-watermark' ); ?> - <?php _e( 'Image backup', 'image-watermark' ); ?>: <?php _e( "Your uploads folder is not writable so we can't create a backup of your image uploads. We've disabled this feature for now.", 'image-watermark' ); ?></p>
+				<p><?php _e( 'Image Watermark', 'image-watermark' ); ?> - <?php _e( 'Image backup', 'image-watermark' ); ?>: <?php _e( "Your uploads folder is not writable, so we can't create backups of your images. This feature has been disabled for now.", 'image-watermark' ); ?></p>
 			</div>
 			<?php
 		}

@@ -124,6 +124,7 @@ final class Image_Watermark {
 		add_action( 'admin_notices', [ $this, 'bulk_admin_notices' ] );
 		add_action( 'delete_attachment', [ $this->upload_handler, 'delete_attachment' ] );
 		add_action( 'wp_ajax_iw_watermark_bulk_action', [ $this, 'watermark_action_ajax' ] );
+		add_action( 'attachment_submitbox_misc_actions', [ $this, 'render_attachment_editor_actions' ], 20 );
 
 		// filters
 		add_filter( 'plugin_action_links_' . IMAGE_WATERMARK_BASENAME, [ $this, 'plugin_settings_link' ] );
@@ -314,7 +315,7 @@ final class Image_Watermark {
 
 			wp_add_inline_script( 'image-watermark-upload-manager', 'var iwArgsUpload = ' . wp_json_encode( $script_data ) . ";\n", 'before' );
 
-			wp_enqueue_script( 'image-watermark-admin-settings', IMAGE_WATERMARK_URL . '/js/admin-settings.js', [ 'jquery', 'jquery-ui-core', 'jquery-ui-button', 'jquery-ui-slider' ], $this->defaults['version'] );
+			wp_enqueue_script( 'image-watermark-admin-settings', IMAGE_WATERMARK_URL . '/js/admin-settings.js', [], $this->defaults['version'] );
 
 			// prepare script data
 			$script_data = [
@@ -323,7 +324,6 @@ final class Image_Watermark {
 
 			wp_add_inline_script( 'image-watermark-admin-settings', 'var iwArgsSettings = ' . wp_json_encode( $script_data ) . ";\n", 'before' );
 
-			wp_enqueue_style( 'wp-like-ui-theme', IMAGE_WATERMARK_URL . '/css/wp-like-ui-theme.css', [], $this->defaults['version'] );
 			wp_enqueue_style( 'watermark-style' );
 
 			wp_enqueue_script( 'postbox' );
@@ -331,7 +331,7 @@ final class Image_Watermark {
 
 		if ( $pagenow === 'upload.php' ) {
 			if ( $this->options['watermark_image']['manual_watermarking'] == 1 && current_user_can( 'upload_files' ) ) {
-				wp_enqueue_script( 'image-watermark-admin-media', IMAGE_WATERMARK_URL . '/js/admin-media.js', [ 'jquery' ], $this->defaults['version'], false );
+				wp_enqueue_script( 'image-watermark-admin-media', IMAGE_WATERMARK_URL . '/js/admin-media.js', [], $this->defaults['version'], false );
 
 				// prepare script data
 				$script_data = [
@@ -348,7 +348,7 @@ final class Image_Watermark {
 
 		// image modal could be loaded in various places
 		if ( $this->options['watermark_image']['manual_watermarking'] == 1 ) {
-			wp_enqueue_script( 'image-watermark-admin-image-actions', IMAGE_WATERMARK_URL . '/js/admin-image-actions.js', [ 'jquery' ], $this->defaults['version'], true );
+			wp_enqueue_script( 'image-watermark-admin-image-actions', IMAGE_WATERMARK_URL . '/js/admin-image-actions.js', [], $this->defaults['version'], true );
 
 			// prepare script data
 			$script_data = [
@@ -367,6 +367,37 @@ final class Image_Watermark {
 			];
 
 			wp_add_inline_script( 'image-watermark-admin-image-actions', 'var iwArgsImageActions = ' . wp_json_encode( $script_data ) . ";\n", 'before' );
+		}
+
+		if ( $pagenow === 'post.php' && $this->options['watermark_image']['manual_watermarking'] == 1 && current_user_can( 'upload_files' ) ) {
+			$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+			$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			if ( $screen && $screen->post_type === 'attachment' && $post_id ) {
+				$mime = get_post_mime_type( $post_id );
+
+				if ( in_array( $mime, $this->get_allowed_mime_types(), true ) ) {
+					wp_enqueue_script( 'image-watermark-admin-classic', IMAGE_WATERMARK_URL . '/js/admin-classic-editor.js', [], $this->defaults['version'], true );
+
+					$script_data = [
+						'postId'       => $post_id,
+						'attachmentId' => $post_id,
+						'backupImage'  => (bool) $this->options['backup']['backup_image'],
+						'nonce'        => wp_create_nonce( 'image-watermark' ),
+						'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
+						'strings'      => [
+							'apply'   => __( 'Apply watermark', 'image-watermark' ),
+							'remove'  => __( 'Remove watermark', 'image-watermark' ),
+							'applied' => __( 'Watermark applied.', 'image-watermark' ),
+							'removed' => __( 'Watermark removed.', 'image-watermark' ),
+							'error'   => __( 'Action failed.', 'image-watermark' ),
+							'running' => __( 'Working…', 'image-watermark' ),
+						],
+					];
+
+					wp_add_inline_script( 'image-watermark-admin-classic', 'var iwArgsClassic = ' . wp_json_encode( $script_data ) . ";\n", 'before' );
+				}
+			}
 		}
 	}
 
@@ -475,13 +506,7 @@ final class Image_Watermark {
 							<span class="value" style="width: 63%"><a href="#" class="iw-watermark-action" data-action="applywatermark" data-id="' . $post->ID . '">' . __( 'Apply watermark', 'image-watermark' ) . '</a> | <a href="#" class="iw-watermark-action delete-watermark" data-action="removewatermark" data-id="' . $post->ID . '">' . __( 'Remove watermark', 'image-watermark' ) . '</a></span>
 						</label>
 						<div class="clear"></div>
-					</div>
-					<script>
-						jQuery( function() {
-							if ( typeof watermarkImageActions !== "undefined" )
-								jQuery( "#image_watermark_buttons" ).show();
-						} );
-					</script>'
+					</div>'
 				];
 			}
 		}
@@ -679,6 +704,44 @@ final class Image_Watermark {
 			return array_merge( $links, [ sprintf( '<a href="http://www.dfactory.co/support/forum/image-watermark/" target="_blank">%s</a>', __( 'Support', 'image-watermark' ) ) ] );
 
 		return $links;
+	}
+
+	/**
+	 * Attachment editor sidebar actions.
+	 *
+	 * @return void
+	 */
+	public function render_attachment_editor_actions() {
+		global $post;
+
+		if ( ! $post || ! current_user_can( 'upload_files' ) ) {
+			return;
+		}
+
+		if ( $this->options['watermark_image']['manual_watermarking'] != 1 ) {
+			return;
+		}
+
+		if ( $post->post_type !== 'attachment' ) {
+			return;
+		}
+
+		$mime = get_post_mime_type( $post->ID );
+
+		if ( ! in_array( $mime, $this->get_allowed_mime_types(), true ) ) {
+			return;
+		}
+
+		$remove_allowed = (bool) $this->options['backup']['backup_image'];
+		?>
+		<div class="misc-pub-section iw-classic-actions">
+			<button type="button" class="button-link iw-classic-apply"><?php esc_html_e( 'Apply watermark', 'image-watermark' ); ?></button>
+			<?php if ( $remove_allowed ) : ?>
+				| <button type="button" class="button-link iw-classic-remove"><?php esc_html_e( 'Remove watermark', 'image-watermark' ); ?></button>
+			<?php endif; ?>
+			<div class="iw-classic-status" aria-live="polite"></div>
+		</div>
+		<?php
 	}
 }
 

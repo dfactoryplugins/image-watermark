@@ -33,3 +33,10 @@ For more information, check out the plugin page at [dFactory](http://www.dfactor
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to the Watermark menu in Settings and set your watermarking options.
 4. Enable watermark to apply watermark to uploaded images or go to Media Library to apply watermark to previously uploaded images
+
+## Development (Vite build) ##
+
+* Sources live in `src/js` and `src/scss`; built files output to `js/*.js` and `css/image-watermark.css` with the same names the plugin enqueues. The legacy `wp-like-ui-theme.css` asset and its images were removed.
+* Install deps with `npm install`, then run `npm run build` to regenerate the distributed JS and CSS in-place (no hashes, no manifest). Use `npm run watch` for a rebuild-on-change loop.
+* All admin/front JS was rewritten to vanilla ES6 and builds target ES5 for compatibility; WordPress no longer needs jQuery/jquery-ui as dependencies for these scripts.
+* `npm run dev` and `npm run preview` are available for local iteration if needed. Node 18+ is recommended.

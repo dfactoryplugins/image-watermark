@@ -554,11 +554,9 @@ class Image_Watermark_Settings {
 	public function iw_watermark_size_scaled() {
 		?>
 		<fieldset id="iw_watermark_size_scaled">
-			<div>
-				<input type="text" id="iw_size_input" maxlength="3" class="hide-if-js" name="iw_options[watermark_image][width]" value="<?php echo Image_Watermark()->options['watermark_image']['width']; ?>" />
-				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_size_span" title="<?php echo Image_Watermark()->options['watermark_image']['width']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['watermark_image']['width']; ?>%;"><?php echo Image_Watermark()->options['watermark_image']['width']; ?></span></span><span class="right hide-if-no-js">100</span>
-				</div>
+			<div class="iw-range-field">
+				<input type="range" id="iw_size_input" class="iw-range" name="iw_options[watermark_image][width]" value="<?php echo Image_Watermark()->options['watermark_image']['width']; ?>" min="0" max="100" step="1" />
+				<span class="iw-range-value" data-for="iw_size_input"><?php echo Image_Watermark()->options['watermark_image']['width']; ?></span>
 			</div>
 		</fieldset>
 		<p class="description"><?php _e( 'Enter a number from 0 to 100. 100 makes the watermark image as wide as the image it is applied to.', 'image-watermark' ); ?></p>
@@ -573,11 +571,9 @@ class Image_Watermark_Settings {
 	public function iw_watermark_opacity() {
 		?>
 		<fieldset id="iw_watermark_opacity">
-			<div>
-				<input type="text" id="iw_opacity_input" maxlength="3" class="hide-if-js" name="iw_options[watermark_image][transparent]" value="<?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>" />
-				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_opacity_span" title="<?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>%;"><?php echo Image_Watermark()->options['watermark_image']['transparent']; ?></span></span><span class="right hide-if-no-js">100</span>
-				</div>
+			<div class="iw-range-field">
+				<input type="range" id="iw_opacity_input" class="iw-range" name="iw_options[watermark_image][transparent]" value="<?php echo Image_Watermark()->options['watermark_image']['transparent']; ?>" min="0" max="100" step="1" />
+				<span class="iw-range-value" data-for="iw_opacity_input"><?php echo Image_Watermark()->options['watermark_image']['transparent']; ?></span>
 			</div>
 		</fieldset>
 		<p class="description"><?php _e( 'Enter a number from 0 to 100. 0 makes the watermark completely transparent; 100 shows it fully opaque.', 'image-watermark' ); ?></p>
@@ -592,11 +588,9 @@ class Image_Watermark_Settings {
 	public function iw_image_quality() {
 		?>
 		<fieldset id="iw_image_quality">
-			<div>
-				<input type="text" id="iw_quality_input" maxlength="3" class="hide-if-js" name="iw_options[watermark_image][quality]" value="<?php echo Image_Watermark()->options['watermark_image']['quality']; ?>" />
-				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_quality_span" title="<?php echo Image_Watermark()->options['watermark_image']['quality']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['watermark_image']['quality']; ?>%;"><?php echo Image_Watermark()->options['watermark_image']['quality']; ?></span></span><span class="right hide-if-no-js">100</span>
-				</div>
+			<div class="iw-range-field">
+				<input type="range" id="iw_quality_input" class="iw-range" name="iw_options[watermark_image][quality]" value="<?php echo Image_Watermark()->options['watermark_image']['quality']; ?>" min="0" max="100" step="1" />
+				<span class="iw-range-value" data-for="iw_quality_input"><?php echo Image_Watermark()->options['watermark_image']['quality']; ?></span>
 			</div>
 		</fieldset>
 		<p class="description"><?php _e( 'Set output image quality.', 'image-watermark' ); ?></p>
@@ -680,11 +674,9 @@ class Image_Watermark_Settings {
 	public function iw_backup_image_quality() {
 		?>
 		<fieldset id="iw_backup_image_quality">
-			<div>
-				<input type="text" id="iw_backup_quality_input" maxlength="3" class="hide-if-js" name="iw_options[backup][backup_quality]" value="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>" />
-				<div class="wplike-slider">
-					<span class="left hide-if-no-js">0</span><span class="middle" id="iw_backup_quality_span" title="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>"><span class="iw-current-value" style="left: <?php echo Image_Watermark()->options['backup']['backup_quality']; ?>%;"><?php echo Image_Watermark()->options['backup']['backup_quality']; ?></span></span><span class="right hide-if-no-js">100</span>
-				</div>
+			<div class="iw-range-field">
+				<input type="range" id="iw_backup_quality_input" class="iw-range" name="iw_options[backup][backup_quality]" value="<?php echo Image_Watermark()->options['backup']['backup_quality']; ?>" min="0" max="100" step="1" />
+				<span class="iw-range-value" data-for="iw_backup_quality_input"><?php echo Image_Watermark()->options['backup']['backup_quality']; ?></span>
 			</div>
 		</fieldset>
 		<p class="description"><?php _e( 'Set output image quality.', 'image-watermark' ); ?></p>

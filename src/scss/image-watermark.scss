@@ -1,0 +1,164 @@
+// Base variables
+$iw-muted: #eee;
+$iw-panel-bg: #fff;
+$iw-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+$iw-font-sm: 13px;
+$iw-spacing: 20px;
+
+/* Image Watermark settings */
+.image-watermark-settings {
+  margin-right: 300px;
+
+  form {
+    float: left;
+    min-width: 463px;
+    width: auto;
+  }
+
+  fieldset .description {
+    font-size: $iw-font-sm;
+    margin: 4px 0 8px;
+    display: block;
+  }
+
+  p.help,
+  p.description,
+  span.description {
+    font-size: $iw-font-sm;
+    font-style: italic;
+  }
+
+  select {
+    vertical-align: top;
+  }
+
+  .df-credits {
+    float: right;
+    width: 280px;
+    background: $iw-panel-bg;
+    margin: $iw-spacing -300px $iw-spacing $iw-spacing;
+    position: relative;
+    box-shadow: $iw-shadow;
+
+    .inner {
+      padding: 0 10px;
+    }
+
+    h3 {
+      font-size: 14px;
+      line-height: 1.4;
+      margin: 0;
+      padding: 8px 12px;
+      border-bottom: 1px solid $iw-muted;
+    }
+
+    .df-link {
+      padding: 5px 0 10px;
+      margin: 0;
+
+      a {
+        display: block;
+        text-align: center;
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+
+        img {
+          display: block;
+          margin: 0 auto;
+          width: 80px;
+        }
+      }
+    }
+
+    hr {
+      border: solid $iw-muted;
+      border-width: 1px 0 0;
+      clear: both;
+      height: 0;
+    }
+  }
+
+  .iw-range-field {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  &.ui-button {
+    margin-bottom: 5px;
+  }
+
+  #watermark_position {
+    td {
+      padding: 15px 20px;
+    }
+
+    td input {
+      margin: 0;
+    }
+  }
+}
+
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 960px) {
+  .image-watermark-settings {
+    margin-right: 0;
+
+    .df-credits {
+      width: 100%;
+      float: none;
+      margin: $iw-spacing 0;
+    }
+  }
+}
+
+#cpt-select {
+  margin-top: 5px;
+}
+
+.iw-overlay .spinner {
+  margin: 0;
+  height: 20px;
+  width: 40px;
+  padding: 0;
+}
+
+div.iw-notice {
+  margin: 12px 0;
+}
+
+.iw-classic-actions {
+  display: block;
+  padding-top: 6px;
+
+  .iw-classic-status {
+    margin-top: 6px;
+    font-size: 12px;
+
+    &.success { color: #008a20; }
+    &.error { color: #bc0b0b; }
+    &.info { color: #646970; }
+  }
+}
+
+.iw-attachment-actions {
+  display: inline-block;
+  margin-left: 8px;
+  font-size: 12px;
+  color: #3c434a;
+
+  a {
+    text-decoration: none;
+    margin-right: 4px;
+  }
+
+  .disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+
+.iw-watermark-action {
+  text-decoration: none;
+}

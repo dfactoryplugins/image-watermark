@@ -1,11 +1,1 @@
-( function( $ ) {
-
-	// ready event
-	$( function() {
-		$( '<option>' ).val( 'applywatermark' ).text( iwArgsMedia.applyWatermark ).appendTo( 'select[name="action"], select[name="action2"]' );
-
-		if ( iwArgsMedia.backupImage )
-			$( '<option>' ).val( 'removewatermark' ).text( iwArgsMedia.removeWatermark ).appendTo( 'select[name="action"], select[name="action2"]' );
-	} );
-
-} )( jQuery );
+(function(){var e=window.iwArgsMedia||{},a=function(n,o){var t=document.createElement("option");t.value=n,t.textContent=o,document.querySelectorAll('select[name="action"], select[name="action2"]').forEach(function(r){r.appendChild(t.cloneNode(!0))})};document.addEventListener("DOMContentLoaded",function(){e.applyWatermark&&(a("applywatermark",e.applyWatermark),e.backupImage&&a("removewatermark",e.removeWatermark))})})();
